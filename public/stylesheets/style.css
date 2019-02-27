@@ -1,0 +1,180 @@
+@font-face {
+    font-family: "7SEG";
+    src: url('../font/7Segment.ttf') format('opentype');
+  }
+
+body{
+    background: #282d30;
+    height: 100%;
+}
+
+.no-gutter > [class*='col-'] {
+    padding-right:0;
+    padding-left:0;
+}
+
+.no-gutter-all  { 
+    padding: 0;
+    margin: 0;
+}
+
+.no-gutter-margin{
+    margin: 1px;
+    padding: 1px;
+}
+
+.icon-gutter{
+    padding: 1px;
+    margin: 1px;
+}
+
+.button-icon{
+    -webkit-transition-duration: 0.1s; /* Safari */
+  transition-duration: 0.1s;
+  padding: 3px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.button-icon:hover{
+    background-color: #b3b3b3;
+}
+
+.img-icon{
+   max-height: 40px;
+    max-width: 40px;
+}
+.full-div{
+    height: 100%;
+    width:100%;
+}
+
+[data-toggle="collapse"] .fa:before {  
+    content: "\f13a";
+  }
+  
+  [data-toggle="collapse"].collapsed .fa:before {
+    content: "\f138";
+  }
+
+.toggle-nav a{
+    color: white;
+}
+
+.full-height{
+    height: 100vh;
+}
+
+.scrollable{
+    max-height: 700px;
+    overflow-y:scroll;
+}
+
+.row-pointer{
+    cursor:pointer;
+}
+.row-selected{
+    background: #292b2c;
+    color:#f7f7f7;
+}
+
+.row-selected:hover{
+    
+    color:#292b2c;
+}
+
+#tagModal {
+    background: rgba(0, 0, 0, 0.4);
+    }
+
+
+    
+
+/*
+***********************************************************************************************
+                                Toggle button (Switch) style 
+***********************************************************************************************
+*/
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    float: right;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    display: none;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input.default:checked+.slider {
+    background-color: #444;
+}
+
+input.primary:checked+.slider {
+    background-color: #2196F3;
+}
+
+input.success:checked+.slider {
+    background-color: #8bc34a;
+}
+
+input.info:checked+.slider {
+    background-color: #3de0f5;
+}
+
+input.warning:checked+.slider {
+    background-color: #FFC107;
+}
+
+input.danger:checked+.slider {
+    background-color: #f44336;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+

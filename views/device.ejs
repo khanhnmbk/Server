@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap-formhelpers.min.css">
+    <link rel="stylesheet" href="/stylesheets/device.css">
+    <link rel="stylesheet" href="/stylesheets/style4.css">
+    <!--Slidebar style-->
+    <link rel="stylesheet" href="/stylesheets/all.css">
+    <!--Font Awesome-->
+    <title>Device Manager</title>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <div class="row">
+                    <h3 class="mx-2">Devices</h3>
+                    <button class="btn text-white ml-auto mx-2" id="sidebarButton"><i class="fas fa-arrow-left"
+                            style="font-size:24px"></i></i></button>
+                </div>
+                <!-- <strong>BS</strong> -->
+            </div>
+
+            <ul class="list-unstyled components mx-2">
+                <li>
+                    <a href="#">
+                        Device 1
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Device 2
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Device 3
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        Device 4
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content" style="padding:0;padding-left:2px">
+            <nav class="navbar navbar-expand-sm p-1 navbar-dark mb-0 " style="background:#7386D5;color:white">
+                <div class="btn-toolbar ml-auto" role="toolbar" aria-label="Toolbar with button groups">
+                    <% if (user) { %>
+                    <div class="my-auto" id="user"><strong><%= user %></strong></div>
+                    <% } %>
+                    <div class="btn-group" role="group" aria-label="Clipboard group">
+                        <a class="btn text-white btn-link" href = "/logout"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    </div>
+                </div>
+            </nav>
+
+            <div id="googleMap" class="container-fluid google-map">
+                <iframe src="https://maps.google.com/maps?q=chicago&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0"
+                    style="border:0" allowfullscreen>
+                </iframe>
+
+            </div>
+            <div class="container-fluid device-table">
+                <div class="row device-title">
+                    <h5 style="color:#00b0ff; margin:1px; padding: 5px;" class="my-auto px-20"><strong>Device
+                            details</strong></h5>
+                    <div class="btn-toolbar ml-auto" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group mx-2" role="group" aria-label="Clipboard group">
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#newDeviceModal">New device</button>
+                        </div>
+                        <div class="btn-group mx-2" role="group" aria-label="Clipboard group">
+                            <button type="button" class="btn btn-success" id="btnOpen">Open</button>
+                        </div>
+                        <div class="btn-group mx-2" role="group" aria-label="Clipboard group">
+                            <button type="button" class="btn btn-danger delete-row" >Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row device-title">
+                    <table class="table table-hover" id="deviceTable">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Creation time</th>
+                                <th>Last active</th>
+                                <th>Longitude</th>
+                                <th>Latitude</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                                <th>Children nodes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="checkbox">
+                                </td>
+                                <td>Lab 109B3</td>
+                                <td>20/02/2019 17:30:00</td>
+                                <td>20/03/2019 12:00:00</td>
+                                <td>10</td>
+                                <td>20</td>
+                                <td>5000</td>
+                                <td>
+                                    <span class="rounded-circle bg-primary status"></span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-cog variable-icon" data-toggle="modal"
+                                        data-target="#gatewayChildrenModal">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <input type="checkbox">
+                                </td>
+                                <td>Sitrain</td>
+                                <td>21/02/2019 17:30:00</td>
+                                <td>22/03/2019 12:00:00</td>
+                                <td>10.5</td>
+                                <td>20.5</td>
+                                <td>5000</td>
+                                <td>
+                                    <span class="rounded-circle bg-secondary status"></span>
+                                </td>
+                                <td>
+                                    <i class="fas fa-cog variable-icon" data-toggle="modal"
+                                        data-target="#gatewayChildrenModal">
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!------------------------ MODAL ------------------------->
+    <!--Gateway children-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="gatewayChildrenModal" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gateway children</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">Information</legend>
+                        <div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Gateway name:</strong> </div>
+                                <div class="col-sm gatewayName">Sitrain Việt Nam</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Creation time:</strong></div>
+                                <div class="col-sm creationTime">20/as02/2019 10:30:00</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Last active:</strong></div>
+                                <div class="col-sm lastActive">20/03/asf 10:30:00</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Longitude:</strong></div>
+                                <div class="col-sm longitude">10as</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Latitude:</strong></div>
+                                <div class="col-sm latitude">123123123</div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">Children</legend>
+                        <div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Protocol</th>
+                                        <th>IP address</th>
+                                        <th>Variables</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>PLC S7-1500</td>
+                                        <td>S7-Connection</td>
+                                        <td>192.168.1.150</td>
+                                        <td>
+                                            <i class="fas fa-cog variable-icon" data-toggle="modal"
+                                                data-target="#variableModal">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>PLC S7-1200</td>
+                                        <td>Modbus TCP</td>
+                                        <td>192.168.1.120</td>
+                                        <td>
+                                            <i class="fas fa-cog variable-icon" data-toggle="modal"
+                                                data-target="#variableModal">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--PLC variable details-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="variableModal" data-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Node details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">Information</legend>
+                        <div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Node name:</strong> </div>
+                                <div class="col-sm plcName">PLC S7-1500</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>Protocol:</strong></div>
+                                <div class="col-sm connectionName">S7-Connection</div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col-sm-3"><strong>IP address:</strong></div>
+                                <div class="col-sm plcIPAddress">192.168.1.150</div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">Variables</legend>
+                        <div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Datatype</th>
+                                        <th>Address</th>
+                                        <th>Access</th>
+                                        <th>Unit</th>
+                                        <th>Alarm</th>
+                                        <th>History</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Motor.Speed</td>
+                                        <td>Real</td>
+                                        <td>MD100</td>
+                                        <td>Read/Write</td>
+                                        <td>RPM</td>
+                                        <td>yes</td>
+                                        <td>no</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Motor.RunningTime</td>
+                                        <td>UDInt</td>
+                                        <td>40001</td>
+                                        <td>Read</td>
+                                        <td>s</td>
+                                        <td>yes</td>
+                                        <td>yes</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Create new device-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="newDeviceModal" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create a new device</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row py-1">
+                        <div class="col-sm-4">Device name</div>
+                        <div class="col-sm">
+                            <input type="text" class="form-control inputName" placeholder="required" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Unique ID</div>
+                        <div class="col-sm">
+                            <input type="text" class="form-control inputID" placeholder="required" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Longitude</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputLongitude">
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Latitude</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputLatitude">
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Data interval</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputInterval" min="0" placeholder="miliseconds">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btnNext"
+                        data-target="#newPLCModal">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Add new PLC-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="newPLCModal" data-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add new PLC</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">PLC information</legend>
+                        <div>
+                            <div class="row py-1">
+                                <div class="col-sm-3">Name</div>
+                                <div class="col-sm">
+                                    <input type="text" class="form-control inputName" placeholder="required">
+                                </div>
+                            </div>
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">Protocol</div>
+                                <div class="col-sm">
+                                    <select name="protocol" class="custom-select">
+                                        <option selected value="S7-connection">S7 Connection</option>
+                                        <option value="ModbusTCP">Modbus TCP/IP</option>
+                                        <option value="OPCUA">OPC UA</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">IP address</div>
+                                <div class="col-sm">
+                                    <input type="text" class="form-control inputIPAddress" placeholder="required">
+                                </div>
+                            </div>
+                            <div class="row py-1">
+                                <button class="btn btn-primary btn-block ml-auto mr-3"
+                                    style="max-width:120px" id="btnAddNewPLC">Add</button>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">PLC list</legend>
+                        <div>
+                            <div class="row">
+                                    <button class="btn btn-danger ml-auto mr-3 btn-block mt-0 mb-3 delete-row" style="max-width:120px">Delete</button>
+                            </div>
+                           
+                            <table class="table table-hover" id="plcTable" >
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Name</th>
+                                        <th>Protocol</th>
+                                        <th>IP address</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plcTableBody" style="max-height:300px">
+                                    <!-- <tr>
+                                        <td>
+                                            <input type="checkbox">
+                                        </td>
+                                        <td>PLC S7-1500</td>
+                                        <td>S7-Connection</td>
+                                        <td>192.168.1.150</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><input type="checkbox"></td>
+                                        <td>PLC S7-1200</td>
+                                        <td>Modbus TCP</td>
+                                        <td>192.168.1.120</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnNext" >Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Add new variable-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="addNewVariable" data-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add new variable</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">New variable</legend>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Name</div>
+                                    <div class="col-sm">
+                                        <input type="text" class="form-control inputName" placeholder="required">
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Datatype</div>
+                                    <div class="col-sm">
+                                        <select name="dataType" class="custom-select">
+                                            <option selected value="Bool">Boolean</option>
+                                            <option value="Int">Int</option>
+                                            <option value="Double">Double</option>
+                                            <option value="String">String</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-sm-3">PLC</div>
+                                    <div class="col-sm">
+                                        <select name="plc" class="custom-select">
+                                            <!-- <option selected value="bool">S7-1500</option>
+                                            <option value="int">S7-1200</option> -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Address</div>
+                                    <div class="col-sm">
+                                        <input type="text" class="form-control inputAddress" placeholder="required">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Access</div>
+                                    <div class="col-sm">
+                                        <select name="access" class="custom-select">
+                                            <option selected value="read">Read</option>
+                                            <option value="write">Write</option>
+                                            <option value="read/write">Read/Write</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Unit</div>
+                                    <div class="col-sm">
+                                        <input type="text" class="form-control inputUnit">
+                                    </div>
+                                </div>
+
+                                    <div class="row py-1 px-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input inputAlarm" id="alarmCheck"
+                                                name="example1">
+                                            <label class="custom-control-label" for="alarmCheck">Alarm</label>
+                                        </div>
+                                    </div>
+                                    <div class="row py-1 px-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input inputHistory" id="historyCheck"
+                                                name="example1">
+                                            <label class="custom-control-label" for="historyCheck">History</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row py-1">
+                                        <button class="btn btn-primary btn-block ml-auto mr-3 btnAdd" style="max-width: 120px;">Add</button>
+                                    </div>
+
+                            </div>
+
+
+
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label w-auto px-2">Variable list</legend>
+                        <div>
+                            <div class="row">
+                                <button class="btn btn-danger btn-block ml-auto mr-3 mb-3 delete-row" style="max-width:120px">Delete</button>
+                            </div>
+                            <table class="table table-hover" id="tableVariableList">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Name</th>
+                                        <th>Datatype</th>
+                                        <th>PLC</th>
+                                        <th>Address</th>
+                                        <th>Access</th>
+                                        <th>Unit</th>
+                                        <th>Alarm</th>
+                                        <th>History</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="varableTableBody">
+                                    <!-- <tr>
+                                        <td><input type="checkbox"></td>
+                                        <td>Motor.Speed</td>
+                                        <td>Real</td>
+                                        <th>PLC1</th>
+                                        <td>MD100</td>
+                                        <td>Read/Write</td>
+                                        <td>RPM</td>
+                                        <td>yes</td>
+                                        <td>no</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><input type="checkbox"></td>
+                                        <td>Motor.RunningTime</td>
+                                        <td>UDInt</td>
+                                        <th>PLC2</th>
+                                        <td>40001</td>
+                                        <td>Read</td>
+                                        <td>s</td>
+                                        <td>yes</td>
+                                        <td>yes</td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnSave" data-dismiss="modal">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!------------------------ SCRIPT ------------------------->
+    <!-- JQuery scripts -->
+    <script src="/javascripts/jquery-3.3.1.min.js"></script>
+    <!-- BootStrap scripts -->
+    <script src="/javascripts/popper.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/socket.io.js"></script>
+
+    <!-- My script -->
+    <script src="/javascripts/deviceScript.js"></script>
+</body>
+
+</html>

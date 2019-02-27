@@ -1,0 +1,71 @@
+{
+    "deviceName": "Device1",
+    "deviceID": "123456",
+    "longitude": "",
+    "latitude": "",
+    "period": 5000,
+    "PLCs": [
+        {
+            "name": "PLC1",
+            "protocol": "S7-connection",
+            "ipAddress": "1",
+            "variables": [
+                {
+                    "name": "1",
+                    "dataType": "Bool",
+                    "plc": "PLC1",
+                    "address": "1",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                },
+                {
+                    "name": "2",
+                    "dataType": "Bool",
+                    "plc": "PLC1",
+                    "address": "2",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        },
+        {
+            "name": "PLC2",
+            "protocol": "S7-connection",
+            "ipAddress": "2",
+            "variables": [
+                {
+                    "name": "3",
+                    "dataType": "Bool",
+                    "plc": "PLC2",
+                    "address": "3",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        },
+        {
+            "name": "PLC3",
+            "protocol": "S7-connection",
+            "ipAddress": "3",
+            "variables": [
+                {
+                    "name": "4",
+                    "dataType": "Bool",
+                    "plc": "PLC3",
+                    "address": "4",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com"
+}

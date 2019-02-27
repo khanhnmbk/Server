@@ -1,0 +1,43 @@
+{
+    "deviceName": "Device2",
+    "deviceID": "222",
+    "longitude": "",
+    "latitude": "",
+    "period": 5000,
+    "PLCs": [
+        {
+            "name": "PLC1",
+            "protocol": "S7-connection",
+            "ipAddress": "1",
+            "variables": [
+                {
+                    "name": "Bien1",
+                    "dataType": "Bool",
+                    "plc": "PLC1",
+                    "address": "1",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                },
+                {
+                    "name": "Bien2",
+                    "dataType": "Bool",
+                    "plc": "PLC1",
+                    "address": "2",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        },
+        {
+            "name": "PLC2",
+            "protocol": "S7-connection",
+            "ipAddress": "2",
+            "variables": []
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com"
+}
