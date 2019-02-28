@@ -4,7 +4,14 @@ let deviceObject = {};
 $(document).ready(function () {
     var _user = $('#user').text();
     var socket = io();
+
     socket.on('connect', function(){
+        socket.emit('reqDeviceConfig',_user); //Get device config array
+        socket.on('resDeviceConfig', function (data) { 
+            console.log(data);
+            console.log('New');
+            loadDeviceTable(data);
+        });
         $('#sidebarButton').on('click', function () {
             $('#sidebar').toggleClass('active');
             var icon = $(this).children('i')[0];
@@ -59,6 +66,8 @@ $(document).ready(function () {
                     else deviceObject.period = 5000;
                     deviceObject.PLCs = [];
                     deviceObject.user = _user;
+                    deviceObject.creationTime = new Date().toLocaleString();
+                    deviceObject.lastActive = '';
                     
                     modalItem.modal('hide');
                     //Add new row to device table
@@ -66,8 +75,8 @@ $(document).ready(function () {
                     <tr>
                         <td><input type = "checkbox"></td>
                         <td>` + deviceObject.deviceName + `</td>
-                        <td>` + new Date().toLocaleString() + `</td>
-                        <td></td>
+                        <td>` + deviceObject.creationTime + `</td>
+                        <td>` + deviceObject.lastActive + `</td>
                         <td>` + deviceObject.longitude + `</td>
                         <td>` + deviceObject.latitude + `</td>
                         <td>` + deviceObject.period + `</td>
@@ -102,6 +111,7 @@ $(document).ready(function () {
                         variables : [],
                     }
                     deviceObject.PLCs.push(newPLC);
+                    deviceObject.status = false;
     
                     var htmlMarkup = `
                     <tr>
@@ -194,6 +204,7 @@ $(document).ready(function () {
             modalItem.find('.btnSave').on('click', function (clickEvent) { 
                 socket.emit('deviceConfig', JSON.stringify(deviceObject,null,4));
                 location.reload();
+                socket.emit('reqDeviceConfig',_user); //Get device config array
             });
         });
     
@@ -206,14 +217,79 @@ $(document).ready(function () {
             });
         });
 
-            
-        
     });
-    
-    
-    
-
-    
-
-
 });
+
+function loadDeviceTable(arrDeviceObject){
+    if (arrDeviceObject.length > 0) {
+        arrDeviceObject.forEach(function (device) { 
+            var htmlMarkup = `
+                <tr>
+                    <td><input type = "checkbox"></td>
+                    <td>` + device.deviceName + `</td>
+                    <td>` + device.creationTime + `</td>
+                    <td>` + device.lastActive + `</td>
+                    <td>` + device.longitude + `</td>
+                    <td>` + device.latitude + `</td>
+                    <td>` + device.period + `</td>`
+            if (!device.status) 
+                htmlMarkup += '<td><span class="rounded-circle bg-secondary status"></span></td>'
+            else htmlMarkup += '<td><span class="rounded-circle bg-primary status"></span></td>'
+                 htmlMarkup += `
+                    <td>
+                        <i class="fas fa-cog variable-icon" data-toggle="modal" data-target="#gatewayChildrenModal">
+                    </td>
+                </tr>`   
+            $('#deviceTable > tbody').append(htmlMarkup);
+                
+        });
+    }
+}
+
+function loadPLCModal($modal,deviceObj){
+    $modal.find('.gatewayName')[0].innerHTML = deviceObj.deviceName;
+    $modal.find('.creationTime')[0].innerHTML = deviceObj.creationTime;
+    $modal.find('.lastActive')[0].innerHTML = deviceObj.lastActive;
+    $modal.find('.longitude')[0].innerHTML = deviceObj.longitude;
+    $modal.find('.latitude')[0].innerHTML = deviceObj.latitude;
+
+    var plcList = deviceObj.PLCs;
+    $modal.find('.table > tbody')[0].empty();
+    plcList.forEach(function (plc) { 
+        var htmlMarkup = `
+        <tr>
+            <td>` + (plcList.indexOf(plc) +1) +`</td>
+            <td>` + plc.name + `</td>
+            <td>` + plc.protocol + `</td>
+            <td>` + plc.ipAddress + `</td>
+            <td>
+                <i class="fas fa-cog variable-icon" data-toggle="modal" data-target="#variableModal">
+            </td>
+        </tr>`
+        $modal.find('.table > tbody')[0].append(htmlMarkup);
+    });
+}
+
+function loadVariables($modal,plcObject){
+    $modal.find('.plcName')[0].innerHTML = plcObject.name;
+    $modal.find('.connectionName')[0].innerHTML = plcObject.protocol;
+    $modal.find('.plcIPAddress')[0].innerHTML = plcObject.ipAddress;
+
+    var variableList = plcObject.variables;
+    $modal.find('.table > tbody')[0].empty();
+    variableList.forEach(function (variable) { 
+        var htmlMarkup = `
+        <tr>
+            <td>` + (variableList.indexOf(variable) +1) +`</td>
+            <td>` + variable.name + `</td>
+            <td>` + variable.dataType + `</td>
+            <td>` + variable.address + `</td>
+            <td>` + variable.access + `</td>
+            <td>` + variable.unit + `</td>
+            <td>` + variable.isAlarm + `</td>
+            <td>` + variable.isHistory + `</td>
+        </tr>`
+        $modal.find('.table > tbody')[0].append(htmlMarkup);
+    });
+}
+

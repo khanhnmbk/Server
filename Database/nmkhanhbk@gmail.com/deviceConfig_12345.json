@@ -1,0 +1,30 @@
+{
+    "deviceName": "Device 5",
+    "deviceID": "12345",
+    "longitude": "10",
+    "latitude": "10",
+    "period": "5000",
+    "PLCs": [
+        {
+            "name": "OPC-X",
+            "protocol": "OPCUA",
+            "ipAddress": "192.168.100.2",
+            "variables": [
+                {
+                    "name": "Bien1",
+                    "dataType": "Int",
+                    "plc": "OPC-X",
+                    "address": "2",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com",
+    "creationTime": "3/1/2019, 2:45:58 AM",
+    "lastActive": "",
+    "status": false
+}

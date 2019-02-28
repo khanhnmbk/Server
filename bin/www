@@ -10,7 +10,8 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 
-var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database'
+var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
+let  arrConfig = [];
 /**
  * Get port from environment and store in Express.
  */
@@ -43,6 +44,15 @@ io.on('connection',function (socket) {
       }
     }
   });
+
+  socket.on('reqDeviceConfig', function (user) { 
+    readConfigFiles(user);
+    socket.emit('resDeviceConfig',arrConfig);
+    arrConfig = [];
+    
+    
+  });
+
 });
 server.listen(port);
 server.on('error', onError);
@@ -107,3 +117,31 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+//Function
+
+var readConfigFiles = async(user) => {
+  var userFolder = path.resolve(databasePath,user);
+  
+  await readFiles();
+  
+
+  function readFiles() {
+    fs.readdir(userFolder , function (err, files) { 
+      if (err) throw err;
+      if (files.length > 0){
+        files.forEach(function (file) { 
+          if (path.extname(file) == '.json'){
+            fs.readFile(path.resolve(userFolder,file), function (err,data) { 
+              if (err) throw err;
+              arrConfig.push(JSON.parse(data));
+              //console.log(arrConfig);
+            });
+          }
+        });
+      }
+    });
+   };
+  
+ 
+ }
