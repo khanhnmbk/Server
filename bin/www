@@ -36,8 +36,10 @@ io.on('connection',function (socket) {
     if (data) {
       var receivedObject = JSON.parse(data);
       if (receivedObject) {
+        receivedObject.fileName = 'deviceConfig_' + receivedObject.deviceID + '.json';
+        receivedObjectJSON = JSON.stringify(receivedObject, null, 4);
         var filePath = path.resolve(databasePath,receivedObject.user,'deviceConfig_' + receivedObject.deviceID + '.json') ;
-        fs.writeFile(filePath , data , function (err) { 
+        fs.writeFile(filePath , receivedObjectJSON , function (err) { 
           if (err) throw err;
           console.log('Succeed');
         });
@@ -49,8 +51,13 @@ io.on('connection',function (socket) {
     readConfigFiles(user);
     socket.emit('resDeviceConfig',arrConfig);
     arrConfig = [];
-    
-    
+  });
+
+  socket.on('deleteDevice', function (filePath) {
+    fs.unlink(path.resolve(databasePath,filePath), function(err){
+      if (err) throw err;
+      socket.emit('deleteSuccess','1');
+    }) 
   });
 
 });

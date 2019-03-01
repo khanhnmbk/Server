@@ -90,5 +90,6 @@
     "user": "nmkhanhbk@gmail.com",
     "creationTime": "3/1/2019, 2:28:57 AM",
     "lastActive": "",
-    "status": false
+    "status": false,
+	"fileName": "deviceConfig_123456.json"
 }
