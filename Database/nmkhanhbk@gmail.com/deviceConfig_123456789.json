@@ -1,8 +1,8 @@
 {
     "deviceName": "Device -2",
     "deviceID": "123456789",
-    "longitude": "20",
-    "latitude": "20.5",
+    "longitude": "105.972298",
+    "latitude": "10.254260",
     "period": "3000",
     "PLCs": [
         {
@@ -64,5 +64,6 @@
     "creationTime": "3/1/2019, 2:31:30 AM",
     "lastActive": "",
     "status": true,
+	"published": true,
 	"fileName": "deviceConfig_123456789.json"
 }

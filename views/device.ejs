@@ -14,6 +14,9 @@
     <!--Slidebar style-->
     <link rel="stylesheet" href="/stylesheets/all.css">
     <!--Font Awesome-->
+
+    
+    
     <title>Device Manager</title>
 </head>
 
@@ -69,12 +72,7 @@
                 </div>
             </nav>
 
-            <div id="googleMap" class="container-fluid google-map">
-                <iframe src="https://maps.google.com/maps?q=chicago&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0"
-                    style="border:0" allowfullscreen>
-                </iframe>
-
-            </div>
+            <div id="googleMap" class="container-fluid google-map"></div>
             <div class="container-fluid device-table">
                 <div class="row device-title">
                     <h5 style="color:#00b0ff; margin:1px; padding: 5px;" class="my-auto px-20"><strong>Device
@@ -105,6 +103,7 @@
                                 <th>Period</th>
                                 <th>Status</th>
                                 <th>Children nodes</th>
+                                <th>Publish state</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -573,11 +572,13 @@
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
+    
     <!-- BootStrap scripts -->
     <script src="/javascripts/popper.min.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
     <script src="/javascripts/socket.io.js"></script>
-
+    <script src='http://www.bing.com/api/maps/mapcontrol' ></script>
+    
     <!-- My script -->
     <script src="/javascripts/deviceScript.js"></script>
 </body>

@@ -49,7 +49,8 @@ io.on('connection',function (socket) {
 
   socket.on('reqDeviceConfig', function (user) { 
     readConfigFiles(user);
-    socket.emit('resDeviceConfig',arrConfig);
+    if (arrConfig!=[])
+      socket.emit('resDeviceConfig',arrConfig);
     arrConfig = [];
   });
 

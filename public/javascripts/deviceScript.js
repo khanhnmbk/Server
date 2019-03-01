@@ -1,19 +1,24 @@
+'use strict'
 //Global variable
 let deviceObject = {};
 let rcvDeviceObject = [];
 let deviceIndex;
+
 
 $(document).ready(function () {
     var _user = $('#user').text();
     var socket = io();
 
     socket.on('connect', function(){
-        socket.emit('reqDeviceConfig',_user); //Get device config array
+       
         socket.on('resDeviceConfig', function (data) { 
-            console.log('New config');
+            //console.log('New config');
+            //console.log(data);
             rcvDeviceObject = data;
             loadDeviceTable(rcvDeviceObject);
+            //loadMap(rcvDeviceObject);
         });
+        socket.emit('reqDeviceConfig',_user); //Get device config array
         $('#sidebarButton').on('click', function () {
             $('#sidebar').toggleClass('active');
             var icon = $(this).children('i')[0];
@@ -60,6 +65,7 @@ $(document).ready(function () {
                     deviceObject.user = _user;
                     deviceObject.creationTime = new Date().toLocaleString();
                     deviceObject.lastActive = '';
+                    deviceObject.published = false;
                     
                     modalItem.modal('hide');
                     //Add new row to device table
@@ -225,6 +231,10 @@ $(document).ready(function () {
         });
 
     });
+
+    $('#btnOpen').on('click',function () {
+        loadMap(rcvDeviceObject);
+      })
 });
 
 function loadDeviceTable(arrDeviceObject){
@@ -241,13 +251,17 @@ function loadDeviceTable(arrDeviceObject){
                     <td>` + device.latitude + `</td>
                     <td>` + device.period + `</td>`
             if (!device.status) 
-                htmlMarkup += '<td><span class="rounded-circle bg-secondary status"></span></td>'
-            else htmlMarkup += '<td><span class="rounded-circle bg-primary status"></span></td>'
-                 htmlMarkup += `
+                htmlMarkup += '<td><span class="rounded-circle bg-secondary status"></span></td>';
+            else htmlMarkup += '<td><span class="rounded-circle bg-primary status"></span></td>';
+            
+            htmlMarkup += `
                     <td>
                         <i class="fas fa-cog variable-icon" data-index=` + arrDeviceObject.indexOf(device) + ` data-toggle="modal" data-target="#gatewayChildrenModal">
-                    </td>
-                </tr>`   
+                    </td>` ;
+            
+            if (!device.published) 
+                htmlMarkup += `<td><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "#">Design page</a></td> </tr>`;
+            else htmlMarkup += `<td><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "#">Published page</a></td> </tr>`;
             $('#deviceTable > tbody').append(htmlMarkup);
                 
         });
@@ -301,3 +315,25 @@ function loadVariables($modal,plcObject){
     });
 }
 
+function loadMap(arrDeviceObject) {
+    var map = new Microsoft.Maps.Map(document.getElementById('googleMap'), {
+        credentials: 'Asj0-f-7zchkrJPjgOi33l47en99sYjmCLyrF09f2CE2l88GoDFpgBPUUI6qcpAX',
+        center: new Microsoft.Maps.Location(10.773362, 106.659393),
+        zoom: 10,
+      });
+
+    arrDeviceObject.forEach(function(device) {
+        var center = new Microsoft.Maps.Location(device.latitude , device.longitude);
+        var pin = new Microsoft.Maps.Pushpin(center, {
+            title: device.deviceName,
+            icon : '/images/png/pushpin.png',
+            anchor: new Microsoft.Maps.Point(12, 39),
+          });
+        map.entities.push(pin);
+    });
+}
+
+//Wait 1s to confirm BingMap resource loaded
+setTimeout(function(){
+    loadMap(rcvDeviceObject);
+}, 1000);
