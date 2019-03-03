@@ -4,8 +4,42 @@
 ***********************************************************************************************
 */
 $(document).ready(function () {
-  $('[data-toggle="tooltip"]').tooltip();
+  var socket = io();
+  socket.on('connect', function () {
+    socket.on('getMqttTopic', function (data) {
+      mqttDeviceTopic = data;
+    });
+    $('#btnRun').on('click', function (clickEvent) {
+      $(this).prop('disabled', true);
+      $('#btnStop').prop('disabled', false);
+      draggableObjects.forEach(function (item) {
+        item.disabled = true;
+      });
+      $('.draggable').draggable('disable');
+      socket.on(mqttDeviceTopic, function (data) {
+        console.log(data);
+      });
+    });
 
+    $('#btnStop').on('click', function (clickEvent) {
+      $(this).prop('disabled', true);
+      $('#btnRun').prop('disabled', false);
+      draggableObjects.forEach(function (item) {
+        item.disabled = false;
+      });
+      $('.draggable').draggable('enable');
+      socket.off();
+    });
+  });
+
+
+  $('#btnOpen').on('click', function () {
+    console.log(shapes);
+    console.log(shapes[shapes.length - 1].node.id);
+  });
+
+
+  $('[data-toggle="tooltip"]').tooltip();
   $('body').keyup(function (e) {
     if (e.keyCode == 27) {
       stopDraw(true);
@@ -18,24 +52,7 @@ $(document).ready(function () {
     $(this).toggleClass('row-selected');
   });
 
-  $('#btnRun').on('click', function (clickEvent) {
-    $(this).prop('disabled', true);
-    $('#btnStop').prop('disabled', false);
-    draggableObjects.forEach(function (item) {
-      item.disabled = true;
-    });
-    $('.draggable').draggable('disable');
-  });
 
-  $('#btnStop').on('click', function (clickEvent) {
-    $(this).prop('disabled', true);
-    $('#btnRun').prop('disabled', false);
-    draggableObjects.forEach(function (item) {
-      item.disabled = false;
-    });
-    $('.draggable').draggable('enable');
-    console.log(draggableObjects);
-  });
 
 });
 
@@ -51,6 +68,7 @@ const draggableObjects = [];
 let index = 0;
 let shape;
 let selectedItemId;
+let mqttDeviceTopic;
 
 //Default option for basic objects except LINE
 const defaultOption = {
@@ -590,7 +608,7 @@ var startDraw = function (shape) {
     draggable.containment = document.getElementById('mainPage1');
     draggableObjects.push(draggable);
 
-    console.log(draggableObjects);
+    //console.log(draggableObjects);
 
 
     //Add contextMenu class
@@ -915,7 +933,7 @@ function imageMouseDownEventHandler(event) {
   var top = event.pageY - topOffset + 'px';
 
   //Declare new image
-  var defaultImageSrc = '../public/img/png/default-image.png';
+  var defaultImageSrc = '../../images/png/default-image.png';
   shapes[index] = document.createElement('img');
   shapes[index].id = 'img' + index;
   shapes[index].className += ' contextMenu '
@@ -2114,7 +2132,7 @@ function symbolsetMouseDownEventHandler(event) {
   var top = event.pageY - topOffset + 'px';
 
   //Declare new image
-  var defaultSymbolSet = '../public/img/symbol-set/light-off.png';
+  var defaultSymbolSet = '../../images/symbol-set/light-off.png';
   var symbolSet = document.createElement('img');
   symbolSet.id = 'symbolSet' + index;
   symbolSet.className += ' contextMenu ';
@@ -2180,7 +2198,7 @@ function symbolsetMouseDownEventHandler(event) {
         mouseEvent.target.onCondition = itemModal.querySelector('.inputOnCondition').value;
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
 
-      
+
       });
 
       //Browse Tag button

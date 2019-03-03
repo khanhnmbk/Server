@@ -10,15 +10,14 @@ $(document).ready(function () {
     var socket = io();
 
     socket.on('connect', function(){
-       
-        socket.on('resDeviceConfig', function (data) { 
-            //console.log('New config');
-            //console.log(data);
+        socket.on('/' + _user + '/resDeviceConfig', function (data) { 
+            console.log(data);
             rcvDeviceObject = data;
             loadDeviceTable(rcvDeviceObject);
-            //loadMap(rcvDeviceObject);
         });
+
         socket.emit('reqDeviceConfig',_user); //Get device config array
+
         $('#sidebarButton').on('click', function () {
             $('#sidebar').toggleClass('active');
             var icon = $(this).children('i')[0];
@@ -31,14 +30,14 @@ $(document).ready(function () {
             $(".modal-body input").val("");
           });
     
-        
+        //Gateway children (PLCs) modal
         $('#gatewayChildrenModal').on('show.bs.modal',function (event) {
             var modal = $(this);
             deviceIndex = $(event.relatedTarget).attr('data-index');
             loadPLCModal(modal,rcvDeviceObject[deviceIndex]);
-    
         });
     
+        //Variable modal
         $('#variableModal').on('show.bs.modal',function (event) {
             var modal = $(this);
             var plcIndex = $(event.relatedTarget).attr('data-index');
@@ -213,11 +212,12 @@ $(document).ready(function () {
                   if ($(this).closest('table')[0].id == 'deviceTable') {
                     var delRow = $(this).parents("tr");
                     var delDevice = $(this).parents("tr").find('td')[1].innerHTML;
-                    for (device of rcvDeviceObject) {
+                    for (var device of rcvDeviceObject) {
                         if (device.deviceName == delDevice) {
                             socket.on('deleteSuccess', function (data) { 
                                 delRow.remove();
                                 rcvDeviceObject.splice(rcvDeviceObject.indexOf(device),1);
+                                console.log(rcvDeviceObject);
                             });
                             socket.emit('deleteDevice',device.user + '/' + device.fileName);
                             break;
@@ -232,9 +232,7 @@ $(document).ready(function () {
 
     });
 
-    $('#btnOpen').on('click',function () {
-        loadMap(rcvDeviceObject);
-      })
+   
 });
 
 function loadDeviceTable(arrDeviceObject){
@@ -260,7 +258,7 @@ function loadDeviceTable(arrDeviceObject){
                     </td>` ;
             
             if (!device.published) 
-                htmlMarkup += `<td><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "#">Design page</a></td> </tr>`;
+                htmlMarkup += `<td><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Design page</a></td> </tr>`;
             else htmlMarkup += `<td><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "#">Published page</a></td> </tr>`;
             $('#deviceTable > tbody').append(htmlMarkup);
                 

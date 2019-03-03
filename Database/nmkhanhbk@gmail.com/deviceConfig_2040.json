@@ -1,0 +1,32 @@
+{
+    "deviceName": "MindConnect IoT2040",
+    "deviceID": "2040",
+    "longitude": "106.521289",
+    "latitude": "10.389262",
+    "period": 5000,
+    "PLCs": [
+        {
+            "name": "Omron",
+            "protocol": "ModbusTCP",
+            "ipAddress": "192.168.7.12",
+            "variables": [
+                {
+                    "name": "Speed-Omron",
+                    "dataType": "Double",
+                    "plc": "Omron",
+                    "address": "40002",
+                    "access": "read",
+                    "unit": "RPM",
+                    "isAlarm": false,
+                    "isHistory": false
+                }
+            ]
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com",
+    "creationTime": "3/3/2019, 1:02:26 AM",
+    "lastActive": "",
+    "published": false,
+    "status": false,
+    "fileName": "deviceConfig_2040.json"
+}

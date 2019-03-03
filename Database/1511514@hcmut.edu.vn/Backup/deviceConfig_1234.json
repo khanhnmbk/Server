@@ -1,0 +1,41 @@
+{
+    "deviceName": "Device 4",
+    "deviceID": "1234",
+    "longitude": "100",
+    "latitude": "200",
+    "period": "1000",
+    "PLCs": [
+        {
+            "name": "S7-1200",
+            "protocol": "S7-connection",
+            "ipAddress": "192.168.1.120",
+            "variables": [
+                {
+                    "name": "Var1",
+                    "dataType": "Bool",
+                    "plc": "S7-1200",
+                    "address": "1",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": true,
+                    "isHistory": false
+                },
+                {
+                    "name": "Var2",
+                    "dataType": "Int",
+                    "plc": "S7-1200",
+                    "address": "2",
+                    "access": "read",
+                    "unit": "X",
+                    "isAlarm": false,
+                    "isHistory": true
+                }
+            ]
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com",
+    "creationTime": "3/1/2019, 2:43:58 AM",
+    "lastActive": "",
+    "status": true,
+	"fileName": "deviceConfig_1234.json"
+}
