@@ -9,6 +9,7 @@ var debug = require('debug')('server:server');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var recursive = require("recursive-readdir");
 
 
 var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
@@ -29,19 +30,61 @@ global.io = require('socket.io')(server);
 
  /* MQTT */
  var mqtt = require('mqtt');
- var mqttClient = mqtt.connect('mqtt://test.mosquitto.org');
+ var mqttClient = mqtt.connect('mqtt://localhost:1883');
 
- reInitMqttSubscription(mqttClient);
+
 
  mqttClient.on('connect', function () {
    console.log('Connected to MQTT broker');
+
+   mqttClient.subscribe('/+/status' , function (err) { 
+    if (err) throw err;
+    console.log('Subscribed topic : ' + '/*/status');
+  });
+
+  mqttClient.subscribe('/+/tags' , function (err) { 
+    if (err) throw err;
+    console.log('Subscribed topic : ' + '/*/tags');
+  });
  });
 
  mqttClient.on('message', function (topic, message) {
-   console.log('Topic : ' + topic + ' - Message : ' + message);
   if (topic.endsWith('status')) {
-    //socket.emit(topic,message);
+    var statusObject = JSON.parse(message.toString());
+    if (statusObject) {
+      console.log(statusObject.deviceID);
+      recursive(databasePath, function (err, files) {
+        if (err) throw err;
+        console.log(files);
+         for ( var file of files) {
+           if (file.includes(statusObject.deviceID + '.json')) {
+             var filePath = file;
+             fs.readFile(filePath , function (err , data) { 
+               if (err) throw err;
+               var object = JSON.parse(data);
+               object.status = statusObject.status;
+               object.lastActive = statusObject.timestamp;
+               //console.log(object);
+               fs.writeFile( filePath , JSON.stringify(object , null , 4) , function (err) { 
+                 if (err) throw err;
+                 console.log('Write success in ' +   filePath);
+               });
+             });
+             break;
+           }
+         }
+      });
+      io.emit('/' + statusObject.deviceID + '/status' , message.toString());
+    } 
   }
+
+  if (topic.endsWith('tags')) {
+    console.log('Topic : ' + topic + ' - Message : ' + message.toString());
+    variableObj = JSON.parse(message.toString());
+    io.emit('/' + variableObj.deviceID + '/tag' , message.toString());
+  }
+
+
 });
 
 
@@ -50,13 +93,6 @@ global.io = require('socket.io')(server);
  */
 
 io.on('connection', function (socket) {
- 
-
-  
-
-
-
-
   socket.on('deviceConfig', function (data) {
     console.log(data);
     if (data) {
@@ -78,17 +114,17 @@ io.on('connection', function (socket) {
         }
         mqttClient.publish('/' + receivedObject.deviceID + '/config',JSON.stringify(configObject,null,4));
 
-        //Subscribe topic /deviceID/status to get gateway status
-        mqttClient.subscribe('/' + receivedObject.deviceID + '/status', function (err) {
-          if (err) throw err;
-          console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/status');
-        });
+        // //Subscribe topic /deviceID/status to get gateway status
+        // mqttClient.subscribe('/' + receivedObject.deviceID + '/status', function (err) {
+        //   if (err) throw err;
+        //   console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/status');
+        // });
 
-        //Subscribe topic /deviceID/tags to get variable values
-        mqttClient.subscribe('/' + receivedObject.deviceID + '/tags' , function(err) {
-          if (err) throw err;
-          console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/tags');
-        })
+        // //Subscribe topic /deviceID/tags to get variable values
+        // mqttClient.subscribe('/' + receivedObject.deviceID + '/tags' , function(err) {
+        //   if (err) throw err;
+        //   console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/tags');
+        // })
 
       }
     }
@@ -100,14 +136,13 @@ io.on('connection', function (socket) {
       socket.emit('/' + user + '/resDeviceConfig', arrConfig);
       arrConfig = [];
     });
-    
   });
 
   socket.on('deleteDevice', function (filePath) {
     fs.unlink(path.resolve(databasePath, filePath), function (err) {
       if (err) throw err;
       socket.emit('deleteSuccess', 1);
-    })
+    });
   });
 
 });
@@ -191,7 +226,6 @@ var readConfigFiles = async (user) => {
             fs.readFile(path.resolve(userFolder, file), function (err, data) {
               if (err) throw err;
               arrConfig.push(JSON.parse(data));
-              //console.log(arrConfig);
             });
           }
         });
@@ -200,32 +234,3 @@ var readConfigFiles = async (user) => {
   };
 }
 
-//Subscribe all pre-config files
-function reInitMqttSubscription(mqttClient){
-  fs.readdir(databasePath , function (err , folders) { 
-    if (err) throw err;
-    if (folders != []) {
-      folders.forEach( function (folder) { 
-        fs.readdir(path.resolve(databasePath , folder), function (err , files) { 
-          if (err) throw err;
-          if (files != []) {
-            files.forEach(function (file) { 
-             var str1 = file.replace('deviceConfig_' , '');
-             var str2 = str1.replace('.json','');
-             mqttClient.subscribe('/' + str2 + '/tags', function (err) { 
-               if (err) throw err;
-               console.log('Subscribed topic : ' + '/' + str2 + '/tags');
-              });
-
-              mqttClient.subscribe('/' + str2 + '/status', function (err) { 
-                if (err) throw err;
-                console.log('Subscribed topic : ' + '/' + str2 + '/status');
-               });
-
-            })
-          }
-        });
-      });
-    }
-  });
-}

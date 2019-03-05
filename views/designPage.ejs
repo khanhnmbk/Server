@@ -61,6 +61,9 @@
         </div>
 
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <% if (deviceID) { %>
+                <div hidden id="deviceID"><%= deviceID %></div>
+            <% } %>
             <% if (user) { %>
             <div class="my-auto text-white" id="user"><%= user %></div>
             <% } %>

@@ -6,17 +6,16 @@
 $(document).ready(function () {
   var socket = io();
   socket.on('connect', function () {
-    socket.on('getMqttTopic', function (data) {
-      mqttDeviceTopic = data;
-    });
+    
     $('#btnRun').on('click', function (clickEvent) {
+      console.log(deviceID);
       $(this).prop('disabled', true);
       $('#btnStop').prop('disabled', false);
       draggableObjects.forEach(function (item) {
         item.disabled = true;
       });
       $('.draggable').draggable('disable');
-      socket.on(mqttDeviceTopic, function (data) {
+      socket.on('/' + deviceID + '/tag', function (data) {
         console.log(data);
       });
     });
@@ -69,6 +68,7 @@ let index = 0;
 let shape;
 let selectedItemId;
 let mqttDeviceTopic;
+const deviceID = $('#deviceID').text();
 
 //Default option for basic objects except LINE
 const defaultOption = {

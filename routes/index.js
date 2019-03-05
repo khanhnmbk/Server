@@ -128,14 +128,12 @@ router.get('/design/:user/:filename', checkAuthtication, function(req, res, next
         variableList.push(variableObject);
       });
     });
-    
     console.log(variableList);
-    res.render('designPage', {user : req.user.email , variableList : variableList});
 
-    io.on('connection' , function(client){
-      client.emit('getMqttTopic' , JSON.parse(data).user + '/' + JSON.parse(data).deviceID);
-    });
-    
+    var deviceID = req.params.filename.substring(
+      req.params.filename.lastIndexOf("Config_") + 7, 
+      req.params.filename.lastIndexOf(".json"));
+    res.render('designPage', {user : req.user.email , variableList : variableList , deviceID : deviceID});
 });
   
   
