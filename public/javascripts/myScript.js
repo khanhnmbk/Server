@@ -193,17 +193,18 @@ function declareVariable () {
 function SCADA(arrHtmlElems , variableName) {
   shapes.forEach(function (_shape) { 
     var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
+    console.log(_id);
     switch (_id) {
       case 'text' : {
         scadaTextObject(_shape , variableName);
         break;
       }
       case 'img' :{
-
+        scadaImageObject(_shape , variableName);
         break;
       }
-      case 'displayValue' :{
-        
+      case 'displayvalue' :{
+        scadaDisplayValueObject(_shape , variableName);
         break;
       }
       case 'input' : {
@@ -223,28 +224,36 @@ function SCADA(arrHtmlElems , variableName) {
         break;
       }
       case 'progressbar' : {
-
+        scadaProgressBarObject(_shape , variableName);
         break;
       }
       case 'checkbox' : {
 
         break;
       }
-      case 'symbolSet' : {
-
+      case 'symbolset' : {
+        scadaSymbolSetObject(_shape , variableName);
         break;
       }
       default : {
-
+        scadaSvgObject(_shape , variableName);
       }
     }
   })
 }
 
-function scadaSvgObject() {
-
+//Svg scada
+function scadaSvgObject(item , variableName) {
+  console.log(item);
+  if (item.node.hiddenWhen) {
+    if (item.node.hiddenWhen.includes(variableName)){
+      if (eval(item.node.hiddenWhen)) item.hide();
+      else item.show();
+    }
+  }  
 }
 
+//Text scada
 function scadaTextObject(item , variableName) {
   if (item.hiddenWhen) {
     if (item.hiddenWhen.includes(variableName)){
@@ -254,6 +263,47 @@ function scadaTextObject(item , variableName) {
   }  
 }
 
+//Image scada
+function scadaImageObject(item , variableName) {
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)){
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }  
+}
+
+//DisplayValue scada
+function scadaDisplayValueObject(item , variableName) {
+  console.log($(item));
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)){
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }  
+}
+
+//Progressbar scada
+function scadaProgressBarObject(item , variableName) {
+  console.log($(item));
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)){
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }  
+}
+
+//SymbolSet scada
+function scadaSymbolSetObject(item , variableName) {
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)){
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }  
+}
 
 /*
 ***********************************************************************************************
