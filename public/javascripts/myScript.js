@@ -4,6 +4,9 @@
 ***********************************************************************************************
 */
 $(document).ready(function () {
+  
+  declareVariable();
+
   var socket = io();
   socket.on('connect', function () {
     
@@ -16,7 +19,14 @@ $(document).ready(function () {
       });
       $('.draggable').draggable('disable');
       socket.on('/' + deviceID + '/tag', function (data) {
-        console.log(data);
+        var arrVarObjects = JSON.parse(data);
+        console.log(arrVarObjects);
+        if (arrVarObjects) {
+          arrVarObjects.variables.forEach(function (varObject) { 
+              eval(varObject.tagName + '=' + varObject.value);
+              SCADA(shapes , varObject.tagName);
+          });
+        }
       });
     });
 
@@ -33,8 +43,10 @@ $(document).ready(function () {
 
 
   $('#btnOpen').on('click', function () {
-    console.log(shapes);
-    console.log(shapes[shapes.length - 1].node.id);
+    console.dir(shapes);
+    shapes.forEach(function (item) { 
+      console.log(item.id.toString().replace(/[0-9]/g, ''));
+    })
   });
 
 
@@ -69,6 +81,7 @@ let shape;
 let selectedItemId;
 let mqttDeviceTopic;
 const deviceID = $('#deviceID').text();
+let variableList = [];
 
 //Default option for basic objects except LINE
 const defaultOption = {
@@ -163,6 +176,83 @@ function hex(x) {
   return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
 }
 
+function declareVariable () {
+  var tableRows = $('#tagsTable tbody tr');
+  if (tableRows.length > 0) {
+    tableRows.each(function (index , value) {
+      var tds = $(this).find('td');
+      var expression =  tds[3].innerHTML + '_' + tds[1].innerHTML + ' = null;';
+      eval(expression);
+      variableList.push({
+          name : tds[3].innerHTML + '_' + tds[1].innerHTML,
+          value : null,});
+    });
+  }
+}
+
+function SCADA(arrHtmlElems , variableName) {
+  shapes.forEach(function (_shape) { 
+    var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
+    switch (_id) {
+      case 'text' : {
+        scadaTextObject(_shape , variableName);
+        break;
+      }
+      case 'img' :{
+
+        break;
+      }
+      case 'displayValue' :{
+        
+        break;
+      }
+      case 'input' : {
+
+        break;
+      }
+      case 'switch' : {
+
+        break;
+      }
+      case 'button' : {
+
+        break;
+      }
+      case 'slider' : {
+
+        break;
+      }
+      case 'progressbar' : {
+
+        break;
+      }
+      case 'checkbox' : {
+
+        break;
+      }
+      case 'symbolSet' : {
+
+        break;
+      }
+      default : {
+
+      }
+    }
+  })
+}
+
+function scadaSvgObject() {
+
+}
+
+function scadaTextObject(item , variableName) {
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)){
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }  
+}
 
 
 /*

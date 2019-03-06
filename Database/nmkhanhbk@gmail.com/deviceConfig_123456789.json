@@ -6,14 +6,14 @@
     "period": "3000",
     "PLCs": [
         {
-            "name": "S7-1500",
+            "name": "S7_1500",
             "protocol": "S7-connection",
             "ipAddress": "192.168.1.150",
             "variables": [
                 {
-                    "name": "Bien-5",
+                    "name": "Bien_5",
                     "dataType": "Bool",
-                    "plc": "S7-1500",
+                    "plc": "S7_1500",
                     "address": "5",
                     "access": "read",
                     "unit": "",
@@ -64,6 +64,6 @@
     "creationTime": "3/1/2019, 2:31:30 AM",
     "lastActive": "10/03/2019",
     "status": false,
-    "published": true,
+    "published": false,
     "fileName": "deviceConfig_123456789.json"
 }

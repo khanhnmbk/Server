@@ -82,7 +82,7 @@ global.io = require('socket.io')(server);
     console.log('Topic : ' + topic + ' - Message : ' + message.toString());
     variableObj = JSON.parse(message.toString());
     io.emit('/' + variableObj.deviceID + '/tag' , message.toString());
-  }
+  }   
 
 
 });

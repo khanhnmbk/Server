@@ -3,6 +3,7 @@
 let deviceObject = {};
 let rcvDeviceObject = [];
 let deviceIndex;
+const regexPattern = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
 
 
 $(document).ready(function () {
@@ -101,6 +102,7 @@ $(document).ready(function () {
                 if (!(plcName && plcIPAddress)) {
                     alert('Please fill required parameters');
                 }
+                else if (!regexPattern.test(plcName)) alert('Invalid PLC name');
                 else {
                     var newPLC = {
                         name: plcName,
@@ -152,6 +154,8 @@ $(document).ready(function () {
                 if (!(modalItem.find('.inputName')[0].value && modalItem.find('.inputAddress')[0].value)) {
                     alert('Please fill required parameters');
                 }
+                else if (!regexPattern.test(modalItem.find('.inputName')[0].value)) 
+                    alert('Invalid variable name');
                 else {
                     var variableObject = {};
                     variableObject.name = modalItem.find('.inputName')[0].value;

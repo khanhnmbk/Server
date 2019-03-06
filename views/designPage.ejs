@@ -18,7 +18,7 @@
     <title>Main page</title>
 </head>
 
-<body>
+<body onbeforeunload="return confirm('Are you sure to reload?')">
     <!------------------------ MAIN PAGE ------------------------->
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark ">
         <a class="navbar-brand mx-2" href="/device" onclick="return confirm('Return to device page?')">
@@ -56,7 +56,7 @@
                         class="fas fa-stop mr-2"></i></i>Stop</button>
             </div>
             <div class="btn-group" role="group" aria-label="Clipboard group">
-                <button type="button" class="btn btn-dark"><i class="fas fa-upload mr-2"></i>Publish</button>
+                <button type="button" class="btn btn-dark"><i class="fas fa-upload mr-2" id="btnPublish"></i>Publish</button>
             </div>
         </div>
 
@@ -1882,9 +1882,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body scrollable ">
+                <div class="modal-body scrollable">
                     <p>Choose tag name</p>
-                    <table class="table table-hover ">
+                    <table class="table table-hover" id="tagsTable">
                         <thead>
                             <tr>
                                 <th scope="col"></th>
