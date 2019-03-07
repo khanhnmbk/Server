@@ -18,6 +18,11 @@ $(document).ready(function () {
         item.disabled = true;
       });
       $('.draggable').draggable('disable');
+
+      //Disable all input in Modals: to prevent users from changing elements' properties
+      $('.inputModal').prop('disabled',true);
+      $('.btnBrowseTag').prop('disabled' , true);
+      
       socket.on('/' + deviceID + '/tag', function (data) {
         var arrVarObjects = JSON.parse(data);
         console.log(arrVarObjects);
@@ -37,6 +42,9 @@ $(document).ready(function () {
         item.disabled = false;
       });
       $('.draggable').draggable('enable');
+      //Enable input
+      $('.inputModal').prop('disabled',false);
+      $('.btnBrowseTag').prop('disabled' , false);
       socket.off();
     });
   });
@@ -208,19 +216,19 @@ function SCADA(arrHtmlElems , variableName) {
         break;
       }
       case 'input' : {
-
+        scadaInputObject(_shape , variableName);
         break;
       }
       case 'switch' : {
-
+        scadaSwitchObject(_shape , variableName);
         break;
       }
       case 'button' : {
-
+        scadaButtonObject(_shape , variableName);
         break;
       }
       case 'slider' : {
-
+        scadaSliderObject(_shape , variableName);
         break;
       }
       case 'progressbar' : {
@@ -228,7 +236,7 @@ function SCADA(arrHtmlElems , variableName) {
         break;
       }
       case 'checkbox' : {
-
+        scadaCheckboxObject(_shape , variableName);
         break;
       }
       case 'symbolset' : {
@@ -281,18 +289,33 @@ function scadaDisplayValueObject(item , variableName) {
       if (eval(item.hiddenWhen)) $(item).hide();
       else $(item).show();
     }
-  }  
+  }
+  
+  if (item.tag) {
+    if (item.tag.includes(variableName)) {
+      $(item).text(eval(item.tag).toFixed(item.format));
+    }
+  }
 }
 
 //Progressbar scada
 function scadaProgressBarObject(item , variableName) {
-  console.log($(item));
+  console.log($(item).children('div'))
   if (item.hiddenWhen) {
     if (item.hiddenWhen.includes(variableName)){
       if (eval(item.hiddenWhen)) $(item).hide();
       else $(item).show();
     }
-  }  
+  } 
+
+  if (item.tag) {
+    if (item.tag.includes(variableName)){
+      $(item).children('div').css({
+        'width' : eval(item.tag) + '%',
+      });
+      $(item).children('div').text(eval(item.tag) + '%');
+    }
+  }   
 }
 
 //SymbolSet scada
@@ -302,8 +325,64 @@ function scadaSymbolSetObject(item , variableName) {
       if (eval(item.hiddenWhen)) $(item).hide();
       else $(item).show();
     }
+  }
+  
+  if (item.onCondition) {
+    if (item.onCondition.includes(variableName)) {
+      if (eval(item.onCondition)) console.log('OnCondition trigger');
+      else console.log('OnCondition off');
+    }
+  }
+}
+
+//Button scada
+function scadaButtonObject(item , variableName) {
+  if (item.disableWhen) {
+    if (item.disableWhen.includes(variableName)){
+      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
+      else $(item).prop('disabled' , false);
+    }
   }  
 }
+
+//Switch scada
+function scadaSwitchObject(item , variableName) {
+  var _span = $(item).find('span')[0];
+  if (_span.disableWhen) {
+    if (eval(_span.disableWhen)) $(item).find('input').prop('disabled' , true);
+    else $(item).find('input').prop('disabled' , false  );
+  }
+}  
+
+//Checkbox scada
+function scadaCheckboxObject(item , variableName) {
+  var _label = $(item).find('label')[0];
+  if (_label.disableWhen) {
+    if (eval(_label.disableWhen)) $(item).find('input').prop('disabled' , true);
+    else $(item).find('input').prop('disabled' , false  );
+  }
+}
+
+//Input scada
+function scadaInputObject(item , variableName) {
+  if (item.disableWhen) {
+    if (item.disableWhen.includes(variableName)){
+      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
+      else $(item).prop('disabled' , false);
+    }
+  }  
+}
+
+//Slider scada
+function scadaSliderObject(item , variableName) {
+  if (item.disableWhen) {
+    if (item.disableWhen.includes(variableName)){
+      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
+      else $(item).prop('disabled' , false);
+    }
+  }  
+}
+
 
 /*
 ***********************************************************************************************
@@ -1321,6 +1400,7 @@ function displayValueMouseDownEventHandler(event) {
         elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
         elemColor = rgb2hex(elemStyle.color),
         elemText = mouseEvent.target.innerText;
+        elemFormat = mouseEvent.target.format;
 
       var itemModal = $('#displayValueModal')[0];
 
@@ -1329,6 +1409,8 @@ function displayValueMouseDownEventHandler(event) {
       itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
       itemModal.querySelector('#inputTextColor').value = elemColor;
       itemModal.querySelector('#textContent').value = elemText;
+      if (elemFormat) itemModal.querySelector('#displayFormat').value = elemFormat;
+      else itemModal.querySelector('#displayFormat').value = 3;
 
       if (mouseEvent.target.hiddenWhen) {
         itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
@@ -1352,6 +1434,7 @@ function displayValueMouseDownEventHandler(event) {
         document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
+        mouseEvent.target.format = itemModal.querySelector('#displayFormat').value;
 
       });
 
@@ -1559,7 +1642,7 @@ function switchMouseDownEventHandler(event) {
 
   var inputsw = document.createElement('input');
   inputsw.setAttribute('type', 'checkbox');
-  inputsw.className = 'primary';
+  inputsw.className = ' primary ';
 
   var spansw = document.createElement('span');
   spansw.className = 'slider round';
