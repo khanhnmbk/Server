@@ -4,12 +4,12 @@
 ***********************************************************************************************
 */
 $(document).ready(function () {
-  
+
   declareVariable();
 
   var socket = io();
   socket.on('connect', function () {
-    
+
     $('#btnRun').on('click', function (clickEvent) {
       console.log(deviceID);
       $(this).prop('disabled', true);
@@ -20,16 +20,16 @@ $(document).ready(function () {
       $('.draggable').draggable('disable');
 
       //Disable all input in Modals: to prevent users from changing elements' properties
-      $('.inputModal').prop('disabled',true);
-      $('.btnBrowseTag').prop('disabled' , true);
-      
+      $('.inputModal').prop('disabled', true);
+      $('.btnBrowseTag').prop('disabled', true);
+      initSCADA(shapes, socket);
       socket.on('/' + deviceID + '/tag', function (data) {
         var arrVarObjects = JSON.parse(data);
         console.log(arrVarObjects);
         if (arrVarObjects) {
-          arrVarObjects.variables.forEach(function (varObject) { 
-              eval(varObject.tagName + '=' + varObject.value);
-              SCADA(shapes , varObject.tagName);
+          arrVarObjects.variables.forEach(function (varObject) {
+            eval(varObject.tagName + '=' + varObject.value);
+            SCADA(shapes, varObject.tagName);
           });
         }
       });
@@ -43,16 +43,16 @@ $(document).ready(function () {
       });
       $('.draggable').draggable('enable');
       //Enable input
-      $('.inputModal').prop('disabled',false);
-      $('.btnBrowseTag').prop('disabled' , false);
-      socket.off();
+      $('.inputModal').prop('disabled', false);
+      $('.btnBrowseTag').prop('disabled', false);
+      socket.on('/' + deviceID + '/tag');
     });
   });
 
 
   $('#btnOpen').on('click', function () {
     console.dir(shapes);
-    shapes.forEach(function (item) { 
+    shapes.forEach(function (item) {
       console.log(item.id.toString().replace(/[0-9]/g, ''));
     })
   });
@@ -184,113 +184,219 @@ function hex(x) {
   return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
 }
 
-function declareVariable () {
+function declareVariable() {
   var tableRows = $('#tagsTable tbody tr');
   if (tableRows.length > 0) {
-    tableRows.each(function (index , value) {
+    tableRows.each(function (index, value) {
       var tds = $(this).find('td');
-      var expression =  tds[3].innerHTML + '_' + tds[1].innerHTML + ' = null;';
+      var expression = tds[3].innerHTML + '_' + tds[1].innerHTML + ' = null;';
       eval(expression);
       variableList.push({
-          name : tds[3].innerHTML + '_' + tds[1].innerHTML,
-          value : null,});
+        name: tds[3].innerHTML + '_' + tds[1].innerHTML,
+        value: null,
+      });
     });
   }
 }
 
-function SCADA(arrHtmlElems , variableName) {
-  shapes.forEach(function (_shape) { 
+function initSCADA(_shapes, _socket) {
+  _shapes.forEach(function (_shape) {
+    var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
+    switch (_id) {
+      case 'button': {
+        $(_shape).on('click', function (event) {
+          var _sendObj = {
+            deviceID: deviceID,
+            command: this.command,
+          }
+          _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+        })
+        break;
+      }
+      case 'switch': {
+        var _checkbox = $(_shape).find('input')[0];
+        var _span = $(_shape).find('span')[0];
+        if (_checkbox) {
+          $(_checkbox).on('change', function () {
+            if ($(this).is(':checked')) {
+              var _sendObj = {
+                deviceID: deviceID,
+                command: _span.onCommand,
+              }
+              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+            }
+            else {
+              var _sendObj = {
+                deviceID: deviceID,
+                command: _span.offCommand,
+              }
+              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+            }
+          });
+        }
+        break;
+      }
+      case 'input': {
+        $(_shape).on('keyup', function (event) {
+          if (event.keyCode == 13) {
+            if (this.tag) {
+              if (this.type == 'text') {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: this.tag + ' = ' + '"' + this.value + '"'
+                }
+              }
+              else {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: this.tag + ' = ' + this.value
+                }
+              }
+              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+            }
+          }
+        });
+        break;
+      }
+      case 'slider': {
+        $(_shape).on('input', function (event) {
+          $(this).tooltip('dispose');
+          $(this).tooltip({
+            animation: false,
+            offset: (this.value - (this.max - this.min) / 2) * (parseInt(this.style.width, 10) / (this.max - this.min)),
+            title: this.value
+          });
+          $(this).tooltip('show');
+        });
+        $(_shape).on('change', function (event) {
+          var _sendObj = {
+            deviceID: deviceID,
+            command: this.tag + ' = ' + this.value
+          }
+          if (this.tag) _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+        });
+        break;
+      }
+      case 'checkbox': {
+        var _label = $(_shape).find('label')[0];
+        var _checkbox = $(_shape).find('input')[0];
+        if (_checkbox) {
+          $(_checkbox).on('change', function () {
+            if ($(this).is(':checked')) {
+              var _sendObj = {
+                deviceID: deviceID,
+                command: _label.checkedCommand,
+              }
+              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+            }
+            else {
+              var _sendObj = {
+                deviceID: deviceID,
+                command: _label.unCheckedCommand,
+              }
+              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+            }
+          });
+        }
+        break;
+      }
+    }
+  })
+}
+
+function SCADA(arrHtmlElems, variableName) {
+  shapes.forEach(function (_shape) {
     var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
     console.log(_id);
     switch (_id) {
-      case 'text' : {
-        scadaTextObject(_shape , variableName);
+      case 'text': {
+        scadaTextObject(_shape, variableName);
         break;
       }
-      case 'img' :{
-        scadaImageObject(_shape , variableName);
+      case 'img': {
+        scadaImageObject(_shape, variableName);
         break;
       }
-      case 'displayvalue' :{
-        scadaDisplayValueObject(_shape , variableName);
+      case 'displayvalue': {
+        scadaDisplayValueObject(_shape, variableName);
         break;
       }
-      case 'input' : {
-        scadaInputObject(_shape , variableName);
+      case 'input': {
+        scadaInputObject(_shape, variableName);
         break;
       }
-      case 'switch' : {
-        scadaSwitchObject(_shape , variableName);
+      case 'switch': {
+        scadaSwitchObject(_shape, variableName);
         break;
       }
-      case 'button' : {
-        scadaButtonObject(_shape , variableName);
+      case 'button': {
+        scadaButtonObject(_shape, variableName);
         break;
       }
-      case 'slider' : {
-        scadaSliderObject(_shape , variableName);
+      case 'slider': {
+        scadaSliderObject(_shape, variableName);
         break;
       }
-      case 'progressbar' : {
-        scadaProgressBarObject(_shape , variableName);
+      case 'progressbar': {
+        scadaProgressBarObject(_shape, variableName);
         break;
       }
-      case 'checkbox' : {
-        scadaCheckboxObject(_shape , variableName);
+      case 'checkbox': {
+        scadaCheckboxObject(_shape, variableName);
         break;
       }
-      case 'symbolset' : {
-        scadaSymbolSetObject(_shape , variableName);
+      case 'symbolset': {
+        scadaSymbolSetObject(_shape, variableName);
         break;
       }
-      default : {
-        scadaSvgObject(_shape , variableName);
+      default: {
+        scadaSvgObject(_shape, variableName);
       }
     }
   })
 }
 
 //Svg scada
-function scadaSvgObject(item , variableName) {
+function scadaSvgObject(item, variableName) {
   console.log(item);
   if (item.node.hiddenWhen) {
-    if (item.node.hiddenWhen.includes(variableName)){
+    if (item.node.hiddenWhen.includes(variableName)) {
       if (eval(item.node.hiddenWhen)) item.hide();
       else item.show();
     }
-  }  
+  }
 }
 
 //Text scada
-function scadaTextObject(item , variableName) {
+function scadaTextObject(item, variableName) {
   if (item.hiddenWhen) {
-    if (item.hiddenWhen.includes(variableName)){
-      if (eval(item.hiddenWhen)) $(item).hide();
-      else $(item).show();
-    }
-  }  
-}
-
-//Image scada
-function scadaImageObject(item , variableName) {
-  if (item.hiddenWhen) {
-    if (item.hiddenWhen.includes(variableName)){
-      if (eval(item.hiddenWhen)) $(item).hide();
-      else $(item).show();
-    }
-  }  
-}
-
-//DisplayValue scada
-function scadaDisplayValueObject(item , variableName) {
-  console.log($(item));
-  if (item.hiddenWhen) {
-    if (item.hiddenWhen.includes(variableName)){
+    if (item.hiddenWhen.includes(variableName)) {
       if (eval(item.hiddenWhen)) $(item).hide();
       else $(item).show();
     }
   }
-  
+}
+
+//Image scada
+function scadaImageObject(item, variableName) {
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)) {
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }
+}
+
+//DisplayValue scada
+function scadaDisplayValueObject(item, variableName) {
+  console.log($(item));
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)) {
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }
+
   if (item.tag) {
     if (item.tag.includes(variableName)) {
       $(item).text(eval(item.tag).toFixed(item.format));
@@ -299,34 +405,34 @@ function scadaDisplayValueObject(item , variableName) {
 }
 
 //Progressbar scada
-function scadaProgressBarObject(item , variableName) {
+function scadaProgressBarObject(item, variableName) {
   console.log($(item).children('div'))
   if (item.hiddenWhen) {
-    if (item.hiddenWhen.includes(variableName)){
-      if (eval(item.hiddenWhen)) $(item).hide();
-      else $(item).show();
-    }
-  } 
-
-  if (item.tag) {
-    if (item.tag.includes(variableName)){
-      $(item).children('div').css({
-        'width' : eval(item.tag) + '%',
-      });
-      $(item).children('div').text(eval(item.tag) + '%');
-    }
-  }   
-}
-
-//SymbolSet scada
-function scadaSymbolSetObject(item , variableName) {
-  if (item.hiddenWhen) {
-    if (item.hiddenWhen.includes(variableName)){
+    if (item.hiddenWhen.includes(variableName)) {
       if (eval(item.hiddenWhen)) $(item).hide();
       else $(item).show();
     }
   }
-  
+
+  if (item.tag) {
+    if (item.tag.includes(variableName)) {
+      $(item).children('div').css({
+        'width': eval(item.tag) + '%',
+      });
+      $(item).children('div').text(eval(item.tag) + '%');
+    }
+  }
+}
+
+//SymbolSet scada
+function scadaSymbolSetObject(item, variableName) {
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)) {
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }
+
   if (item.onCondition) {
     if (item.onCondition.includes(variableName)) {
       if (eval(item.onCondition)) console.log('OnCondition trigger');
@@ -336,51 +442,71 @@ function scadaSymbolSetObject(item , variableName) {
 }
 
 //Button scada
-function scadaButtonObject(item , variableName) {
+function scadaButtonObject(item, variableName) {
   if (item.disableWhen) {
-    if (item.disableWhen.includes(variableName)){
-      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
-      else $(item).prop('disabled' , false);
+    if (item.disableWhen.includes(variableName)) {
+      if (eval(item.disableWhen)) $(item).prop('disabled', true);
+      else $(item).prop('disabled', false);
     }
-  }  
+  }
 }
 
 //Switch scada
-function scadaSwitchObject(item , variableName) {
+function scadaSwitchObject(item, variableName) {
   var _span = $(item).find('span')[0];
   if (_span.disableWhen) {
-    if (eval(_span.disableWhen)) $(item).find('input').prop('disabled' , true);
-    else $(item).find('input').prop('disabled' , false  );
+    if (eval(_span.disableWhen)) $(item).find('input').prop('disabled', true);
+    else $(item).find('input').prop('disabled', false);
   }
-}  
+}
 
 //Checkbox scada
-function scadaCheckboxObject(item , variableName) {
+function scadaCheckboxObject(item, variableName) {
   var _label = $(item).find('label')[0];
   if (_label.disableWhen) {
-    if (eval(_label.disableWhen)) $(item).find('input').prop('disabled' , true);
-    else $(item).find('input').prop('disabled' , false  );
+    if (eval(_label.disableWhen)) $(item).find('input').prop('disabled', true);
+    else $(item).find('input').prop('disabled', false);
   }
 }
 
 //Input scada
-function scadaInputObject(item , variableName) {
+function scadaInputObject(item, variableName) {
   if (item.disableWhen) {
-    if (item.disableWhen.includes(variableName)){
-      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
-      else $(item).prop('disabled' , false);
+    if (item.disableWhen.includes(variableName)) {
+      if (eval(item.disableWhen)) $(item).prop('disabled', true);
+      else $(item).prop('disabled', false);
     }
-  }  
+  }
 }
 
 //Slider scada
-function scadaSliderObject(item , variableName) {
+function scadaSliderObject(item, variableName) {
   if (item.disableWhen) {
-    if (item.disableWhen.includes(variableName)){
-      if (eval(item.disableWhen)) $(item).prop('disabled' , true);
-      else $(item).prop('disabled' , false);
+    if (item.disableWhen.includes(variableName)) {
+      if (eval(item.disableWhen)) $(item).prop('disabled', true);
+      else $(item).prop('disabled', false);
     }
-  }  
+  }
+
+  if (item.tag) {
+    if (item.tag.includes(variableName)) {
+      item.value = eval(item.tag);
+    }
+  }
+
+  if (item.isMinTag) {
+    if (item.minTag.includes(variableName)) item.min = eval(item.minTag);
+  }
+  else {
+    if (item.minValue) item.min = item.minValue;
+  }
+
+  if (item.isMaxTag) {
+    if (item.maxTag.includes(variableName)) item.max = eval(item.maxTag);
+  }
+  else {
+    if (item.maxValue) item.max = item.maxValue;
+  }
 }
 
 
@@ -1400,7 +1526,7 @@ function displayValueMouseDownEventHandler(event) {
         elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
         elemColor = rgb2hex(elemStyle.color),
         elemText = mouseEvent.target.innerText;
-        elemFormat = mouseEvent.target.format;
+      elemFormat = mouseEvent.target.format;
 
       var itemModal = $('#displayValueModal')[0];
 
@@ -1758,9 +1884,9 @@ function inputMouseDownEventHandler(event) {
 
   //Declare new paragrap
   var input = document.createElement('input');
-  input.type = 'text';
+  input.type = 'number';
   input.id = 'input' + index;
-  input.placeholder = 'Add text ...';
+  input.placeholder = 'Add value ...';
 
   //Image css style
   input.className = 'form-control contextMenu ';
@@ -1788,11 +1914,12 @@ function inputMouseDownEventHandler(event) {
 
       var elemWidth = parseInt(elemStyle.width, 10),
         elemHeight = Math.round(elemBound.bottom - elemBound.top);
-
+      elemType = mouseEvent.target.type;
 
       var itemModal = $('#inputModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
       itemModal.querySelector('.inputHeight').value = elemHeight;
+      itemModal.querySelector('.inputType').value = elemType;
 
       if (mouseEvent.target.tag) {
         itemModal.querySelector('.inputTag').value = mouseEvent.target.tag;
@@ -1813,6 +1940,7 @@ function inputMouseDownEventHandler(event) {
         document.getElementById(elemId).style.height = itemModal.querySelector('.inputHeight').value + 'px';
         mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+        mouseEvent.target.type = itemModal.querySelector('.inputType').value;
       });
 
       $('.btnTag').on('click', function (onConditionClickEvent) {
@@ -1994,6 +2122,10 @@ function sliderMouseDownEventHandler(event) {
   slider.type = 'range';
   slider.className = 'custom-range contextMenu ';
   slider.id = 'slider' + index;
+  slider.min = 0;
+  slider.max = 100;
+  slider.minValue = slider.min;
+  slider.maxValue = slider.max;
 
   //Image css style
   slider.style.position = 'absolute';
@@ -2002,14 +2134,23 @@ function sliderMouseDownEventHandler(event) {
   slider.style.width = '400px';
 
 
+
   //Image mouse events
   $(slider).on('mouseover', function (event) {
     event.target.style.opacity = 0.4;
-    //event.target.style.cursor = 'move';
+    $(this).tooltip('dispose');
+    $(this).tooltip({
+      animation: false,
+      offset: (this.value - (this.max - this.min) / 2) * (parseInt(this.style.width, 10) / (this.max - this.min)),
+      title: this.value
+    });
+    $(this).tooltip('show');
+
   });
   //Subscribe mouseout event for each polygon
   $(slider).on('mouseout', function (event) {
     event.target.style.opacity = 1;
+    $(this).tooltip('hide');
   });
   //Subscribe mouse double click event
   $(slider).on('dblclick', function (mouseEvent) {
@@ -2082,8 +2223,6 @@ function sliderMouseDownEventHandler(event) {
         if (itemModal.querySelector('.inputMaxTag').value)
           mouseEvent.target.isMaxTag = true;
         else mouseEvent.target.isMaxTag = false;
-
-
       });
 
       //Browse button

@@ -113,19 +113,6 @@ io.on('connection', function (socket) {
           value : receivedObjectJSON,
         }
         mqttClient.publish('/' + receivedObject.deviceID + '/config',JSON.stringify(configObject,null,4));
-
-        // //Subscribe topic /deviceID/status to get gateway status
-        // mqttClient.subscribe('/' + receivedObject.deviceID + '/status', function (err) {
-        //   if (err) throw err;
-        //   console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/status');
-        // });
-
-        // //Subscribe topic /deviceID/tags to get variable values
-        // mqttClient.subscribe('/' + receivedObject.deviceID + '/tags' , function(err) {
-        //   if (err) throw err;
-        //   console.log('Subscribed topic : ' + '/' + receivedObject.deviceID + '/tags');
-        // })
-
       }
     }
   });
@@ -143,6 +130,11 @@ io.on('connection', function (socket) {
       if (err) throw err;
       socket.emit('deleteSuccess', 1);
     });
+  });
+
+  socket.on('/write' , function (rcvJson) { 
+    var rcvObj = JSON.parse(rcvJson);
+    mqttClient.publish('/' + rcvObj.deviceID + '/write' , rcvObj.command);
   });
 
 });
