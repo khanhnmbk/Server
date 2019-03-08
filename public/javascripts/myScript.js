@@ -22,6 +22,7 @@ $(document).ready(function () {
       //Disable all input in Modals: to prevent users from changing elements' properties
       $('.inputModal').prop('disabled', true);
       $('.btnBrowseTag').prop('disabled', true);
+      $('.saveChangeButton').prop('disabled' , true);
       initSCADA(shapes, socket);
       socket.on('/' + deviceID + '/tag', function (data) {
         var arrVarObjects = JSON.parse(data);
@@ -45,17 +46,18 @@ $(document).ready(function () {
       //Enable input
       $('.inputModal').prop('disabled', false);
       $('.btnBrowseTag').prop('disabled', false);
-      socket.on('/' + deviceID + '/tag');
+      $('.saveChangeButton').prop('disabled' , false);
+      socket.off('/' + deviceID + '/tag');
     });
   });
 
 
-  $('#btnOpen').on('click', function () {
-    console.dir(shapes);
-    shapes.forEach(function (item) {
-      console.log(item.id.toString().replace(/[0-9]/g, ''));
-    })
-  });
+  // $('#btnOpen').on('click', function () {
+  //   console.dir(shapes);
+  //   shapes.forEach(function (item) {
+  //     console.log(item.id.toString().replace(/[0-9]/g, ''));
+  //   })
+  // });
 
 
   $('[data-toggle="tooltip"]').tooltip();
@@ -406,6 +408,22 @@ function scadaDisplayValueObject(item, variableName) {
 
 //Progressbar scada
 function scadaProgressBarObject(item, variableName) {
+  if (item.isMinTag) {
+    if (item.minTag.includes(variableName)) item.min = eval(item.minTag);
+  }
+  else {
+    if (item.minValue) item.min = item.minValue;
+  }
+
+  if (item.isMaxTag) {
+    if (item.maxTag.includes(variableName)) item.max = eval(item.maxTag);
+  }
+  else {
+    if (item.maxValue) item.max = item.maxValue;
+  }
+
+  var _range = item.max - item.min;
+
   console.log($(item).children('div'))
   if (item.hiddenWhen) {
     if (item.hiddenWhen.includes(variableName)) {
@@ -416,10 +434,12 @@ function scadaProgressBarObject(item, variableName) {
 
   if (item.tag) {
     if (item.tag.includes(variableName)) {
+      var _width = eval(item.tag)/_range * 100 + '%';
       $(item).children('div').css({
-        'width': eval(item.tag) + '%',
+        'width': _width,
       });
-      $(item).children('div').text(eval(item.tag) + '%');
+      if (item.isHideLabel) $(item).children('div').text('');
+      else $(item).children('div').text(_width);
     }
   }
 }
@@ -2295,6 +2315,9 @@ function processbarMouseDownEventHandler(event) {
   var progressbar = document.createElement('div');
   progressbar.className = 'progress contextMenu';
   progressbar.id = 'progressbar' + index;
+  progressbar.isHideLabel = false;
+  progressbar.min = 0;
+  progressbar.max = 100;
 
   var bar = document.createElement('div');
   bar.className = 'progress-bar';
@@ -2329,6 +2352,7 @@ function processbarMouseDownEventHandler(event) {
       var selectedItem = mouseEvent.target;
       var elemWidth, elemHeight;
       var progressElement;
+      var isHideLabel = false;
 
       if (selectedItem.id) { //Progress is chosen
         progressElement = selectedItem;
@@ -2340,10 +2364,12 @@ function processbarMouseDownEventHandler(event) {
         elemWidth = parseInt(selectedItem.parentNode.style.width, 10);
         elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
       }
+      isHideLabel = progressElement.isHideLabel;
 
       var itemModal = $('#progressBarModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
       itemModal.querySelector('.inputHeight').value = elemHeight;
+      itemModal.querySelector('#hideLabelCheckbox').checked = isHideLabel;
 
       if (progressElement.tag) {
         itemModal.querySelector('.inputValue').value = progressElement.tag;
@@ -2405,6 +2431,7 @@ function processbarMouseDownEventHandler(event) {
         progressElement.maxTag = itemModal.querySelector('.inputMaxTag').value;
         progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
         progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+        progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
 
         if (itemModal.querySelector('.inputMinTag').value)
           progressElement.isMinTag = true;
@@ -2414,14 +2441,9 @@ function processbarMouseDownEventHandler(event) {
           progressElement.isMaxTag = true;
         else progressElement.isMaxTag = false;
 
-        console.log(progressElement.tag);
-        console.log(progressElement.minTag);
-        console.log(progressElement.minValue);
-        console.log(progressElement.maxTag);
-        console.log(progressElement.maxValue);
-        console.log(progressElement.hiddenWhen);
-        console.log(progressElement.isMinTag);
-        console.log(progressElement.isMaxTag);
+        var _bar = $(progressElement).find('.progress-bar')[0];
+        if (progressElement.isHideLabel) _bar.innerText = '';
+        else _bar.innerText = _bar.style.width;
 
 
       });
