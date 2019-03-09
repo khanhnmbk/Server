@@ -4,8 +4,10 @@ var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy;
 var fs = require('fs');
 var path = require('path');
+var async = require('async');
 
 var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
+var symbolPath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\public\\images\\symbols';
 
 var userModel = require('../model/user');
 var file = require('../model/fileSystem');
@@ -112,38 +114,79 @@ router.get('/device', checkAuthtication, function(req, res, next) {
 /* GET design page. */
 router.get('/design/:user/:filename', checkAuthtication, function(req, res, next) {
   var variableList = [];
-  console.log(path.resolve(databasePath,req.params.user,req.params.filename));
-  fs.readFile(path.resolve(databasePath,req.params.user,req.params.filename), function (err, data) { 
-    if (err) throw err;
-    JSON.parse(data).PLCs.forEach(plc => {
-      plc.variables.forEach(variable => {
-        var variableObject = {
-          name : variable.name,
-          dataType : variable.dataType,
-          address : variable.address,
-          plcName : plc.name,
-          plcAddress : plc.ipAddress,
-          plcProtocol : plc.protocol,
-        };
-        variableList.push(variableObject);
+  var arrSymbols = [];
+
+  var deviceID = req.params.filename.substring(
+    req.params.filename.lastIndexOf("Config_") + 7, 
+    req.params.filename.lastIndexOf(".json"));
+  
+  async.parallel([
+    function(callback){
+      fs.readFile(path.resolve(databasePath,req.params.user,req.params.filename), function (err, data) { 
+        if (err) callback(err);
+        JSON.parse(data).PLCs.forEach(plc => {
+          plc.variables.forEach(variable => {
+            var variableObject = {
+              name : variable.name,
+              dataType : variable.dataType,
+              address : variable.address,
+              plcName : plc.name,
+              plcAddress : plc.ipAddress,
+              plcProtocol : plc.protocol,
+            };
+            variableList.push(variableObject);
+          });
+        });
+        callback();
       });
-    });
-    console.log(variableList);
+    },
 
-    var deviceID = req.params.filename.substring(
-      req.params.filename.lastIndexOf("Config_") + 7, 
-      req.params.filename.lastIndexOf(".json"));
-    res.render('designPage', {user : req.user.email , variableList : variableList , deviceID : deviceID});
+    function(callback){
+      var arrFolders = fs.readdirSync(symbolPath);
+      if (arrFolders) {
+        arrFolders.forEach(function (folder) { 
+          var _arrSymbol = fs.readdirSync(path.resolve(symbolPath,folder));
+          var _obj = {
+            folder : folder,
+            symbols : _arrSymbol,
+          }
+          arrSymbols.push(_obj);
+        })
+      }
+      callback();
+      // fs.readdir(symbolPath , function (err , folders) { 
+      //   if (err) callback(err);
+      //   if (folders.length > 0) {
+      //     folders.forEach(function (folder) {
+      //       _symbol.folder = folder; 
+      //       fs.readdir(path.resolve(symbolPath,folder) , function (err , files) { 
+      //         if (err) callback(err);
+      //         if (files.length > 0) {
+      //           files.forEach(function (file) {
+      //             _symbol.symbols.push(path.basename(file));
+      //           });
+      //         }
+      //       });
+      //       arrSymbols.push(_symbol);
+      //       _symbol.folder = '';
+      //       _symbol.symbols = [];
+      //     });
+      //   }
+      //   callback();
+      // });
+    }
+  ] , function (err) { 
+    if (err) throw err;
+    console.log(arrSymbols);
+    res.render('designPage', {user : req.user.email , variableList : variableList , deviceID : deviceID , arrSymbols : arrSymbols});
+    
+  });
 });
-  
-  
 
-});
-
-router.get('/design', checkAuthtication, function(req, res, next) {
-  res.render('designPage',{user : req.user.email});
+// router.get('/design', checkAuthtication, function(req, res, next) {
+//   res.render('designPage',{user : req.user.email});
   
-});
+// });
 
 
 //Check if user logins: TRUE = prevent login , FALSE = allow login
@@ -157,5 +200,11 @@ function checkAuthtication(req , res , next) {
   if (req.isAuthenticated()) next();
   else res.redirect('/login');
 }
+
+//Read symbol dir
+async function readSymbolDir(_path) {
+  
+}
+
 
 module.exports = router;

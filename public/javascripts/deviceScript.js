@@ -10,7 +10,9 @@ $(document).ready(function () {
     var _user = $('#user').text();
     var socket = io();
 
+    
     socket.on('connect', function () {
+       
         socket.on('/' + _user + '/resDeviceConfig', function (data) {
             console.log(data);
             rcvDeviceObject = data;
@@ -18,7 +20,9 @@ $(document).ready(function () {
             socketOnStatus(socket); //Subscribe status topic
         });
 
-        socket.emit('reqDeviceConfig', _user); //Get device config array
+        
+
+        socket.emit('/reqDeviceConfig', _user); //Get device config array
 
         $('#sidebarButton').on('click', function () {
             $('#sidebar').toggleClass('active');
@@ -367,7 +371,9 @@ function loadMap(arrDeviceObject) {
     });
 }
 
+
+
 //Wait 1s to confirm BingMap resource loaded
 setTimeout(function () {
     loadMap(rcvDeviceObject);
-}, 1000);
+}, 500);

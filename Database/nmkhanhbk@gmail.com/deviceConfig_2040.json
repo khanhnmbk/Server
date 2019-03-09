@@ -1,32 +1,32 @@
 {
-    "deviceName": "MindConnect IoT2040",
-    "deviceID": "2040",
-    "longitude": "106.521289",
-    "latitude": "10.389262",
-    "period": 5000,
+    "deviceName": "Siemens Viet Nam",
+    "deviceID": "230497",
+    "longitude": "105.853880",
+    "latitude": "21.028280",
+    "period": "3000",
     "PLCs": [
         {
-            "name": "Omron",
-            "protocol": "ModbusTCP",
-            "ipAddress": "192.168.7.12",
+            "name": "Station-1",
+            "protocol": "S7-connection",
+            "ipAddress": "192.168.22.100",
             "variables": [
                 {
-                    "name": "Speed_Omron",
+                    "name": "Speed",
                     "dataType": "Double",
-                    "plc": "Omron",
-                    "address": "40002",
+                    "plc": "Station-1",
+                    "address": "MD100",
                     "access": "read",
                     "unit": "RPM",
-                    "isAlarm": false,
-                    "isHistory": false
+                    "isAlarm": true,
+                    "isHistory": true
                 }
             ]
         }
     ],
     "user": "nmkhanhbk@gmail.com",
-    "creationTime": "3/3/2019, 1:02:26 AM",
-    "lastActive": "10/03/2019",
+    "creationTime": "3/1/2019, 5:52:57 PM",
+    "lastActive": "05/03/2019",
     "published": false,
     "status": true,
-    "fileName": "deviceConfig_2040.json"
+    "fileName": "deviceConfig_230497.json"
 }

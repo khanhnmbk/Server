@@ -10,10 +10,10 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var recursive = require("recursive-readdir");
+var async = require('async');
 
 
 var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
-let arrConfig = [];
 /**
  * Get port from environment and store in Express.
  */
@@ -28,27 +28,27 @@ app.set('port', port);
 var server = http.createServer(app);
 global.io = require('socket.io')(server);
 
- /* MQTT */
- var mqtt = require('mqtt');
- var mqttClient = mqtt.connect('mqtt://localhost:1883');
+/* MQTT */
+var mqtt = require('mqtt');
+var mqttClient = mqtt.connect('mqtt://localhost:1883');
 
 
 
- mqttClient.on('connect', function () {
-   console.log('Connected to MQTT broker');
+mqttClient.on('connect', function () {
+  console.log('Connected to MQTT broker');
 
-   mqttClient.subscribe('/+/status' , function (err) { 
-    if (err) throw err;
-    console.log('Subscribed topic : ' + '/*/status');
+  mqttClient.subscribe('/+/status', function (err) {
+    if (err) console.log(err);
+    else console.log('Subscribed topic : ' + '/*/status');
   });
 
-  mqttClient.subscribe('/+/tags' , function (err) { 
-    if (err) throw err;
-    console.log('Subscribed topic : ' + '/*/tags');
+  mqttClient.subscribe('/+/tags', function (err) {
+    if (err) console.log(err);
+    else console.log('Subscribed topic : ' + '/*/tags');
   });
- });
+});
 
- mqttClient.on('message', function (topic, message) {
+mqttClient.on('message', function (topic, message) {
   if (topic.endsWith('status')) {
     var statusObject = JSON.parse(message.toString());
     if (statusObject) {
@@ -56,33 +56,33 @@ global.io = require('socket.io')(server);
       recursive(databasePath, function (err, files) {
         if (err) throw err;
         console.log(files);
-         for ( var file of files) {
-           if (file.includes(statusObject.deviceID + '.json')) {
-             var filePath = file;
-             fs.readFile(filePath , function (err , data) { 
-               if (err) throw err;
-               var object = JSON.parse(data);
-               object.status = statusObject.status;
-               object.lastActive = statusObject.timestamp;
-               //console.log(object);
-               fs.writeFile( filePath , JSON.stringify(object , null , 4) , function (err) { 
-                 if (err) throw err;
-                 console.log('Write success in ' +   filePath);
-               });
-             });
-             break;
-           }
-         }
+        for (var file of files) {
+          if (file.includes(statusObject.deviceID + '.json')) {
+            var filePath = file;
+            fs.readFile(filePath, function (err, data) {
+              if (err) throw err;
+              var object = JSON.parse(data);
+              object.status = statusObject.status;
+              object.lastActive = statusObject.timestamp;
+              //console.log(object);
+              fs.writeFile(filePath, JSON.stringify(object, null, 4), function (err) {
+                if (err) console.log(err);
+                else console.log('Write success in ' + filePath);
+              });
+            });
+            break;
+          }
+        }
       });
-      io.emit('/' + statusObject.deviceID + '/status' , message.toString());
-    } 
+      io.emit('/' + statusObject.deviceID + '/status', message.toString());
+    }
   }
 
   if (topic.endsWith('tags')) {
     console.log('Topic : ' + topic + ' - Message : ' + message.toString());
     variableObj = JSON.parse(message.toString());
-    io.emit('/' + variableObj.deviceID + '/tag' , message.toString());
-  }   
+    io.emit('/' + variableObj.deviceID + '/tag', message.toString());
+  }
 
 
 });
@@ -93,6 +93,27 @@ global.io = require('socket.io')(server);
  */
 
 io.on('connection', function (socket) {
+
+  socket.on('/reqDeviceConfig' , function (user) { 
+    var arrConfig = [];
+    var userFolder = path.resolve(databasePath , user);
+    async.series([
+      function(callback) {
+        var fileList = fs.readdirSync(userFolder);
+        if(fileList.length > 0) {
+          fileList.forEach(function (file) { 
+            if (path.extname(file) == '.json') 
+              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder, file))))
+          });
+        }
+        callback();
+      }
+    ], function (err) { 
+      if (err) console.log(err);
+      else socket.emit('/' + user + '/resDeviceConfig' , arrConfig);
+    });
+  });
+
   socket.on('deviceConfig', function (data) {
     console.log(data);
     if (data) {
@@ -103,38 +124,30 @@ io.on('connection', function (socket) {
         var filePath = path.resolve(databasePath, receivedObject.user, 'deviceConfig_' + receivedObject.deviceID + '.json');
 
         fs.writeFile(filePath, receivedObjectJSON, function (err) {
-          if (err) throw err;
-          console.log('Succeed');
+          if (err) console.log(err);
+          else console.log('Succeed');
         });
 
         //Send configuration to gateway via MQTT
         var configObject = {
-          command : 'set',
-          value : receivedObjectJSON,
+          command: 'set',
+          value: receivedObjectJSON,
         }
-        mqttClient.publish('/' + receivedObject.deviceID + '/config',JSON.stringify(configObject,null,4));
+        mqttClient.publish('/' + receivedObject.deviceID + '/config', JSON.stringify(configObject, null, 4));
       }
     }
   });
 
-  socket.on('reqDeviceConfig', function (user) {
-    console.log(user);
-    readConfigFiles(user).then(() => {
-      socket.emit('/' + user + '/resDeviceConfig', arrConfig);
-      arrConfig = [];
-    });
-  });
-
   socket.on('deleteDevice', function (filePath) {
     fs.unlink(path.resolve(databasePath, filePath), function (err) {
-      if (err) throw err;
-      socket.emit('deleteSuccess', 1);
+      if (err) console.log(err)
+      else socket.emit('deleteSuccess', 1);
     });
   });
 
-  socket.on('/write' , function (rcvJson) { 
+  socket.on('/write', function (rcvJson) {
     var rcvObj = JSON.parse(rcvJson);
-    mqttClient.publish('/' + rcvObj.deviceID + '/write' , rcvObj.command);
+    mqttClient.publish('/' + rcvObj.deviceID + '/write', rcvObj.command);
   });
 
 });
@@ -204,25 +217,4 @@ function onListening() {
 }
 
 //Function
-
-//Read config files
-var readConfigFiles = async (user) => {
-  var userFolder = path.resolve(databasePath, user);
-  await readFiles();
-  function readFiles() {
-    fs.readdir(userFolder, function (err, files) {
-      if (err) throw err;
-      if (files.length > 0) {
-        files.forEach(function (file) {
-          if (path.extname(file) == '.json') {
-            fs.readFile(path.resolve(userFolder, file), function (err, data) {
-              if (err) throw err;
-              arrConfig.push(JSON.parse(data));
-            });
-          }
-        });
-      }
-    });
-  };
-}
 

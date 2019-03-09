@@ -37,6 +37,6 @@
     "creationTime": "3/1/2019, 2:43:58 AM",
     "lastActive": "",
     "status": true,
-	"published": false,
+	"published": true,
 	"fileName": "deviceConfig_1234.json"
 }
