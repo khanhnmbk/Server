@@ -20,8 +20,6 @@ $(document).ready(function () {
             socketOnStatus(socket); //Subscribe status topic
         });
 
-        
-
         socket.emit('/reqDeviceConfig', _user); //Get device config array
 
         $('#sidebarButton').on('click', function () {
@@ -250,25 +248,25 @@ function loadDeviceTable(arrDeviceObject) {
         arrDeviceObject.forEach(function (device) {
             var htmlMarkup = `
                 <tr>
-                    <td><input type = "checkbox"></td>
-                    <td>` + device.deviceName + `</td>
-                    <td>` + device.creationTime + `</td>
-                    <td>` + device.lastActive + `</td>
-                    <td>` + device.longitude + `</td>
-                    <td>` + device.latitude + `</td>
-                    <td>` + device.period + `</td>`
+                    <td class = "text-center"><input type = "checkbox"></td>
+                    <td class = "text-center">` + device.deviceName + `</td>
+                    <td class = "text-center">` + device.creationTime + `</td>
+                    <td class = "text-center">` + device.lastActive + `</td>
+                    <td class = "text-center">` + device.longitude + `</td>
+                    <td class = "text-center">` + device.latitude + `</td>
+                    <td class = "text-center">` + device.period + `</td>`
             if (!device.status)
-                htmlMarkup += '<td><span class="rounded-circle bg-secondary status"></span></td>';
-            else htmlMarkup += '<td><span class="rounded-circle bg-primary status"></span></td>';
+                htmlMarkup += '<td class = "text-center"><span class="rounded-circle bg-secondary status"></span></td>';
+            else htmlMarkup += '<td class = "text-center"><span class="rounded-circle bg-primary status"></span></td>';
 
             htmlMarkup += `
-                    <td>
+                    <td class = "text-center">
                         <i class="fas fa-cog variable-icon" data-index=` + arrDeviceObject.indexOf(device) + ` data-toggle="modal" data-target="#gatewayChildrenModal">
                     </td>` ;
 
             if (!device.published)
-                htmlMarkup += `<td><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Design page</a></td> </tr>`;
-            else htmlMarkup += `<td><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "#">Published page</a></td> </tr>`;
+                htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Design page</a></td> </tr>`;
+            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "#">Published page</a></td> </tr>`;
             $('#deviceTable > tbody').append(htmlMarkup);
 
         });

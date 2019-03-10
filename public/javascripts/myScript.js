@@ -457,8 +457,8 @@ function scadaSymbolSetObject(item, variableName) {
 
   if (item.onCondition) {
     if (item.onCondition.includes(variableName)) {
-      if (eval(item.onCondition)) console.log('OnCondition trigger');
-      else console.log('OnCondition off');
+      if (eval(item.onCondition)) item.src = item.onSymbol;
+      else item.src = item.offSymbol;
     }
   }
 }

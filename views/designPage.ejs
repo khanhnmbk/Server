@@ -231,28 +231,103 @@
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs bg-secondary toggle-nav" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><strong>Home</strong></a>
+                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i class="fas fa-home mr-1"></i><strong>Home</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#menu1"><strong>Menu 1</strong></a>
+                        <a class="nav-link" data-toggle="tab" href="#alarm"><i class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#menu2"><strong>Menu 2</strong></a>
+                        <a class="nav-link" data-toggle="tab" href="#history"><i class="fas fa-history mr-1"></i><strong>History</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#dashboard"><i class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                 </ul>
 
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height no-gutter-all">
-                        <!-- <br> -->
                     </div>
-                    <div id="menu1" class="container-fluid tab-pane fade bg-white full-height"><br>
-                        <h3>Menu 1</h3>
-                        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                            commodo consequat.</p>
+                    <div id="alarm" class="container-fluid tab-pane fade bg-white full-height">
+                        <div class="row pt-3">
+                            <button class="btn btn-primary ml-auto">Acknowledge</button>
+                            <button class="btn btn-primary mx-3">Acknowledge All</button>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <table class="table table-hover" id="alarmTable">
+                                <thead  class="bg-secondary text-white">
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Source</th>
+                                    <th>Value</th>
+                                    <th>Message</th>
+                                    <th>Type</th>
+                                    <th>State</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>10/03/2019</td>
+                                    <td>20:00:00</td>
+                                    <td>Level</td>
+                                    <td>3.5</td>
+                                    <td>Too high level</td>
+                                    <td>HI HI</td>
+                                    <td>UNACK</td>
+                                </tr>
+                                </tbody>
+                              </table>
+                        </div>
+                        
                     </div>
-                    <div id="menu2" class="container-fluid tab-pane fade bg-white full-height"><br>
-                        <h3>Menu 2</h3>
+                    <div id="history" class="container-fluid tab-pane fade bg-white full-height">
+                        <div class="row pt-3">
+                          
+                            <label for="#inputFilter" class="my-auto mx-2">Filter</label>
+                            <input class="form-control" id="inputFilter" type="text" placeholder="Search.." style="max-width : 400px">
+
+                            <label for="#inputFilter" class="my-auto ml-5 mr-2">From</label>
+                            <input class="form-control" id="inputFilter" type="date" style="max-width : 200px">
+                        
+                            <label for="#inputFilter" class="my-auto ml-5 mr-2">To</label>
+                            <input class="form-control" id="inputFilter" type="date" style="max-width : 200px">
+
+                            <button class="btn btn-primary ml-auto mr-3">Export</button>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <table class="table table-hover" id="historyTable">
+                                <thead  class="bg-secondary text-white">
+                                  <tr>
+                                    <th>PLC</th>
+                                    <th>PLC address</th>
+                                    <th>Tag</th>
+                                    <th>Address</th>
+                                    <th>Value</th>
+                                    <th>Unit</th>
+                                    <th>Timestamp</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>S7-1500</td>
+                                    <td>192.168.1.150</td>
+                                    <td>Speed</td>
+                                    <td>MW100</td>
+                                    <td>200</td>
+                                    <td>RPM</td>
+                                    <td>23/04/2019</td>
+                                </tr>
+                                </tbody>
+                              </table>
+                        </div>
+                    </div>
+                    <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height"><br>
+                        <h3>Dashboard</h3>
                         <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
                             laudantium, totam rem aperiam.</p>
                     </div>
