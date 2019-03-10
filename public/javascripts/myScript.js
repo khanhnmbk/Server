@@ -22,6 +22,7 @@ $(document).ready(function () {
       //Disable all input in Modals: to prevent users from changing elements' properties
       $('.inputModal').prop('disabled', true);
       $('.btnBrowseTag').prop('disabled', true);
+      $('.btnChooseImage').prop('disabled', true);
       $('.saveChangeButton').prop('disabled' , true);
       initSCADA(shapes, socket);
       socket.on('/' + deviceID + '/tag', function (data) {
@@ -46,6 +47,7 @@ $(document).ready(function () {
       //Enable input
       $('.inputModal').prop('disabled', false);
       $('.btnBrowseTag').prop('disabled', false);
+      $('.btnChooseImage').prop('disabled', false);
       $('.saveChangeButton').prop('disabled' , false);
       socket.off('/' + deviceID + '/tag');
     });
@@ -1311,7 +1313,7 @@ function imageMouseDownEventHandler(event) {
   shapes[index].style.position = 'absolute';
   shapes[index].style.top = top;
   shapes[index].style.left = left;
-  shapes[index].style.border = '2px solid black';
+  //  shapes[index].style.border = '2px solid black';
 
   //Image mouse events
   $(shapes[index]).on('mouseover', function (event) {
@@ -1334,7 +1336,9 @@ function imageMouseDownEventHandler(event) {
       var elemWidth = parseInt(elemStyle.width, 10),
         elemHeight = parseInt(elemStyle.height, 10),
         elemPositionX = parseInt(elemStyle.left, 10),
-        elemPositionY = parseInt(elemStyle.top, 10);
+        elemPositionY = parseInt(elemStyle.top, 10),
+        elemSource = elem.src;
+
 
       //console.log('Target ' + mouseEvent.target.id);
 
@@ -1343,6 +1347,7 @@ function imageMouseDownEventHandler(event) {
       itemModal.querySelector('#inputHeight').value = elemHeight;
       itemModal.querySelector('#inputPositionX').value = elemPositionX;
       itemModal.querySelector('#inputPositionY').value = elemPositionY;
+      itemModal.querySelector('.inputImageSource').value = elemSource;
 
       if (mouseEvent.target.hiddenWhen) {
         itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
@@ -1358,6 +1363,7 @@ function imageMouseDownEventHandler(event) {
         elemStyle.left = imageModal.querySelector('#inputPositionX').value + 'px';
         elemStyle.top = imageModal.querySelector('#inputPositionY').value + 'px';
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+        mouseEvent.target.src = itemModal.querySelector('.inputImageSource').value;
 
       });
 
@@ -1374,6 +1380,15 @@ function imageMouseDownEventHandler(event) {
     $('#imageModal').one('hide.bs.modal', function (hideEvent) {
       $('.saveChangeButton').off('click');
       $('.btnHiddenWhen').off('click');
+      $('.btnSelect').off('click');
+    });
+
+    $('#chooseImageModal').one('show.bs.modal' , function (event) { 
+      $('.btnSelect').on('click' , function(btnEvent){
+        if ($("[name=symbol]").is(":checked"))
+          $('.inputImageSource').val($('[name=symbol]:checked').val())  ;
+          $('#chooseImageModal').modal('toggle');
+      });
     });
 
     $('#imageModal').modal();
@@ -2520,6 +2535,8 @@ function symbolsetMouseDownEventHandler(event) {
   var symbolSet = document.createElement('img');
   symbolSet.id = 'symbolSet' + index;
   symbolSet.className += ' contextMenu ';
+  symbolSet.offSymbol = '';
+  symbolSet.onSymbol = '';
 
 
 
@@ -2551,13 +2568,17 @@ function symbolsetMouseDownEventHandler(event) {
       var elemWidth = parseInt(elemStyle.width, 10),
         elemHeight = parseInt(elemStyle.height, 10),
         elemPositionX = parseInt(elemStyle.left, 10),
-        elemPositionY = parseInt(elemStyle.top, 10);
+        elemPositionY = parseInt(elemStyle.top, 10),
+        elemOnSymbol = elem.onSymbol;
+        elemOffSymbol = elem.offSymbol;
 
       var itemModal = $('#symbolSetModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
       itemModal.querySelector('.inputHeight').value = elemHeight;
       itemModal.querySelector('.inputPositionX').value = elemPositionX;
       itemModal.querySelector('.inputPositionY').value = elemPositionY;
+      itemModal.querySelector('.inputOnImageSource').value = elemOnSymbol;
+      itemModal.querySelector('.inputOffImageSource').value = elemOffSymbol;
 
       if (mouseEvent.target.onCondition) {
         itemModal.querySelector('.inputOnCondition').value = mouseEvent.target.onCondition;
@@ -2581,8 +2602,9 @@ function symbolsetMouseDownEventHandler(event) {
         elemStyle.top = itemModal.querySelector('.inputPositionY').value + 'px';
         mouseEvent.target.onCondition = itemModal.querySelector('.inputOnCondition').value;
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
-
-
+        mouseEvent.target.onSymbol = itemModal.querySelector('.inputOnImageSource').value;
+        mouseEvent.target.offSymbol = itemModal.querySelector('.inputOffImageSource').value;
+        mouseEvent.target.src = mouseEvent.target.offSymbol;
       });
 
       //Browse Tag button
@@ -2609,6 +2631,20 @@ function symbolsetMouseDownEventHandler(event) {
       $('.saveChangeButton').off('click');
       $('#btnOnCondition').off('click');
       $('.btnHiddenWhen').off('click');
+      $('.btnSelect').off('click');
+    });
+
+    $('#chooseImageModal').on('show.bs.modal' , function (event) { 
+      var _target = event.relatedTarget.id;
+      $('.btnSelect').one('click' , function(btnEvent){
+        if ($("[name=symbol]").is(":checked")) {
+          if (_target == 'btnOnSymbol') 
+          $('.inputOnImageSource').val($('[name=symbol]:checked').val())  ;
+          else 
+          $('.inputOffImageSource').val($('[name=symbol]:checked').val())  ;
+        }
+        $('#chooseImageModal').modal('hide');
+      });
     });
 
     $('#symbolSetModal').modal();

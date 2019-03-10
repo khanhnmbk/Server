@@ -87,7 +87,9 @@ body{
     background: rgba(0, 0, 0, 0.4);
     }
 
-
+#chooseImageModal{
+    background: rgba(0, 0, 0, 0.4);
+}
     
 
 /*
@@ -178,3 +180,38 @@ input:checked+.slider:before {
 }
 
 
+/*
+***********************************************************************************************
+                                Image Radio Style 
+***********************************************************************************************
+*/
+
+label[class=imgMenu]  { 
+    display: inline-block;
+    margin: 10px;
+    max-width: 70px;
+    max-height: 70px;
+}
+
+label[class=imgMenu] > img { 
+    width: 70px;
+    height: 70px;
+    padding: 5px;
+}
+
+label[class=imgMenu] > p { 
+    word-break: break-all;
+    overflow:hidden;
+}
+
+label[class=imgMenu] > input { /* HIDE RADIO */
+  visibility: hidden; /* Makes input not-clickable */
+  position: absolute; /* Remove input from document flow */
+}
+label[class=imgMenu] > input + img , p { /* IMAGE STYLES */
+  cursor:pointer;
+  border:2px solid transparent;
+}
+label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
+  border:2px solid #f00;
+}
