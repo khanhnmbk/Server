@@ -5,6 +5,10 @@
 */
 $(document).ready(function () {
 
+  //Disable all elements in alarm and history when not RUN
+  $('#alarm *').prop('disabled' , true);
+  $('#history *').prop('disabled' , true);
+
   declareVariable();
 
   var socket = io();
@@ -14,6 +18,9 @@ $(document).ready(function () {
       console.log(deviceID);
       $(this).prop('disabled', true);
       $('#btnStop').prop('disabled', false);
+      $('.button-icon').prop('disabled',true);
+      $('#alarm *').prop('disabled' , false);
+      $('#history *').prop('disabled' , false);
       draggableObjects.forEach(function (item) {
         item.disabled = true;
       });
@@ -25,6 +32,7 @@ $(document).ready(function () {
       $('.btnChooseImage').prop('disabled', true);
       $('.saveChangeButton').prop('disabled' , true);
       initSCADA(shapes, socket);
+
       socket.on('/' + deviceID + '/tag', function (data) {
         var arrVarObjects = JSON.parse(data);
         console.log(arrVarObjects);
@@ -35,11 +43,68 @@ $(document).ready(function () {
           });
         }
       });
+
+      //Clear table body first
+      $('#alarmTable tbody').empty();
+      socket.on('/' + deviceID + '/alarm' , function(alarmObject){
+        var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
+        var _isExist = false;
+        var _timeStamp = new Date(alarmObject.timestamp)
+        
+            for (var _item of arrAlarmSource) {
+              if (_item.innerText == alarmObject.source) {
+                if (alarmObject.state == 'UNACK') {
+                  var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
+                  var tableRow = $(_expression);
+                  tableRow[1].innerText = _timeStamp.toLocaleDateString();
+                  tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+                  tableRow[4].innerText = alarmObject.value;
+                  tableRow[5].innerText = alarmObject.message;
+                  tableRow[6].innerText = alarmObject.type;
+                  tableRow[7].innerText = alarmObject.state;
+                }
+                else { //ACKED
+                  _item.closest('tr').remove();
+                } 
+                _isExist = true;
+                break;
+              }
+            }
+         
+         
+            if (!_isExist) {//Not found item 
+              var _htmlMarkup = 
+              `<tr class = "row-pointer">
+                <td><input type="checkbox" class = "alarmCheckbox"></td>
+                <td>` + _timeStamp.toLocaleDateString() + `</td>
+                <td>` + _timeStamp.toLocaleTimeString() + `</td>
+                <td>` + alarmObject.source + `</td>
+                <td>` + alarmObject.value + `</td>
+                <td>` + alarmObject.message + `</td>
+                <td>` + alarmObject.type +`</td>
+                <td>` + alarmObject.state +`</td>
+              </tr>`
+              $('#alarmTable').prepend(_htmlMarkup);
+
+              $('#alarmTable tbody tr:nth-child(1)').click(function () { 
+                var _checkbox =  $(this).children('td').children('input');
+                _checkbox.prop('checked' , !_checkbox.prop('checked'));
+                if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
+                else $(this).removeClass('alarm-selected');
+              });
+
+            }
+        
+      })
+
     });
 
     $('#btnStop').on('click', function (clickEvent) {
       $(this).prop('disabled', true);
       $('#btnRun').prop('disabled', false);
+      $('.button-icon').prop('disabled',false);
+      $('#alarm *').prop('disabled' , true);
+      $('#history *').prop('disabled' , true);
       draggableObjects.forEach(function (item) {
         item.disabled = false;
       });
@@ -54,14 +119,6 @@ $(document).ready(function () {
   });
 
 
-  // $('#btnOpen').on('click', function () {
-  //   console.dir(shapes);
-  //   shapes.forEach(function (item) {
-  //     console.log(item.id.toString().replace(/[0-9]/g, ''));
-  //   })
-  // });
-
-
   $('[data-toggle="tooltip"]').tooltip();
   $('body').keyup(function (e) {
     if (e.keyCode == 27) {
@@ -73,6 +130,49 @@ $(document).ready(function () {
     $(this).children('td').children('div').children('input').prop('checked', true);
     $('.table-body tr').removeClass('row-selected');
     $(this).toggleClass('row-selected');
+  });
+
+  $('#btnAck').click(function () { 
+    if ($('.alarm-selected').length > 0) {
+      var _resAlarm = {
+        deviceID : deviceID,
+        resAlarm : []
+      }
+      $('.alarm-selected').each(function () { 
+        var _selectedItem = $(this).find('td');
+        _resAlarm.resAlarm.push({
+          source : _selectedItem[3].innerText,
+          value : _selectedItem[4].innerText,
+          message : _selectedItem[5].innerText,
+          type : _selectedItem[6].innerText,
+          state : 'ACKED',
+          timestamp : new Date().toLocaleString(),
+        })
+      });
+      socket.emit('/resAlarm',_resAlarm);
+    }
+  });
+
+  $('#btnAckAll').click(function () { 
+    var rows = $('#alarmTable tbody tr');
+    if (rows.length > 0) {
+      var _resAlarm = {
+        deviceID : deviceID,
+        resAlarm : []
+      }
+      rows.each(function () {
+        if ($(this).find('td')[7].innerText == 'UNACK')
+          _resAlarm.resAlarm.push({
+            source : $(this).find('td')[3].innerText,
+            value : $(this).find('td')[4].innerText,
+            message : $(this).find('td')[5].innerText,
+            type : $(this).find('td')[6].innerText,
+            state : 'ACKED',
+            timestamp : new Date().toLocaleString(),
+          })
+      });
+      socket.emit('/resAlarm',_resAlarm);
+    }
   });
 
 

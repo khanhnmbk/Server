@@ -11,10 +11,9 @@ var fs = require('fs');
 var path = require('path');
 var recursive = require("recursive-readdir");
 var async = require('async');
-
-const mongoose = require('mongoose');
-var alarmModal = require('../model/alarm');
-//mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', {useNewUrlParser: true});
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', {useNewUrlParser: true});
+var alarmMongoose = require('../model/alarm');
 
 var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
 /**
@@ -90,15 +89,28 @@ mqttClient.on('message', function (topic, message) {
 
   if (topic.endsWith('tags')) {
     console.log('Topic : ' + topic + ' - Message : ' + message.toString());
-    variableObj = JSON.parse(message.toString());
+    var variableObj = JSON.parse(message.toString());
     io.emit('/' + variableObj.deviceID + '/tag', message.toString());
   }
 
   if (topic.endsWith('alarm')) {
+    var alarmObject = JSON.parse(message.toString());
+    io.emit('/' + alarmObject.deviceID + '/alarm' , alarmObject);
+    //Save to mongo
+    var alarmModel = alarmMongoose.createModel('Device_' + alarmObject.deviceID + '_alarm');
+    var _newAlarm = new alarmModel({
+      source : alarmObject.source,
+      value : alarmObject.value ,
+      message : alarmObject.message ,
+      type : alarmObject.type ,
+      state : alarmObject.state ,
+      timestamp : alarmObject.timestamp ,
+    });
+    alarmMongoose.createNewAlarm(_newAlarm);
 
   }
-
 });
+    
 
 
 /**
@@ -162,6 +174,11 @@ io.on('connection', function (socket) {
     var rcvObj = JSON.parse(rcvJson);
     mqttClient.publish('/' + rcvObj.deviceID + '/write', rcvObj.command);
   });
+
+  socket.on('/resAlarm' , function (alarmObject) { 
+    console.log(alarmObject);
+    mqttClient.publish('/' + alarmObject.deviceID + '/resAlarm' , JSON.stringify(alarmObject , null , 4));
+  })
 
 });
 server.listen(port);

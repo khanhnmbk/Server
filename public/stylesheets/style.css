@@ -91,6 +91,14 @@ body{
     background: rgba(0, 0, 0, 0.4);
 }
     
+#alarmTable tbody {
+    color:red;
+}
+
+.alarm-selected{
+    background : #bdbdbd;
+    color : red;
+}
 
 /*
 ***********************************************************************************************

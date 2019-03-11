@@ -2,25 +2,31 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 mongoose.Promise = global.Promise; //Error if not declared
 
-var AlarmSchema = new Schema ({
-    source : String,
-    value : Number,
-    message : String,
-    type : String,
-    state: String,
-    timestamp : {type : Date , default : Date.now},
-} , {collection: 'alarm'});
+// var AlarmSchema = new Schema ({
+//     source : String,
+//     value : Number,
+//     message : String,
+//     type : String,
+//     state: String,
+//     timestamp : Date,
+// } , {collection: 'alarm'});
 
-var alarmSchema = module.exports.alarmSchema = AlarmSchema;
+var AlarmSchema =  new Schema({
+        source: String,
+        value: Number,
+        message: String,
+        type: String,
+        state: String,
+        timestamp: Date,
+    });
 
-module.exports.createConnection = function (connectionUrl) { 
-    return mongoose.createConnection(connectionUrl)
+var Alarm = module.exports.createModel = function (collection) { 
+    return mongoose.model('Alarm' , AlarmSchema , collection)
 }
 
-module.exports.createModel = function (connection , modelName , schema) { 
-    return connection.model(modelName , schema)
-}
+module.exports.createNewAlarm = function (newAlarm) {
+    newAlarm.save();
+    console.log('Write success to mongo :' + newAlarm);
+};
 
-module.exports.addNewAlarm = function (connection , modelName , schema) { 
-    return connection.model(modelName , schema)
-}
+
