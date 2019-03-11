@@ -95,8 +95,27 @@ $(document).ready(function () {
 
             }
         
-      })
+      });
 
+      //Clear history table body first
+      $('#historyTable tbody').empty();
+      socket.emit('/reqHistory',deviceID);
+      socket.on('/' + deviceID + '/resHistory' , function (data) { 
+        if (data.length > 0) {
+          $('#historyTable tbody').empty();
+          data.forEach(function (dataItem) { 
+            var _htmlMarkup = 
+            `<tr>
+              <td>` + dataItem.tag +`</td>
+              <td>` + dataItem.type +`</td>
+              <td>` + dataItem.address +`</td>
+              <td>` + dataItem.value +`</td>
+              <td>` + dataItem.timestamp +`</td>
+            </tr>`
+            $('#historyTable tbody').append(_htmlMarkup);
+          });
+        }
+      });
     });
 
     $('#btnStop').on('click', function (clickEvent) {
@@ -115,6 +134,9 @@ $(document).ready(function () {
       $('.btnChooseImage').prop('disabled', false);
       $('.saveChangeButton').prop('disabled' , false);
       socket.off('/' + deviceID + '/tag');
+      socket.off('/' + deviceID + '/alarm');
+      socket.off('/' + deviceID + '/resHistory');
+
     });
   });
 
@@ -173,6 +195,10 @@ $(document).ready(function () {
       });
       socket.emit('/resAlarm',_resAlarm);
     }
+  });
+
+  $('#btnRefreshHistory').click(function () { 
+    socket.emit('/reqHistory',deviceID);
   });
 
 

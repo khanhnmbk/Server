@@ -154,26 +154,6 @@ router.get('/design/:user/:filename', checkAuthtication, function(req, res, next
         })
       }
       callback();
-      // fs.readdir(symbolPath , function (err , folders) { 
-      //   if (err) callback(err);
-      //   if (folders.length > 0) {
-      //     folders.forEach(function (folder) {
-      //       _symbol.folder = folder; 
-      //       fs.readdir(path.resolve(symbolPath,folder) , function (err , files) { 
-      //         if (err) callback(err);
-      //         if (files.length > 0) {
-      //           files.forEach(function (file) {
-      //             _symbol.symbols.push(path.basename(file));
-      //           });
-      //         }
-      //       });
-      //       arrSymbols.push(_symbol);
-      //       _symbol.folder = '';
-      //       _symbol.symbols = [];
-      //     });
-      //   }
-      //   callback();
-      // });
     }
   ] , function (err) { 
     if (err) throw err;

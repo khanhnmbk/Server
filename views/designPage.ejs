@@ -305,31 +305,28 @@
                         
                             <label for="#inputFilter" class="my-auto ml-5 mr-2">To</label>
                             <input class="form-control" id="inputFilter" type="date" style="max-width : 200px">
-
-                            <button class="btn btn-primary ml-auto mr-3">Export</button>
+                            
+                            <button class="btn btn-primary ml-auto mr-3" id="btnRefreshHistory">Refresh</button>
+                            <button class="btn btn-primary mr-3">Export</button>
                         </div>
                         
                         <div class="row mt-3">
-                            <table class="table table-hover" id="historyTable">
+                            <table class="table table-hover text-center" id="historyTable">
                                 <thead  class="bg-secondary text-white">
                                   <tr>
-                                    <th>PLC</th>
-                                    <th>PLC address</th>
                                     <th>Tag</th>
+                                    <th>Data type</th>
                                     <th>Address</th>
                                     <th>Value</th>
-                                    <th>Unit</th>
                                     <th>Timestamp</th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   <tr>
-                                    <td>S7-1500</td>
-                                    <td>192.168.1.150</td>
                                     <td>Speed</td>
+                                    <td>aa</td>
                                     <td>MW100</td>
                                     <td>200</td>
-                                    <td>RPM</td>
                                     <td>23/04/2019</td>
                                 </tr>
                                 </tbody>

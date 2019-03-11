@@ -17,7 +17,7 @@ var AlarmSchema =  new Schema({
         message: String,
         type: String,
         state: String,
-        timestamp: Date,
+        timestamp: String,
     });
 
 var Alarm = module.exports.createModel = function (collection) { 
@@ -26,7 +26,7 @@ var Alarm = module.exports.createModel = function (collection) {
 
 module.exports.createNewAlarm = function (newAlarm) {
     newAlarm.save();
-    console.log('Write success to mongo :' + newAlarm);
+    console.log('Write success to mongo alarm :' + newAlarm);
 };
 
 

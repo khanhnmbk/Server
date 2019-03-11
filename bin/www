@@ -12,8 +12,9 @@ var path = require('path');
 var recursive = require("recursive-readdir");
 var async = require('async');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', { useNewUrlParser: true });
 var alarmMongoose = require('../model/alarm');
+var historyMongoose = require('../model/history');
 
 var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
 /**
@@ -88,29 +89,44 @@ mqttClient.on('message', function (topic, message) {
   }
 
   if (topic.endsWith('tags')) {
-    console.log('Topic : ' + topic + ' - Message : ' + message.toString());
     var variableObj = JSON.parse(message.toString());
     io.emit('/' + variableObj.deviceID + '/tag', message.toString());
+
+    if (variableObj.variables) {
+      variableObj.variables.forEach(function (_var) {
+        if (_var.isHistory) {
+          var historyModel = historyMongoose.createModel('Device_' + variableObj.deviceID + '_history');
+          var _newHistory = new historyModel({
+            tag: _var.tagName,
+            type: _var.dataType,
+            address: _var.address,
+            value: _var.value,
+            timestamp: _var.timestamp
+          });
+          historyMongoose.createNewHistory(_newHistory);
+        }
+      });
+    }
   }
 
   if (topic.endsWith('alarm')) {
     var alarmObject = JSON.parse(message.toString());
-    io.emit('/' + alarmObject.deviceID + '/alarm' , alarmObject);
+    io.emit('/' + alarmObject.deviceID + '/alarm', alarmObject);
     //Save to mongo
     var alarmModel = alarmMongoose.createModel('Device_' + alarmObject.deviceID + '_alarm');
     var _newAlarm = new alarmModel({
-      source : alarmObject.source,
-      value : alarmObject.value ,
-      message : alarmObject.message ,
-      type : alarmObject.type ,
-      state : alarmObject.state ,
-      timestamp : alarmObject.timestamp ,
+      source: alarmObject.source,
+      value: alarmObject.value,
+      message: alarmObject.message,
+      type: alarmObject.type,
+      state: alarmObject.state,
+      timestamp: alarmObject.timestamp,
     });
     alarmMongoose.createNewAlarm(_newAlarm);
 
   }
 });
-    
+
 
 
 /**
@@ -119,23 +135,23 @@ mqttClient.on('message', function (topic, message) {
 
 io.on('connection', function (socket) {
 
-  socket.on('/reqDeviceConfig' , function (user) { 
+  socket.on('/reqDeviceConfig', function (user) {
     var arrConfig = [];
-    var userFolder = path.resolve(databasePath , user);
+    var userFolder = path.resolve(databasePath, user);
     async.series([
-      function(callback) {
+      function (callback) {
         var fileList = fs.readdirSync(userFolder);
-        if(fileList.length > 0) {
-          fileList.forEach(function (file) { 
-            if (path.extname(file) == '.json') 
+        if (fileList.length > 0) {
+          fileList.forEach(function (file) {
+            if (path.extname(file) == '.json')
               arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder, file))))
           });
         }
         callback();
       }
-    ], function (err) { 
+    ], function (err) {
       if (err) console.log(err);
-      else socket.emit('/' + user + '/resDeviceConfig' , arrConfig);
+      else socket.emit('/' + user + '/resDeviceConfig', arrConfig);
     });
   });
 
@@ -175,10 +191,17 @@ io.on('connection', function (socket) {
     mqttClient.publish('/' + rcvObj.deviceID + '/write', rcvObj.command);
   });
 
-  socket.on('/resAlarm' , function (alarmObject) { 
+  socket.on('/resAlarm', function (alarmObject) {
     console.log(alarmObject);
-    mqttClient.publish('/' + alarmObject.deviceID + '/resAlarm' , JSON.stringify(alarmObject , null , 4));
-  })
+    mqttClient.publish('/' + alarmObject.deviceID + '/resAlarm', JSON.stringify(alarmObject, null, 4));
+  });
+
+  socket.on('/reqHistory', function (_id) {
+    var historyModel = historyMongoose.createModel('Device_' + _id + '_history');
+    historyModel.find({}, {_id : 0 , __v : 0} ,function (err , results) { 
+      socket.emit('/' + _id + '/resHistory' , results);
+    });
+  });
 
 });
 server.listen(port);
