@@ -201,6 +201,65 @@ $(document).ready(function () {
     socket.emit('/reqHistory',deviceID);
   });
 
+  $('#inputFilter').on('keyup' , function () { 
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("inputFilter");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("historyTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }       
+    }
+  });
+
+  $('.inputTimeFilter').on('change' , function () { 
+    //console.log('Change')
+    var inputFrom, inputTo, filterFrom, filterTo, table, tr, td, i, txtDate;
+
+    inputFrom = document.getElementById("inputFrom");
+    filterFrom = new Date(inputFrom.value);
+    inputTo = document.getElementById("inputTo");
+    filterTo = new Date(inputTo.value);
+    
+    table = document.getElementById("historyTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[4];
+      if (td) {
+        txtDate =  new Date(td.textContent || td.innerText);
+        if (inputFrom.value && !inputTo.value) { //Only from
+          if (txtDate > filterFrom) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        } else if (!inputFrom.value && inputTo.value) { //Only to
+          if (txtDate < filterTo) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        } else {  //Both
+          if ((txtDate > filterFrom) && (txtDate < filterTo)) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+        
+        
+      }       
+    }
+   })
+
 
 
 });
