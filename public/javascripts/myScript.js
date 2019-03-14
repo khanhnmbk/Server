@@ -269,7 +269,6 @@ $(document).ready(function () {
   })
 
   $('#btnExportToPdf').click(function () {
-
     var rowData = [];
     table = document.getElementById("historyTable");
     tr = table.getElementsByTagName("tr");
@@ -301,6 +300,33 @@ $(document).ready(function () {
     doc.save('table.pdf');
   });
 
+  $('#btnPublish').click( function() {
+    var _confirm = confirm('Do you want to publish your design? This cannot be back!');
+    if (_confirm) {
+      var mainPage1 = document.getElementById('mainPage1').innerHTML;
+      var _sendObject = {
+        user: user,
+        deviceID : deviceID ,
+        html : mainPage1,
+      }
+      $('#spinnerModal').modal('show');
+      console.log(mainPage1);
+      socket.on('/publishSuccess' , function(data){
+        setTimeout(function(){
+          $('#spinnerModal').modal('hide');
+          var href =  '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
+          console.log(href)
+          $('#publishedLink').attr('href' ,href)
+          $('#successModal').modal('show');
+        },3000);
+        
+      })
+      socket.emit('/publish' , _sendObject);
+      
+    }
+    
+  });
+
 });
 
 /*
@@ -317,6 +343,7 @@ let shape;
 let selectedItemId;
 let mqttDeviceTopic;
 const deviceID = $('#deviceID').text();
+const user = $('#user').text();
 let variableList = [];
 
 //Default option for basic objects except LINE

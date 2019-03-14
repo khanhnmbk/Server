@@ -266,7 +266,7 @@ function loadDeviceTable(arrDeviceObject) {
 
             if (!device.published)
                 htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Design page</a></td> </tr>`;
-            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "#">Published page</a></td> </tr>`;
+            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "` + device.link + `">Published page</a></td> </tr>`;
             $('#deviceTable > tbody').append(htmlMarkup);
 
         });

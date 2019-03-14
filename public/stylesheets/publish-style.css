@@ -1,0 +1,31 @@
+body{
+    background: #282d30;
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.no-gutter-all  { 
+    padding: 0;
+    margin: 0;
+}
+
+.full-height{
+    height: 100vh;
+}
+
+.toggle-nav a{
+    color: white;
+}
+
+.nav-tabs > li {
+    float:none;
+    display:inline-block;
+    zoom:1;
+}
+
+.nav-tabs {
+    text-align:center;
+}

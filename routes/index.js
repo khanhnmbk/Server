@@ -163,6 +163,27 @@ router.get('/design/:user/:filename', checkAuthtication, function(req, res, next
   });
 });
 
+/* GET published page */
+router.get('/published/:user/:fileName' , checkAuthtication, function(req , res , next){
+  res.render(req.params.user + '/' + req.params.fileName);
+
+  //Update published state
+  var configFile = req.params.fileName.replace('Device' , 'deviceConfig').replace('_publish.ejs' , '.json');
+  fs.readFile(path.resolve(databasePath , req.params.user , configFile )  , function(err , data) {
+    if (err) console.log(err);
+    else {
+      var deviceObj = JSON.parse(data);
+      deviceObj.published = true;
+      deviceObj.link = '/published/' + deviceObj.user + '/Device_' + deviceObj.deviceID + '_publish.ejs';
+      fs.writeFile(path.resolve(databasePath , req.params.user , configFile ), JSON.stringify(deviceObj , null, 4) , function(err) {
+        if (err) console.log(err);
+        else console.log('Write success in ' + path.resolve(databasePath , req.params.user , configFile ));
+      })
+
+    }
+  })
+})
+
 // router.get('/design', checkAuthtication, function(req, res, next) {
 //   res.render('designPage',{user : req.user.email});
   

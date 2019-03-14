@@ -12,6 +12,7 @@ var path = require('path');
 var recursive = require("recursive-readdir");
 var async = require('async');
 var mongoose = require('mongoose');
+var HTMLParser = require('node-html-parser');
 mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', { useNewUrlParser: true });
 var alarmMongoose = require('../model/alarm');
 var historyMongoose = require('../model/history');
@@ -202,6 +203,15 @@ io.on('connection', function (socket) {
       socket.emit('/' + _id + '/resHistory' , results);
     });
   });
+
+  socket.on('/publish' , function(dataObj) {
+    var template = fs.readFileSync('../Server/views/publish-template.ejs').toString();
+    var htlmObject = HTMLParser.parse(template);
+    htlmObject.querySelector('#mainPage1').appendChild(dataObj.html);
+    var fileName = 'Device_' + dataObj.deviceID + '_publish.ejs';
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user , fileName) , htlmObject);
+    socket.emit('/publishSuccess' , 1);
+  })
 
 });
 server.listen(port);
