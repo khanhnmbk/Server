@@ -307,7 +307,7 @@
                             <input class="form-control inputTimeFilter" id="inputTo" type="date" style="max-width : 200px">
                             
                             <button class="btn btn-primary ml-auto mr-3" id="btnRefreshHistory">Refresh</button>
-                            <button class="btn btn-primary mr-3">Export</button>
+                            <button class="btn btn-primary mr-3" id="btnExportToPdf">Export</button>
                         </div>
                         
                         <div class="row mt-3">
@@ -2170,6 +2170,10 @@
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
+    <!-- Jquery export to pdf-->
+    <script src="/javascripts/tableHTMLExport.js"></script>
+    <script src="/javascripts/jspdf.min.js"></script>
+    <script src="/javascripts/jspdf.plugin.autotable.js"></script>
     <!--Jquery UI draggable-->
     <script src="/javascripts/jquery-ui.min.js"></script>
     <!-- BootStrap scripts -->

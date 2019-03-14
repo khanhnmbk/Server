@@ -1,8 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 
-var rootDir = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server';
-var databaseDir = path.resolve(rootDir,'Database');
+var rootDir = '../Server';
+//var databaseDir = path.resolve(rootDir,'Database');
 
 fs.readdir(path.resolve(rootDir,'Database'), function (err , dirs) { 
     var result ='';

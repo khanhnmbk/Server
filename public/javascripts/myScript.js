@@ -6,8 +6,8 @@
 $(document).ready(function () {
 
   //Disable all elements in alarm and history when not RUN
-  $('#alarm *').prop('disabled' , true);
-  $('#history *').prop('disabled' , true);
+  $('#alarm *').prop('disabled', true);
+  $('#history *').prop('disabled', true);
 
   declareVariable();
 
@@ -18,9 +18,9 @@ $(document).ready(function () {
       console.log(deviceID);
       $(this).prop('disabled', true);
       $('#btnStop').prop('disabled', false);
-      $('.button-icon').prop('disabled',true);
-      $('#alarm *').prop('disabled' , false);
-      $('#history *').prop('disabled' , false);
+      $('.button-icon').prop('disabled', true);
+      $('#alarm *').prop('disabled', false);
+      $('#history *').prop('disabled', false);
       draggableObjects.forEach(function (item) {
         item.disabled = true;
       });
@@ -30,7 +30,7 @@ $(document).ready(function () {
       $('.inputModal').prop('disabled', true);
       $('.btnBrowseTag').prop('disabled', true);
       $('.btnChooseImage').prop('disabled', true);
-      $('.saveChangeButton').prop('disabled' , true);
+      $('.saveChangeButton').prop('disabled', true);
       initSCADA(shapes, socket);
 
       socket.on('/' + deviceID + '/tag', function (data) {
@@ -46,71 +46,71 @@ $(document).ready(function () {
 
       //Clear table body first
       $('#alarmTable tbody').empty();
-      socket.on('/' + deviceID + '/alarm' , function(alarmObject){
+      socket.on('/' + deviceID + '/alarm', function (alarmObject) {
         var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
         var _isExist = false;
         var _timeStamp = new Date(alarmObject.timestamp)
-        
-            for (var _item of arrAlarmSource) {
-              if (_item.innerText == alarmObject.source) {
-                if (alarmObject.state == 'UNACK') {
-                  var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
-                  var tableRow = $(_expression);
-                  tableRow[1].innerText = _timeStamp.toLocaleDateString();
-                  tableRow[2].innerText = _timeStamp.toLocaleTimeString();
-                  tableRow[4].innerText = alarmObject.value;
-                  tableRow[5].innerText = alarmObject.message;
-                  tableRow[6].innerText = alarmObject.type;
-                  tableRow[7].innerText = alarmObject.state;
-                }
-                else { //ACKED
-                  _item.closest('tr').remove();
-                } 
-                _isExist = true;
-                break;
-              }
+
+        for (var _item of arrAlarmSource) {
+          if (_item.innerText == alarmObject.source) {
+            if (alarmObject.state == 'UNACK') {
+              var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
+              var tableRow = $(_expression);
+              tableRow[1].innerText = _timeStamp.toLocaleDateString();
+              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+              tableRow[4].innerText = alarmObject.value;
+              tableRow[5].innerText = alarmObject.message;
+              tableRow[6].innerText = alarmObject.type;
+              tableRow[7].innerText = alarmObject.state;
             }
-         
-         
-            if (!_isExist) {//Not found item 
-              var _htmlMarkup = 
-              `<tr class = "row-pointer">
+            else { //ACKED
+              _item.closest('tr').remove();
+            }
+            _isExist = true;
+            break;
+          }
+        }
+
+
+        if (!_isExist) {//Not found item 
+          var _htmlMarkup =
+            `<tr class = "row-pointer">
                 <td><input type="checkbox" class = "alarmCheckbox"></td>
                 <td>` + _timeStamp.toLocaleDateString() + `</td>
                 <td>` + _timeStamp.toLocaleTimeString() + `</td>
                 <td>` + alarmObject.source + `</td>
                 <td>` + alarmObject.value + `</td>
                 <td>` + alarmObject.message + `</td>
-                <td>` + alarmObject.type +`</td>
-                <td>` + alarmObject.state +`</td>
+                <td>` + alarmObject.type + `</td>
+                <td>` + alarmObject.state + `</td>
               </tr>`
-              $('#alarmTable').prepend(_htmlMarkup);
+          $('#alarmTable').prepend(_htmlMarkup);
 
-              $('#alarmTable tbody tr:nth-child(1)').click(function () { 
-                var _checkbox =  $(this).children('td').children('input');
-                _checkbox.prop('checked' , !_checkbox.prop('checked'));
-                if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
-                else $(this).removeClass('alarm-selected');
-              });
+          $('#alarmTable tbody tr:nth-child(1)').click(function () {
+            var _checkbox = $(this).children('td').children('input');
+            _checkbox.prop('checked', !_checkbox.prop('checked'));
+            if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
+            else $(this).removeClass('alarm-selected');
+          });
 
-            }
-        
+        }
+
       });
 
       //Clear history table body first
       $('#historyTable tbody').empty();
-      socket.emit('/reqHistory',deviceID);
-      socket.on('/' + deviceID + '/resHistory' , function (data) { 
+      socket.emit('/reqHistory', deviceID);
+      socket.on('/' + deviceID + '/resHistory', function (data) {
         if (data.length > 0) {
           $('#historyTable tbody').empty();
-          data.forEach(function (dataItem) { 
-            var _htmlMarkup = 
-            `<tr>
-              <td>` + dataItem.tag +`</td>
-              <td>` + dataItem.type +`</td>
-              <td>` + dataItem.address +`</td>
-              <td>` + dataItem.value +`</td>
-              <td>` + dataItem.timestamp +`</td>
+          data.forEach(function (dataItem) {
+            var _htmlMarkup =
+              `<tr>
+              <td>` + dataItem.tag + `</td>
+              <td>` + dataItem.type + `</td>
+              <td>` + dataItem.address + `</td>
+              <td>` + dataItem.value + `</td>
+              <td>` + dataItem.timestamp + `</td>
             </tr>`
             $('#historyTable tbody').append(_htmlMarkup);
           });
@@ -121,9 +121,9 @@ $(document).ready(function () {
     $('#btnStop').on('click', function (clickEvent) {
       $(this).prop('disabled', true);
       $('#btnRun').prop('disabled', false);
-      $('.button-icon').prop('disabled',false);
-      $('#alarm *').prop('disabled' , true);
-      $('#history *').prop('disabled' , true);
+      $('.button-icon').prop('disabled', false);
+      $('#alarm *').prop('disabled', true);
+      $('#history *').prop('disabled', true);
       draggableObjects.forEach(function (item) {
         item.disabled = false;
       });
@@ -132,7 +132,7 @@ $(document).ready(function () {
       $('.inputModal').prop('disabled', false);
       $('.btnBrowseTag').prop('disabled', false);
       $('.btnChooseImage').prop('disabled', false);
-      $('.saveChangeButton').prop('disabled' , false);
+      $('.saveChangeButton').prop('disabled', false);
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
       socket.off('/' + deviceID + '/resHistory');
@@ -154,54 +154,54 @@ $(document).ready(function () {
     $(this).toggleClass('row-selected');
   });
 
-  $('#btnAck').click(function () { 
+  $('#btnAck').click(function () {
     if ($('.alarm-selected').length > 0) {
       var _resAlarm = {
-        deviceID : deviceID,
-        resAlarm : []
+        deviceID: deviceID,
+        resAlarm: []
       }
-      $('.alarm-selected').each(function () { 
+      $('.alarm-selected').each(function () {
         var _selectedItem = $(this).find('td');
         _resAlarm.resAlarm.push({
-          source : _selectedItem[3].innerText,
-          value : _selectedItem[4].innerText,
-          message : _selectedItem[5].innerText,
-          type : _selectedItem[6].innerText,
-          state : 'ACKED',
-          timestamp : new Date().toLocaleString(),
+          source: _selectedItem[3].innerText,
+          value: _selectedItem[4].innerText,
+          message: _selectedItem[5].innerText,
+          type: _selectedItem[6].innerText,
+          state: 'ACKED',
+          timestamp: new Date().toLocaleString(),
         })
       });
-      socket.emit('/resAlarm',_resAlarm);
+      socket.emit('/resAlarm', _resAlarm);
     }
   });
 
-  $('#btnAckAll').click(function () { 
+  $('#btnAckAll').click(function () {
     var rows = $('#alarmTable tbody tr');
     if (rows.length > 0) {
       var _resAlarm = {
-        deviceID : deviceID,
-        resAlarm : []
+        deviceID: deviceID,
+        resAlarm: []
       }
       rows.each(function () {
         if ($(this).find('td')[7].innerText == 'UNACK')
           _resAlarm.resAlarm.push({
-            source : $(this).find('td')[3].innerText,
-            value : $(this).find('td')[4].innerText,
-            message : $(this).find('td')[5].innerText,
-            type : $(this).find('td')[6].innerText,
-            state : 'ACKED',
-            timestamp : new Date().toLocaleString(),
+            source: $(this).find('td')[3].innerText,
+            value: $(this).find('td')[4].innerText,
+            message: $(this).find('td')[5].innerText,
+            type: $(this).find('td')[6].innerText,
+            state: 'ACKED',
+            timestamp: new Date().toLocaleString(),
           })
       });
-      socket.emit('/resAlarm',_resAlarm);
+      socket.emit('/resAlarm', _resAlarm);
     }
   });
 
-  $('#btnRefreshHistory').click(function () { 
-    socket.emit('/reqHistory',deviceID);
+  $('#btnRefreshHistory').click(function () {
+    socket.emit('/reqHistory', deviceID);
   });
 
-  $('#inputFilter').on('keyup' , function () { 
+  $('#inputFilter').on('keyup', function () {
     var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById("inputFilter");
     filter = input.value.toUpperCase();
@@ -213,14 +213,16 @@ $(document).ready(function () {
         txtValue = td.textContent || td.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
           tr[i].style.display = "";
+          tr[i].classList.remove('ignore-row');
         } else {
           tr[i].style.display = "none";
+          tr[i].classList.add('ignore-row');
         }
-      }       
+      }
     }
   });
 
-  $('.inputTimeFilter').on('change' , function () { 
+  $('.inputTimeFilter').on('change', function () {
     //console.log('Change')
     var inputFrom, inputTo, filterFrom, filterTo, table, tr, td, i, txtDate;
 
@@ -228,39 +230,76 @@ $(document).ready(function () {
     filterFrom = new Date(inputFrom.value);
     inputTo = document.getElementById("inputTo");
     filterTo = new Date(inputTo.value);
-    
+
     table = document.getElementById("historyTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
       td = tr[i].getElementsByTagName("td")[4];
       if (td) {
-        txtDate =  new Date(td.textContent || td.innerText);
+        txtDate = new Date(td.textContent || td.innerText);
         if (inputFrom.value && !inputTo.value) { //Only from
           if (txtDate > filterFrom) {
             tr[i].style.display = "";
+            tr[i].classList.remove('ignore-row');
           } else {
             tr[i].style.display = "none";
+            tr[i].classList.add('ignore-row');
           }
         } else if (!inputFrom.value && inputTo.value) { //Only to
           if (txtDate < filterTo) {
             tr[i].style.display = "";
+            tr[i].classList.remove('ignore-row');
           } else {
             tr[i].style.display = "none";
+            tr[i].classList.add('ignore-row');
           }
         } else {  //Both
           if ((txtDate > filterFrom) && (txtDate < filterTo)) {
             tr[i].style.display = "";
+            tr[i].classList.remove('ignore-row');
           } else {
             tr[i].style.display = "none";
+            tr[i].classList.add('ignore-row');
           }
         }
-        
-        
-      }       
+
+
+      }
     }
-   })
+  })
 
+  $('#btnExportToPdf').click(function () {
 
+    var rowData = [];
+    table = document.getElementById("historyTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      
+      if (!tr[i].classList.contains('ignore-row'))  {
+        tds = Array.from(tr[i].getElementsByTagName("td"));
+        rowData.push(tds);
+      }
+    }
+    var doc = new jsPDF();
+
+    var inputFrom = document.getElementById("inputFrom");
+    var filterFrom = new Date(inputFrom.value);
+    var inputTo = document.getElementById("inputTo");
+    var filterTo = new Date(inputTo.value);
+
+    doc.setFontSize(18);
+    doc.text('History table', 14, 22);
+    doc.setFontSize(12);
+    if (inputFrom.value) doc.text('From: ' + filterFrom.toLocaleDateString() , 16 , 30);
+    if (inputTo.value) doc.text('To:   ' + filterTo.toLocaleDateString() , 16 , 35);
+
+    doc.autoTable({
+      head: [['Tag', 'Data type', 'Address', 'Value', 'Timestamp']],
+      body: rowData,
+      startY : 50
+    });
+    doc.save('table.pdf');
+  });
 
 });
 
@@ -588,7 +627,8 @@ function scadaDisplayValueObject(item, variableName) {
 
   if (item.tag) {
     if (item.tag.includes(variableName)) {
-      $(item).text(eval(item.tag).toFixed(item.format));
+      if (typeof (eval(item.tag)) == 'boolean') $(item).text(eval(item.tag));
+      else $(item).text(eval(item.tag).toFixed(item.format));
     }
   }
 }
@@ -621,7 +661,7 @@ function scadaProgressBarObject(item, variableName) {
 
   if (item.tag) {
     if (item.tag.includes(variableName)) {
-      var _width = eval(item.tag)/_range * 100 + '%';
+      var _width = eval(item.tag) / _range * 100 + '%';
       $(item).children('div').css({
         'width': _width,
       });
@@ -1568,11 +1608,11 @@ function imageMouseDownEventHandler(event) {
       $('.btnSelect').off('click');
     });
 
-    $('#chooseImageModal').one('show.bs.modal' , function (event) { 
-      $('.btnSelect').on('click' , function(btnEvent){
+    $('#chooseImageModal').one('show.bs.modal', function (event) {
+      $('.btnSelect').on('click', function (btnEvent) {
         if ($("[name=symbol]").is(":checked"))
-          $('.inputImageSource').val($('[name=symbol]:checked').val())  ;
-          $('#chooseImageModal').modal('toggle');
+          $('.inputImageSource').val($('[name=symbol]:checked').val());
+        $('#chooseImageModal').modal('toggle');
       });
     });
 
@@ -2755,7 +2795,7 @@ function symbolsetMouseDownEventHandler(event) {
         elemPositionX = parseInt(elemStyle.left, 10),
         elemPositionY = parseInt(elemStyle.top, 10),
         elemOnSymbol = elem.onSymbol;
-        elemOffSymbol = elem.offSymbol;
+      elemOffSymbol = elem.offSymbol;
 
       var itemModal = $('#symbolSetModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
@@ -2819,14 +2859,14 @@ function symbolsetMouseDownEventHandler(event) {
       $('.btnSelect').off('click');
     });
 
-    $('#chooseImageModal').on('show.bs.modal' , function (event) { 
+    $('#chooseImageModal').on('show.bs.modal', function (event) {
       var _target = event.relatedTarget.id;
-      $('.btnSelect').one('click' , function(btnEvent){
+      $('.btnSelect').one('click', function (btnEvent) {
         if ($("[name=symbol]").is(":checked")) {
-          if (_target == 'btnOnSymbol') 
-          $('.inputOnImageSource').val($('[name=symbol]:checked').val())  ;
-          else 
-          $('.inputOffImageSource').val($('[name=symbol]:checked').val())  ;
+          if (_target == 'btnOnSymbol')
+            $('.inputOnImageSource').val($('[name=symbol]:checked').val());
+          else
+            $('.inputOffImageSource').val($('[name=symbol]:checked').val());
         }
         $('#chooseImageModal').modal('hide');
       });

@@ -16,7 +16,7 @@ mongoose.connect('mongodb://localhost:27017/LuanVan2019DB', { useNewUrlParser: t
 var alarmMongoose = require('../model/alarm');
 var historyMongoose = require('../model/history');
 
-var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
+var databasePath = '../Server/Database';
 /**
  * Get port from environment and store in Express.
  */

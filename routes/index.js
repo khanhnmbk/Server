@@ -6,8 +6,8 @@ var fs = require('fs');
 var path = require('path');
 var async = require('async');
 
-var databasePath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\Database';
-var symbolPath = 'C:\\Users\\UX410\\Documents\\NodeJS\\LVTN2018\\Server\\public\\images\\symbols';
+var databasePath = '../Server/Database';
+var symbolPath = '../Server/public/images/symbols';
 
 var userModel = require('../model/user');
 var file = require('../model/fileSystem');
