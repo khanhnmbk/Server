@@ -33,6 +33,7 @@
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
                     <li class="nav-item mr-auto my-auto ml-4 text-white">
+                        <p id="deviceID" hidden>123456789</p>
                         <p class="my-auto">Siemens VietNam</p>
                     </li>
                     <li class="nav-item">
@@ -52,7 +53,7 @@
                                 class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
-                        <p class="my-auto">nmkhanh@gmail.com</p>
+                        <p class="my-auto" id="user">nmkhanh@gmail.com</p>
                     </li>
                     <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i
                         class="fas fa-sign-out-alt mr-2"></i>Logout</a>
@@ -166,37 +167,10 @@
     </div>
     </div>
 
-    <!------------------- CONTEXT MENU & MODAL -------------------->
-    <!-- Context menu -->
-    <div class="dropdown-menu" id="context-menu">
-        <a class="dropdown-item" onclick="removeItem()"><i class="fas fa-trash mr-4"></i>Delete</a>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
-    <!-- Jquery export to pdf-->
-    <script src="/javascripts/tableHTMLExport.js"></script>
+    
     <script src="/javascripts/jspdf.min.js"></script>
     <script src="/javascripts/jspdf.plugin.autotable.js"></script>
     <!--Jquery UI draggable-->
@@ -207,7 +181,7 @@
     <!-- Bootstrap form helper script -->
     <script src="/javascripts/bootstrap-formhelpers.min.js"></script>
     <!-- Context menu script -->
-    <script src="/javascripts/contextmenu.js"></script>
+    <!-- <script src="/javascripts/contextmenu.js"></script> -->
     <!-- SVG script -->
     <script src="/javascripts/svg.min.js"></script>
     <!-- SVG draw script -->
@@ -216,9 +190,8 @@
     <script src="/javascripts/plain-draggable.min.js"></script>
     <!-- Socket.io -->
     <script src="/javascripts/socket.io.js"></script>
-
     <!-- My script -->
-    <!-- <script src="/javascripts/myScript.js"></script> -->
+    <script src="/javascripts/Myscripts/publish.js"></script>
 
 </body>
 

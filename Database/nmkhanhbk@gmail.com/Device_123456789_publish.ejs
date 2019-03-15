@@ -32,6 +32,7 @@
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
                     <li class="nav-item mr-auto my-auto ml-4 text-white">
+                        <p id="deviceID" hidden>123456789</p>
                         <p class="my-auto">Siemens VietNam</p>
                     </li>
                     <li class="nav-item">
@@ -47,7 +48,7 @@
                         <a class="nav-link" data-toggle="tab" href="#dashboard"><i class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
-                        <p class="my-auto">nmkhanh@gmail.com</p>
+                        <p class="my-auto" id="user">nmkhanh@gmail.com</p>
                     </li>
                     <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                     
@@ -59,7 +60,7 @@
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height px-2">
                     
-                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><img id="img0" class="contextMenu draggable ui-draggable ui-draggable-handle" src="../../images/png/default-image.png" style="height: 100px; width: 150px; position: absolute; top: 84px; left: 74.8438px; cursor: pointer; opacity: 1;"><button id="button1" class="btn btn-primary contextMenu plain-draggable" style="position: absolute; top: 251px; left: 136.844px; color: rgb(255, 255, 255); background: rgb(66, 133, 244); font-family: &quot;Helvetica Neue&quot;; font-size: 16px; font-style: normal; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;">Button</button><button id="button2" class="btn btn-primary contextMenu plain-draggable" style="position: absolute; top: 288px; left: 472.844px; color: rgb(255, 255, 255); background: rgb(66, 133, 244); font-family: &quot;Helvetica Neue&quot;; font-size: 16px; font-style: normal; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;">Button</button><button id="button3" class="btn btn-primary contextMenu plain-draggable" style="position: absolute; top: 394px; left: 181.844px; color: rgb(255, 255, 255); background: rgb(66, 133, 244); font-family: &quot;Helvetica Neue&quot;; font-size: 16px; font-style: normal; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;">Button</button></div>
+                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" style="opacity: 1;"><defs id="SvgjsDefs1002"></defs><line id="SvgjsLine1008" x1="25" y1="44" x2="25.000000000000007" y2="44.00000000000001" stroke="black" stroke-width="5" stroke-linecap="round" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></line><line id="SvgjsLine1013" x1="193" y1="59" x2="90.00000000000001" y2="113.00000000000003" stroke="black" stroke-width="5" stroke-linecap="round" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none;" transform="translate(0 0)" class="plain-draggable contextMenu"></line><line id="SvgjsLine1038" x1="243" y1="143" x2="58.000000000000014" y2="195.00000000000006" stroke="black" stroke-width="5" stroke-linecap="round" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></line><line id="SvgjsLine1057" x1="341" y1="54" x2="383.00000000000006" y2="109.00000000000003" stroke="black" stroke-width="5" stroke-linecap="round" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></line><circle id="SvgjsCircle1078" r="72.00000000000001" cx="495.0000000000001" cy="44.00000000000001" stroke="black" stroke-width="3" fill-opacity="0" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 28)" class="plain-draggable contextMenu"></circle><circle id="SvgjsCircle1079" r="56.000000000000014" cx="674.0000000000001" cy="86.00000000000001" stroke="black" stroke-width="3" fill-opacity="0" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></circle><polygon id="SvgjsPolygon1080" points="455,233 353.00000000000006,323.00000000000006 581.0000000000001,351.00000000000006" fill-opacity="0" stroke="#000000" stroke-width="3" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu" fill="#000000"></polygon><polyline id="SvgjsPolyline1170" points="890,203 774.0000000000002,320.00000000000006 991.0000000000002,315.00000000000006" fill-opacity="0" stroke="#000000" stroke-width="3" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></polyline><rect id="SvgjsRect1274" width="124.00000000000003" height="66.00000000000001" stroke="black" stroke-width="3" fill-opacity="0" x="834.0000000000002" y="38.00000000000001" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></rect><rect id="SvgjsRect1275" width="114.00000000000003" height="78.00000000000001" stroke="black" stroke-width="3" fill-opacity="0" x="989.0000000000002" y="164.00000000000003" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0)" class="plain-draggable contextMenu"></rect><ellipse id="SvgjsEllipse1276" rx="119" ry="66" cx="119" cy="370" stroke="#000000" stroke-width="3" fill-opacity="0" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0) translate(0 0)" class="plain-draggable contextMenu" fill="#000000"></ellipse><ellipse id="SvgjsEllipse1277" rx="150" ry="101" cx="295" cy="491" stroke="#000000" stroke-width="3" fill-opacity="0" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0) translate(0 0)" class="plain-draggable contextMenu" fill="#000000"></ellipse><rect id="SvgjsRect1278" width="80" height="62" stroke="#000000" stroke-width="3" fill-opacity="0" rx="10" ry="10" x="539" y="639" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0) translate(0 0)" class="plain-draggable contextMenu" fill="#000000"></rect><rect id="SvgjsRect1279" width="39" height="65" stroke="#000000" stroke-width="3" fill-opacity="0" rx="10" ry="10" x="735" y="644" style="-webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1;" transform="translate(0 0) translate(0 0)" class="plain-draggable contextMenu" fill="#000000"></rect></svg><p id="text10" class="contextMenu plain-draggable" style="font-size: 30px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 390.747px; left: 1084.95px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">Textblock</p><p id="text11" class="contextMenu plain-draggable" style="font-size: 30px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 421.753px; left: 880.59px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">Textblock</p><img id="img12" class="contextMenu draggable ui-draggable ui-draggable-handle" src="../../images/png/default-image.png" style="height: 100px; width: 150px; position: absolute; top: 491.757px; left: 775.59px; cursor: pointer; opacity: 1;"><img id="img13" class="contextMenu draggable ui-draggable ui-draggable-handle" src="http://localhost:3000/images/png/default-image.png" style="height: 100px; width: 150px; position: absolute; top: 511px; left: 1063.99px; cursor: pointer; opacity: 1;"><p id="displayValue18" class="contextMenu plain-draggable" style="font-size: 40px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 623.75px; left: 53.5938px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">##.##</p><p id="displayValue19" class="contextMenu plain-draggable" style="font-size: 40px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 702.76px; left: 67.5521px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">##.##</p><p id="displayValue20" class="contextMenu plain-draggable" style="font-size: 40px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 795.747px; left: 77.5521px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">##.##</p><input type="number" id="input21" placeholder="Add value ..." class="form-control contextMenu plain-draggable" style="width: 200px; position: absolute; top: 723.75px; left: 336.597px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;"><input type="number" id="input22" placeholder="Add value ..." class="form-control contextMenu plain-draggable" style="width: 200px; position: absolute; top: 822.76px; left: 365.59px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;"><input type="number" id="input23" placeholder="Add value ..." class="form-control contextMenu plain-draggable" style="width: 200px; position: absolute; top: 874.757px; left: 374.601px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;"><div class="custom-control custom-checkbox contextMenu plain-draggable" style="position: absolute; top: 804.757px; left: 664.583px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;"><input type="checkbox" class="custom-control-input" id="cbInput24"><label class="custom-control-label" for="cbInput24" id="checkbox24" style="opacity: 1;">Checkbox</label></div><img id="symbolSet25" class="contextMenu draggable ui-draggable ui-draggable-handle" src="/images/symbols/Light/light-off.png" style="height: 50px; width: 50px; position: absolute; top: 641px; left: 976px; cursor: pointer; opacity: 1;"><input type="range" class="custom-range contextMenu plain-draggable" id="slider26" min="0" max="100" style="position: absolute; top: 797.76px; left: 814.01px; width: 400px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;" data-original-title="" title=""><button id="button27" class="btn btn-primary contextMenu plain-draggable" style="position: absolute; top: 880px; left: 816.997px; color: rgb(255, 255, 255); background: rgb(66, 133, 244); font-size: 16px; font-style: normal; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px; width: 70px; height: 37px;">Button</button><label class="switch contextMenu plain-draggable" style="position: absolute; top: 407.76px; left: 560.573px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;"><input type="checkbox" class=" primary "><span class="slider round" id="switch28" style="opacity: 0.65;"></span></label><div class="progress contextMenu plain-draggable" id="progressbar29" style="position: absolute; top: 847.76px; left: 814.01px; width: 400px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;"><div class="progress-bar" style="width: 70%; opacity: 1;">70%</div></div></div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height px-2">
                         <div class="row pt-3 px-2">
                             <button class="btn btn-primary ml-auto" id="btnAck">Acknowledge</button>
@@ -163,35 +164,8 @@
 
     
     
-    <div class="dropdown-menu" id="context-menu">
-        <a class="dropdown-item" onclick="removeItem()"><i class="fas fa-trash mr-4"></i>Delete</a>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
     
-    <script src="/javascripts/tableHTMLExport.js"></script>
     <script src="/javascripts/jspdf.min.js"></script>
     <script src="/javascripts/jspdf.plugin.autotable.js"></script>
     
@@ -202,7 +176,7 @@
     
     <script src="/javascripts/bootstrap-formhelpers.min.js"></script>
     
-    <script src="/javascripts/contextmenu.js"></script>
+    
     
     <script src="/javascripts/svg.min.js"></script>
     
@@ -211,9 +185,8 @@
     <script src="/javascripts/plain-draggable.min.js"></script>
     
     <script src="/javascripts/socket.io.js"></script>
-
     
-    
+    <script src="/javascripts/Myscripts/publish.js"></script>
 
 </body>
 

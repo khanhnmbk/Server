@@ -15,7 +15,6 @@ $(document).ready(function () {
   socket.on('connect', function () {
 
     $('#btnRun').on('click', function (clickEvent) {
-      console.log(deviceID);
       $(this).prop('disabled', true);
       $('#btnStop').prop('disabled', false);
       $('.button-icon').prop('disabled', true);
@@ -238,7 +237,7 @@ $(document).ready(function () {
       if (td) {
         txtDate = new Date(td.textContent || td.innerText);
         if (inputFrom.value && !inputTo.value) { //Only from
-          if (txtDate > filterFrom) {
+          if (txtDate >= filterFrom) {
             tr[i].style.display = "";
             tr[i].classList.remove('ignore-row');
           } else {
@@ -246,7 +245,7 @@ $(document).ready(function () {
             tr[i].classList.add('ignore-row');
           }
         } else if (!inputFrom.value && inputTo.value) { //Only to
-          if (txtDate < filterTo) {
+          if (txtDate <= filterTo) {
             tr[i].style.display = "";
             tr[i].classList.remove('ignore-row');
           } else {
@@ -254,7 +253,7 @@ $(document).ready(function () {
             tr[i].classList.add('ignore-row');
           }
         } else {  //Both
-          if ((txtDate > filterFrom) && (txtDate < filterTo)) {
+          if ((txtDate >= filterFrom) && (txtDate <= filterTo)) {
             tr[i].style.display = "";
             tr[i].classList.remove('ignore-row');
           } else {
@@ -273,8 +272,8 @@ $(document).ready(function () {
     table = document.getElementById("historyTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-      
-      if (!tr[i].classList.contains('ignore-row'))  {
+
+      if (!tr[i].classList.contains('ignore-row')) {
         tds = Array.from(tr[i].getElementsByTagName("td"));
         rowData.push(tds);
       }
@@ -289,42 +288,47 @@ $(document).ready(function () {
     doc.setFontSize(18);
     doc.text('History table', 14, 22);
     doc.setFontSize(12);
-    if (inputFrom.value) doc.text('From: ' + filterFrom.toLocaleDateString() , 16 , 30);
-    if (inputTo.value) doc.text('To:   ' + filterTo.toLocaleDateString() , 16 , 35);
+    if (inputFrom.value) doc.text('From: ' + filterFrom.toLocaleDateString(), 16, 30);
+    if (inputTo.value) doc.text('To:   ' + filterTo.toLocaleDateString(), 16, 35);
 
     doc.autoTable({
       head: [['Tag', 'Data type', 'Address', 'Value', 'Timestamp']],
       body: rowData,
-      startY : 50
+      startY: 50
     });
     doc.save('table.pdf');
   });
 
-  $('#btnPublish').click( function() {
+  $('#btnPublish').click(function () {
     var _confirm = confirm('Do you want to publish your design? This cannot be back!');
     if (_confirm) {
       var mainPage1 = document.getElementById('mainPage1').innerHTML;
       var _sendObject = {
         user: user,
-        deviceID : deviceID ,
-        html : mainPage1,
+        deviceID: deviceID,
+        html: mainPage1,
+        elements: elementHTML,
+        //variableList : variableList
       }
       $('#spinnerModal').modal('show');
       console.log(mainPage1);
-      socket.on('/publishSuccess' , function(data){
-        setTimeout(function(){
+      socket.on('/publishSuccess', function (data) {
+        setTimeout(function () {
           $('#spinnerModal').modal('hide');
-          var href =  '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
+          var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
           console.log(href)
-          $('#publishedLink').attr('href' ,href)
+          $('#publishedLink').attr('href', href)
           $('#successModal').modal('show');
-        },3000);
-        
+        }, 3000);
+
       })
-      socket.emit('/publish' , _sendObject);
-      
+      socket.emit('/publish', _sendObject);
     }
-    
+
+  });
+
+  $('#btnOpen').click(function () {
+    console.log(elementHTML);
   });
 
 });
@@ -341,10 +345,10 @@ const draggableObjects = [];
 let index = 0;
 let shape;
 let selectedItemId;
-let mqttDeviceTopic;
 const deviceID = $('#deviceID').text();
 const user = $('#user').text();
 let variableList = [];
+let elementHTML = []; //Array contains extra-HTML properties, which is sent to server via socket.io
 
 //Default option for basic objects except LINE
 const defaultOption = {
@@ -783,6 +787,12 @@ function scadaSliderObject(item, variableName) {
   }
 }
 
+function findElementHTMLById(_id) {
+  for (i = 0; i < elementHTML.length; i++) {
+    if (elementHTML[i].id == _id) return elementHTML.indexOf(elementHTML[i]);
+  }
+  return -1;
+}
 
 /*
 ***********************************************************************************************
@@ -909,6 +919,9 @@ var startDraw = function (shape) {
                 });
                 mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
 
+                var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
                 var html = document.getElementById(mouseEvent.target.id);
                 for (draggableItem of draggableObjects) {
                   if (draggableItem.element.id == html.id) {
@@ -976,6 +989,9 @@ var startDraw = function (shape) {
                 });
 
                 mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
 
                 var html = document.getElementById(mouseEvent.target.id);
                 for (draggableItem of draggableObjects) {
@@ -1050,6 +1066,9 @@ var startDraw = function (shape) {
 
                 mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
 
+                var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
                 var html = document.getElementById(mouseEvent.target.id);
                 for (draggableItem of draggableObjects) {
                   if (draggableItem.element.id == html.id) {
@@ -1115,6 +1134,9 @@ var startDraw = function (shape) {
                 });
 
                 mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
 
                 var html = document.getElementById(mouseEvent.target.id);
                 for (draggableItem of draggableObjects) {
@@ -1185,6 +1207,9 @@ var startDraw = function (shape) {
 
                 mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
 
+                var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
                 var html = document.getElementById(mouseEvent.target.id);
                 for (draggableItem of draggableObjects) {
                   if (draggableItem.element.id == html.id) {
@@ -1219,9 +1244,21 @@ var startDraw = function (shape) {
       $(modalId).modal();
     });
 
+    //Create elementHTML object
+    var _svgObj = {
+      type: 'svg',
+      id: shapes[index].node.id,
+      properties: [
+        {
+          name: 'hiddenWhen',
+          value: ''
+        }
+      ]
+    }
+    elementHTML.push(_svgObj);
+
     //Add draggable feature
     var element = document.getElementById(shapes[index].node.id);
-
     draggable = new PlainDraggable(element, { leftTop: true });
     draggable.autoScroll = true;
     draggable.containment = document.getElementById('mainPage1');
@@ -1302,6 +1339,9 @@ var drawPolygon = function () {
 
             mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
 
+            var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+            if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
           });
 
           $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
@@ -1322,6 +1362,19 @@ var drawPolygon = function () {
 
       $('#polygonModal').modal();
     });
+
+    //Create elementHTML object
+    var _svgObj = {
+      type: 'svg',
+      id: shapes[index].node.id,
+      properties: [
+        {
+          name: 'hiddenWhen',
+          value: ''
+        }
+      ]
+    }
+    elementHTML.push(_svgObj);
 
     //Add draggable feature
     var element = document.getElementById(shapes[index].node.id);
@@ -1402,6 +1455,9 @@ var drawPolyline = function () {
             });
 
             mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+            var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+            if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
           });
 
           $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
@@ -1422,6 +1478,20 @@ var drawPolyline = function () {
 
       $('#polylineModal').modal();
     });
+
+    //Create elementHTML object
+    var _svgObj = {
+      type: 'svg',
+      id: shapes[index].node.id,
+      properties: [
+        {
+          name: 'hiddenWhen',
+          value: ''
+        }
+      ]
+    }
+
+    elementHTML.push(_svgObj);
 
     //Add draggable feature
     var element = document.getElementById(shapes[index].node.id);
@@ -1567,6 +1637,20 @@ function imageMouseDownEventHandler(event) {
   shapes[index].style.left = left;
   //  shapes[index].style.border = '2px solid black';
 
+  //Create elementHTML object
+  var _imgObj = {
+    type: 'img',
+    id: shapes[index].id,
+    properties: [
+      {
+        name: 'hiddenWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_imgObj);
+
   //Image mouse events
   $(shapes[index]).on('mouseover', function (event) {
     event.target.style.cursor = 'pointer';
@@ -1616,6 +1700,9 @@ function imageMouseDownEventHandler(event) {
         elemStyle.top = imageModal.querySelector('#inputPositionY').value + 'px';
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         mouseEvent.target.src = itemModal.querySelector('.inputImageSource').value;
+
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+        if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
 
       });
 
@@ -1695,6 +1782,19 @@ function textMouseDownEventHandler(event) {
   para.style.top = top;
   para.style.left = left;
 
+  //Add to elementHTML
+  var _txtObj = {
+    type: 'text',
+    id: para.id,
+    properties: [
+      {
+        name: 'hiddenWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_txtObj);
 
   //Image mouse events
   $(para).on('mouseover', function (event) {
@@ -1738,6 +1838,9 @@ function textMouseDownEventHandler(event) {
         document.getElementById(elemId).style.fontStyle = itemModal.querySelector('#fontStyleForm').value;
         document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+        var _foundIndex = findElementHTMLById(elemId);
+        if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
       });
 
       $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
@@ -1793,6 +1896,27 @@ function displayValueMouseDownEventHandler(event) {
   para.style.top = top;
   para.style.left = left;
 
+  //Create elementHTML object
+  var _dispObj = {
+    type : 'displayValue',
+    id : para.id,
+    properties : [
+      {
+        name : 'tag',
+        value : ''
+      },
+      {
+        name : 'format',
+        value : ''
+      },
+      {
+        name : 'hiddenWhen',
+        value : ''
+      }
+    ]
+  }
+
+  elementHTML.push(_dispObj);
 
   //Image mouse events
   $(para).on('mouseover', function (event) {
@@ -1848,6 +1972,13 @@ function displayValueMouseDownEventHandler(event) {
         mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
         mouseEvent.target.format = itemModal.querySelector('#displayFormat').value;
+
+        var _foundIndex = findElementHTMLById(elemId);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.format;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.hiddenWhen;
+        }
 
       });
 
@@ -1916,7 +2047,23 @@ function buttonMouseDownEventHandler(event) {
   btn.style.fontSize = '16px';
   btn.style.fontStyle = 'normal';
 
+  //Create elementHTML object
+  var _btnObj = {
+    type : 'button',
+    id : btn.id,
+    properties : [
+      {
+        name : 'command',
+        value : ''
+      },
+      {
+        name : 'disableWhen',
+        value : ''
+      }
+    ]
+  }
 
+  elementHTML.push(_btnObj);
 
   //Image mouse events
   $(btn).on('mouseover', function (event) {
@@ -1989,6 +2136,12 @@ function buttonMouseDownEventHandler(event) {
         mouseEvent.target.command = itemModal.querySelector('.inputCommand').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
 
+        var _foundIndex = findElementHTMLById(elemId);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.command;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
+        }
+
         var html = document.getElementById(elemId);
         for (draggableItem of draggableObjects) {
           if (draggableItem.element.id == html.id) {
@@ -2059,18 +2212,39 @@ function switchMouseDownEventHandler(event) {
 
   var spansw = document.createElement('span');
   spansw.className = 'slider round';
+  spansw.id = 'switch' + index;
 
   sw.appendChild(inputsw);
   sw.appendChild(spansw);
 
-  sw.id = 'switch' + index;
+  //sw.id = 'switch' + index;
 
   //Image css style
   sw.style.position = 'absolute';
   sw.style.top = top;
   sw.style.left = left;
 
+  //Create elementHTML object
+  var _swObj = {
+    type : 'switch',
+    id :  spansw.id,
+    properties : [
+      {
+        name : 'onCommand',
+        value : ''
+      },
+      {
+        name : 'offCommand',
+        value : ''
+      },
+      {
+        name : 'disableWhen',
+        value : ''
+      }
+    ]
+  }
 
+  elementHTML.push(_swObj);
   //Image mouse events
   $(sw).on('mouseover', function (event) {
     event.target.style.opacity = 0.65;
@@ -2110,6 +2284,15 @@ function switchMouseDownEventHandler(event) {
         mouseEvent.target.onCommand = itemModal.querySelector('.inputOnCommand').value;
         mouseEvent.target.offCommand = itemModal.querySelector('.inputOffCommand').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+
+        
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+			if (_foundIndex != -1) {
+        elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCommand;
+        elementHTML[_foundIndex].properties[1].value = mouseEvent.target.offCommand;
+        elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+      }
+
       });
 
       $('.btnOnCommand').on('click', function (onConditionClickEvent) {
@@ -2182,6 +2365,23 @@ function inputMouseDownEventHandler(event) {
   input.style.top = top;
   input.style.left = left;
 
+    //Create elementHTML object
+    var _inputObj = {
+      type : 'input',
+      id : input.id,
+      properties : [
+        {
+          name : 'tag',
+          value : ''
+        },
+        {
+          name : 'disableWhen',
+          value : ''
+        }
+      ]
+    }
+  
+    elementHTML.push(_inputObj);
 
   //Image mouse events
   $(input).on('mouseover', function (event) {
@@ -2228,6 +2428,12 @@ function inputMouseDownEventHandler(event) {
         mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
         mouseEvent.target.type = itemModal.querySelector('.inputType').value;
+
+        var _foundIndex = findElementHTMLById(elemId);
+			  if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
+        }
       });
 
       $('.btnTag').on('click', function (onConditionClickEvent) {
@@ -2281,7 +2487,7 @@ function checkboxMouseDownEventHandler(event) {
   //Declare new paragrap
   var checkbox = document.createElement('div');
   checkbox.className = 'custom-control custom-checkbox contextMenu ';
-  checkbox.id = 'checkbox' + index;
+  //checkbox.id = 'checkbox' + index;
 
   var cbInput = document.createElement('input');
   cbInput.type = 'checkbox';
@@ -2292,6 +2498,7 @@ function checkboxMouseDownEventHandler(event) {
   cbLabel.className = 'custom-control-label';
   cbLabel.htmlFor = 'cbInput' + index;
   cbLabel.innerText = 'Checkbox';
+  cbLabel.id = 'checkbox' + index;
 
   checkbox.appendChild(cbInput);
   checkbox.appendChild(cbLabel);
@@ -2301,6 +2508,28 @@ function checkboxMouseDownEventHandler(event) {
   checkbox.style.position = 'absolute';
   checkbox.style.top = top;
   checkbox.style.left = left;
+
+    //Create elementHTML object
+    var _chbObj = {
+      type : 'checkbox',
+      id : cbLabel.id ,
+      properties : [
+        {
+          name : 'checkedCommand',
+          value : ''
+        },
+        {
+          name : 'unCheckedCommand',
+          value : ''
+        },
+        {
+          name : 'disableWhen',
+          value : ''
+        }
+      ]
+    }
+  
+    elementHTML.push(_chbObj);
 
 
   //Image mouse events
@@ -2345,6 +2574,13 @@ function checkboxMouseDownEventHandler(event) {
         mouseEvent.target.checkedCommand = itemModal.querySelector('.inputChecked').value;
         mouseEvent.target.unCheckedCommand = itemModal.querySelector('.inputUnchecked').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+			if (_foundIndex != -1) {
+        elementHTML[_foundIndex].properties[0].value = mouseEvent.target.checkedCommand;
+        elementHTML[_foundIndex].properties[1].value = mouseEvent.target.unCheckedCommand;
+        elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+      } 
       });
 
       $('.btnChecked').on('click', function (onConditionClickEvent) {
@@ -2420,7 +2656,47 @@ function sliderMouseDownEventHandler(event) {
   slider.style.left = left;
   slider.style.width = '400px';
 
+  //Create elementHTML object
+  var _sliderObj = {
+    type : 'slider',
+    id : slider.id,
+    properties : [
+      {
+        name : 'tag',
+        value : ''
+      },
+      {
+        name : 'minTag',
+        value : ''
+      },
+      {
+        name : 'minValue',
+        value : ''
+      },
+      {
+        name : 'maxTag',
+        value : ''
+      },
+      {
+        name : 'maxValue',
+        value : ''
+      },
+      {
+        name : 'isMinTag',
+        value : ''
+      },
+      {
+        name : 'isMaxTag',
+        value : ''
+      },
+      {
+        name : 'disableWhen',
+        value : ''
+      }
+    ]
+  }
 
+  elementHTML.push(_sliderObj);
 
   //Image mouse events
   $(slider).on('mouseover', function (event) {
@@ -2510,6 +2786,18 @@ function sliderMouseDownEventHandler(event) {
         if (itemModal.querySelector('.inputMaxTag').value)
           mouseEvent.target.isMaxTag = true;
         else mouseEvent.target.isMaxTag = false;
+
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+			  if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.minTag;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.minValue;
+          elementHTML[_foundIndex].properties[3].value = mouseEvent.target.maxTag;
+          elementHTML[_foundIndex].properties[4].value = mouseEvent.target.maxValue;
+          elementHTML[_foundIndex].properties[5].value = mouseEvent.target.isMinTag;
+          elementHTML[_foundIndex].properties[6].value = mouseEvent.target.isMaxTag;
+          elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
+        } 
       });
 
       //Browse button
@@ -2600,7 +2888,52 @@ function processbarMouseDownEventHandler(event) {
   progressbar.style.top = top;
   progressbar.style.left = left;
   progressbar.style.width = '400px';
-  //progressbar.style.height = '20px';
+  
+  //Create elementHTML object
+  var _progressObj = {
+    type : 'progressbar',
+    id : progressbar.id,
+    properties : [
+      {
+        name : 'tag',
+        value : ''
+      },
+      {
+        name : 'minTag',
+        value : ''
+      },
+      {
+        name : 'minValue',
+        value : ''
+      },
+      {
+        name : 'maxTag',
+        value : ''
+      },
+      {
+        name : 'maxValue',
+        value : ''
+      },
+      {
+        name : 'isMinTag',
+        value : ''
+      },
+      {
+        name : 'isMaxTag',
+        value : ''
+      },
+      {
+        name : 'hiddenWhen',
+        value : ''
+      },
+      {
+        name : 'isHideLabel',
+        value : ''
+      }
+    ]
+  }
+
+  elementHTML.push(_progressObj);
 
 
   //Image mouse events
@@ -2712,7 +3045,18 @@ function processbarMouseDownEventHandler(event) {
         if (progressElement.isHideLabel) _bar.innerText = '';
         else _bar.innerText = _bar.style.width;
 
-
+        var _foundIndex = findElementHTMLById(progressElement.id);
+			  if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = progressElement.tag;
+          elementHTML[_foundIndex].properties[1].value = progressElement.minTag;
+          elementHTML[_foundIndex].properties[2].value = progressElement.minValue;
+          elementHTML[_foundIndex].properties[3].value = progressElement.maxTag;
+          elementHTML[_foundIndex].properties[4].value = progressElement.maxValue;
+          elementHTML[_foundIndex].properties[5].value = progressElement.isMinTag;
+          elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
+          elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
+          elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
+        } 
       });
 
       //Button Value browse tag
@@ -2800,6 +3144,32 @@ function symbolsetMouseDownEventHandler(event) {
   symbolSet.style.top = top;
   symbolSet.style.left = left;
 
+    //Create elementHTML object
+    var _sybObj = {
+      type : 'symbolSet',
+      id : symbolSet.id,
+      properties : [
+        {
+          name : 'onCondition',
+          value : ''
+        },
+        {
+          name : 'onSymbol',
+          value : ''
+        },
+        {
+          name : 'offSymbol',
+          value : ''
+        },
+        {
+          name : 'hiddenWhen',
+          value : ''
+        }
+      ]
+    }
+  
+    elementHTML.push(_sybObj);
+
   //Image mouse events
   $(symbolSet).on('mouseover', function (event) {
     event.target.style.cursor = 'pointer';
@@ -2857,6 +3227,14 @@ function symbolsetMouseDownEventHandler(event) {
         mouseEvent.target.onSymbol = itemModal.querySelector('.inputOnImageSource').value;
         mouseEvent.target.offSymbol = itemModal.querySelector('.inputOffImageSource').value;
         mouseEvent.target.src = mouseEvent.target.offSymbol;
+
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCondition;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.onSymbol;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.offSymbol;
+          elementHTML[_foundIndex].properties[3].value = mouseEvent.target.hiddenWhen;
+        }
       });
 
       //Browse Tag button

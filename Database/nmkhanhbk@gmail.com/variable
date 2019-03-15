@@ -1,0 +1,430 @@
+[
+    {
+        "type": "svg",
+        "id": "SvgjsLine1008",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsLine1013",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsLine1038",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsLine1057",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsCircle1078",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsCircle1079",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsPolygon1080",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "zz"
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsPolyline1170",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsRect1274",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsRect1275",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "text",
+        "id": "text10",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "12"
+            }
+        ]
+    },
+    {
+        "type": "text",
+        "id": "text11",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "44"
+            }
+        ]
+    },
+    {
+        "type": "img",
+        "id": "img12",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "img",
+        "id": "img13",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "111"
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsEllipse1276",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "124"
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsEllipse1277",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "124"
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsRect1278",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "OPCUA_Bien7"
+            }
+        ]
+    },
+    {
+        "type": "svg",
+        "id": "SvgjsRect1279",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": "OPCUA_Bien7"
+            }
+        ]
+    },
+    {
+        "type": "displayValue",
+        "id": "displayValue18",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_Bien_5"
+            },
+            {
+                "name": "format",
+                "value": "3"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": "S7_1500_Bien6"
+            }
+        ]
+    },
+    {
+        "type": "displayValue",
+        "id": "displayValue19",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_Bien6"
+            },
+            {
+                "name": "format",
+                "value": "3"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": "S7_1500_Bien6"
+            }
+        ]
+    },
+    {
+        "type": "displayValue",
+        "id": "displayValue20",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "OPCUA_Bien7"
+            },
+            {
+                "name": "format",
+                "value": "3"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "input",
+        "id": "input21",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_Bien6"
+            },
+            {
+                "name": "disableWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "input",
+        "id": "input22",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "OPCUA_Bien8"
+            },
+            {
+                "name": "disableWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "input",
+        "id": "input23",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "OPCUA_Bien7"
+            },
+            {
+                "name": "disableWhen",
+                "value": "OPCUA_Bien7"
+            }
+        ]
+    },
+    {
+        "type": "checkbox",
+        "id": "checkbox24",
+        "properties": [
+            {
+                "name": "checkedCommand",
+                "value": "1"
+            },
+            {
+                "name": "unCheckedCommand",
+                "value": "2"
+            },
+            {
+                "name": "disableWhen",
+                "value": "3"
+            }
+        ]
+    },
+    {
+        "type": "symbolSet",
+        "id": "symbolSet25",
+        "properties": [
+            {
+                "name": "onCondition",
+                "value": ""
+            },
+            {
+                "name": "onSymbol",
+                "value": "/images/symbols/Light/light-on.png"
+            },
+            {
+                "name": "offSymbol",
+                "value": "/images/symbols/Light/light-off.png"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "slider",
+        "id": "slider26",
+        "properties": [
+            {
+                "name": "tag",
+                "value": ""
+            },
+            {
+                "name": "minTag",
+                "value": ""
+            },
+            {
+                "name": "minValue",
+                "value": "0"
+            },
+            {
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "100"
+            },
+            {
+                "name": "isMinTag",
+                "value": false
+            },
+            {
+                "name": "isMaxTag",
+                "value": false
+            },
+            {
+                "name": "disableWhen",
+                "value": "4"
+            }
+        ]
+    },
+    {
+        "type": "button",
+        "id": "button27",
+        "properties": [
+            {
+                "name": "command",
+                "value": "1"
+            },
+            {
+                "name": "disableWhen",
+                "value": "1"
+            }
+        ]
+    },
+    {
+        "type": "switch",
+        "id": "switch28",
+        "properties": [
+            {
+                "name": "onCommand",
+                "value": ""
+            },
+            {
+                "name": "offCommand",
+                "value": ""
+            },
+            {
+                "name": "disableWhen",
+                "value": "aaa"
+            }
+        ]
+    },
+    {
+        "type": "progressbar",
+        "id": "progressbar29",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "11"
+            },
+            {
+                "name": "minTag",
+                "value": "11"
+            },
+            {
+                "name": "minValue",
+                "value": "11"
+            },
+            {
+                "name": "maxTag",
+                "value": "11"
+            },
+            {
+                "name": "maxValue",
+                "value": "11"
+            },
+            {
+                "name": "isMinTag",
+                "value": true
+            },
+            {
+                "name": "isMaxTag",
+                "value": true
+            },
+            {
+                "name": "hiddenWhen",
+                "value": "11"
+            },
+            {
+                "name": "isHideLabel",
+                "value": false
+            }
+        ]
+    }
+]
