@@ -308,28 +308,33 @@ $(document).ready(function () {
         deviceID: deviceID,
         html: mainPage1,
         elements: elementHTML,
-        variableList : variableList
-    }
-    socket.emit('/publish' , _sendObject);
-    $('#spinnerModal').modal('show');
-    console.log(mainPage1);
-    socket.on( '/' + deviceID + '/publishSuccess', function (data) {
-      console.log('Socket on ' + '/' + deviceID + '/publishSuccess');
-      setTimeout(function () {
-        $('#spinnerModal').modal('hide');
-        var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
-        console.log(href)
-        $('#publishedLink').attr('href', href)
-        $('#successModal').modal('show');
-      }, 3000); 
-    });
+        variableList: variableList
+      }
+      socket.emit('/publish', _sendObject);
+      $('#spinnerModal').modal('show');
+      console.log(mainPage1);
+      socket.on('/' + deviceID + '/publishSuccess', function (data) {
+        console.log('Socket on ' + '/' + deviceID + '/publishSuccess');
+        setTimeout(function () {
+          $('#spinnerModal').modal('hide');
+          var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
+          console.log(href)
+          $('#publishedLink').attr('href', href)
+          $('#successModal').modal('show');
+        }, 3000);
+      });
 
-  }
+    }
   });
-}); 
-    
-  
-      
+
+  $('#btnOpen').click(function () {
+    console.log(elementHTML);
+  })
+
+});
+
+
+
 /*
 ***********************************************************************************************
                                 Global variables and functions
@@ -421,6 +426,8 @@ function removeItem() {
       }
     }
 
+    var _foundIndex = findElementHTMLById(selectedItemId);
+    if (_foundIndex != -1) elementHTML.splice(_foundIndex, 1);
   };
 
   selectedItemId = '';
@@ -465,31 +472,8 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.command,
           }
-          _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+          _socket.emit('/write', _sendObj);
         })
-        break;
-      }
-      case 'switch': {
-        var _checkbox = $(_shape).find('input')[0];
-        var _span = $(_shape).find('span')[0];
-        if (_checkbox) {
-          $(_checkbox).on('change', function () {
-            if ($(this).is(':checked')) {
-              var _sendObj = {
-                deviceID: deviceID,
-                command: _span.onCommand,
-              }
-              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
-            }
-            else {
-              var _sendObj = {
-                deviceID: deviceID,
-                command: _span.offCommand,
-              }
-              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
-            }
-          });
-        }
         break;
       }
       case 'input': {
@@ -508,7 +492,7 @@ function initSCADA(_shapes, _socket) {
                   command: this.tag + ' = ' + this.value
                 }
               }
-              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+              _socket.emit('/write', _sendObj);
             }
           }
         });
@@ -529,32 +513,54 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.tag + ' = ' + this.value
           }
-          if (this.tag) _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
+          if (this.tag) _socket.emit('/write', _sendObj);
         });
         break;
       }
-      case 'checkbox': {
-        var _label = $(_shape).find('label')[0];
-        var _checkbox = $(_shape).find('input')[0];
-        if (_checkbox) {
-          $(_checkbox).on('change', function () {
-            if ($(this).is(':checked')) {
-              var _sendObj = {
-                deviceID: deviceID,
-                command: _label.checkedCommand,
+      default: {
+        if ($(_shape).find('span')[0]) {
+          var _checkbox = $(_shape).find('input')[0];
+          var _span = $(_shape).find('span')[0];
+          if (_checkbox) {
+            $(_checkbox).on('change', function () {
+              if ($(this).is(':checked')) {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: _span.onCommand,
+                }
+                _socket.emit('/write', _sendObj);
               }
-              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
-            }
-            else {
-              var _sendObj = {
-                deviceID: deviceID,
-                command: _label.unCheckedCommand,
+              else {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: _span.offCommand,
+                }
+                _socket.emit('/write', _sendObj);
               }
-              _socket.emit('/write', JSON.stringify(_sendObj, null, 4));
-            }
-          });
+            });
+          }
+        } else {
+          var _label = $(_shape).find('label')[0];
+          var _checkbox = $(_shape).find('input')[0];
+          if (_checkbox) {
+            $(_checkbox).on('change', function () {
+              if ($(this).is(':checked')) {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: _label.checkedCommand,
+                }
+                _socket.emit('/write', _sendObj);
+              }
+              else {
+                var _sendObj = {
+                  deviceID: deviceID,
+                  command: _label.unCheckedCommand,
+                }
+                _socket.emit('/write', _sendObj);
+              }
+            });
+          }
         }
-        break;
       }
     }
   })
@@ -606,7 +612,14 @@ function SCADA(arrHtmlElems, variableName) {
         break;
       }
       default: {
-        scadaSvgObject(_shape, variableName);
+        if ($(_shape).find('span')[0]) {
+          scadaSwitchObject(_shape, variableName);
+        } else if ($(_shape).find('label')[0]) {
+          scadaCheckboxObject(_shape, variableName);
+        } else {
+          scadaSvgObject(_shape, variableName);
+        }
+        
       }
     }
   })
@@ -1302,10 +1315,16 @@ var drawPolygon = function () {
       $('#polygonModal').one('show.bs.modal', function (showEvent) {
         var element;
         for (var item of shapes) {
-          if (item.node.id == mouseEvent.target.id) {
-            element = item;
-            break;
+          try {
+            if (item.node.id == mouseEvent.target.id) {
+              element = item;
+              break;
+            }
           }
+          catch {
+
+          }
+          
         }
 
         if (element) {
@@ -1425,10 +1444,15 @@ var drawPolyline = function () {
       $('#polylineModal').one('show.bs.modal', function (showEvent) {
         var element;
         for (var item of shapes) {
-          if (item.node.id == mouseEvent.target.id) {
-            element = item;
-            break;
+          try {
+            if (item.node.id == mouseEvent.target.id) {
+              element = item;
+              break;
+            }
+          } catch {
+
           }
+          
         }
 
         if (element) {
@@ -1897,20 +1921,20 @@ function displayValueMouseDownEventHandler(event) {
 
   //Create elementHTML object
   var _dispObj = {
-    type : 'displayValue',
-    id : para.id,
-    properties : [
+    type: 'displayValue',
+    id: para.id,
+    properties: [
       {
-        name : 'tag',
-        value : ''
+        name: 'tag',
+        value: ''
       },
       {
-        name : 'format',
-        value : ''
+        name: 'format',
+        value: ''
       },
       {
-        name : 'hiddenWhen',
-        value : ''
+        name: 'hiddenWhen',
+        value: ''
       }
     ]
   }
@@ -2048,16 +2072,16 @@ function buttonMouseDownEventHandler(event) {
 
   //Create elementHTML object
   var _btnObj = {
-    type : 'button',
-    id : btn.id,
-    properties : [
+    type: 'button',
+    id: btn.id,
+    properties: [
       {
-        name : 'command',
-        value : ''
+        name: 'command',
+        value: ''
       },
       {
-        name : 'disableWhen',
-        value : ''
+        name: 'disableWhen',
+        value: ''
       }
     ]
   }
@@ -2225,20 +2249,20 @@ function switchMouseDownEventHandler(event) {
 
   //Create elementHTML object
   var _swObj = {
-    type : 'switch',
-    id :  spansw.id,
-    properties : [
+    type: 'switch',
+    id: spansw.id,
+    properties: [
       {
-        name : 'onCommand',
-        value : ''
+        name: 'onCommand',
+        value: ''
       },
       {
-        name : 'offCommand',
-        value : ''
+        name: 'offCommand',
+        value: ''
       },
       {
-        name : 'disableWhen',
-        value : ''
+        name: 'disableWhen',
+        value: ''
       }
     ]
   }
@@ -2284,13 +2308,13 @@ function switchMouseDownEventHandler(event) {
         mouseEvent.target.offCommand = itemModal.querySelector('.inputOffCommand').value;
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
 
-        
+
         var _foundIndex = findElementHTMLById(mouseEvent.target.id);
-			if (_foundIndex != -1) {
-        elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCommand;
-        elementHTML[_foundIndex].properties[1].value = mouseEvent.target.offCommand;
-        elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
-      }
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCommand;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.offCommand;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+        }
 
       });
 
@@ -2364,23 +2388,23 @@ function inputMouseDownEventHandler(event) {
   input.style.top = top;
   input.style.left = left;
 
-    //Create elementHTML object
-    var _inputObj = {
-      type : 'input',
-      id : input.id,
-      properties : [
-        {
-          name : 'tag',
-          value : ''
-        },
-        {
-          name : 'disableWhen',
-          value : ''
-        }
-      ]
-    }
-  
-    elementHTML.push(_inputObj);
+  //Create elementHTML object
+  var _inputObj = {
+    type: 'input',
+    id: input.id,
+    properties: [
+      {
+        name: 'tag',
+        value: ''
+      },
+      {
+        name: 'disableWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_inputObj);
 
   //Image mouse events
   $(input).on('mouseover', function (event) {
@@ -2429,7 +2453,7 @@ function inputMouseDownEventHandler(event) {
         mouseEvent.target.type = itemModal.querySelector('.inputType').value;
 
         var _foundIndex = findElementHTMLById(elemId);
-			  if (_foundIndex != -1) {
+        if (_foundIndex != -1) {
           elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
           elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
         }
@@ -2508,27 +2532,27 @@ function checkboxMouseDownEventHandler(event) {
   checkbox.style.top = top;
   checkbox.style.left = left;
 
-    //Create elementHTML object
-    var _chbObj = {
-      type : 'checkbox',
-      id : cbLabel.id ,
-      properties : [
-        {
-          name : 'checkedCommand',
-          value : ''
-        },
-        {
-          name : 'unCheckedCommand',
-          value : ''
-        },
-        {
-          name : 'disableWhen',
-          value : ''
-        }
-      ]
-    }
-  
-    elementHTML.push(_chbObj);
+  //Create elementHTML object
+  var _chbObj = {
+    type: 'checkbox',
+    id: cbLabel.id,
+    properties: [
+      {
+        name: 'checkedCommand',
+        value: ''
+      },
+      {
+        name: 'unCheckedCommand',
+        value: ''
+      },
+      {
+        name: 'disableWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_chbObj);
 
 
   //Image mouse events
@@ -2575,11 +2599,11 @@ function checkboxMouseDownEventHandler(event) {
         mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
 
         var _foundIndex = findElementHTMLById(mouseEvent.target.id);
-			if (_foundIndex != -1) {
-        elementHTML[_foundIndex].properties[0].value = mouseEvent.target.checkedCommand;
-        elementHTML[_foundIndex].properties[1].value = mouseEvent.target.unCheckedCommand;
-        elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
-      } 
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.checkedCommand;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.unCheckedCommand;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+        }
       });
 
       $('.btnChecked').on('click', function (onConditionClickEvent) {
@@ -2657,40 +2681,40 @@ function sliderMouseDownEventHandler(event) {
 
   //Create elementHTML object
   var _sliderObj = {
-    type : 'slider',
-    id : slider.id,
-    properties : [
+    type: 'slider',
+    id: slider.id,
+    properties: [
       {
-        name : 'tag',
-        value : ''
+        name: 'tag',
+        value: ''
       },
       {
-        name : 'minTag',
-        value : ''
+        name: 'minTag',
+        value: ''
       },
       {
-        name : 'minValue',
-        value : ''
+        name: 'minValue',
+        value: ''
       },
       {
-        name : 'maxTag',
-        value : ''
+        name: 'maxTag',
+        value: ''
       },
       {
-        name : 'maxValue',
-        value : ''
+        name: 'maxValue',
+        value: ''
       },
       {
-        name : 'isMinTag',
-        value : ''
+        name: 'isMinTag',
+        value: ''
       },
       {
-        name : 'isMaxTag',
-        value : ''
+        name: 'isMaxTag',
+        value: ''
       },
       {
-        name : 'disableWhen',
-        value : ''
+        name: 'disableWhen',
+        value: ''
       }
     ]
   }
@@ -2787,7 +2811,7 @@ function sliderMouseDownEventHandler(event) {
         else mouseEvent.target.isMaxTag = false;
 
         var _foundIndex = findElementHTMLById(mouseEvent.target.id);
-			  if (_foundIndex != -1) {
+        if (_foundIndex != -1) {
           elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
           elementHTML[_foundIndex].properties[1].value = mouseEvent.target.minTag;
           elementHTML[_foundIndex].properties[2].value = mouseEvent.target.minValue;
@@ -2796,7 +2820,7 @@ function sliderMouseDownEventHandler(event) {
           elementHTML[_foundIndex].properties[5].value = mouseEvent.target.isMinTag;
           elementHTML[_foundIndex].properties[6].value = mouseEvent.target.isMaxTag;
           elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
-        } 
+        }
       });
 
       //Browse button
@@ -2887,47 +2911,47 @@ function processbarMouseDownEventHandler(event) {
   progressbar.style.top = top;
   progressbar.style.left = left;
   progressbar.style.width = '400px';
-  
+
   //Create elementHTML object
   var _progressObj = {
-    type : 'progressbar',
-    id : progressbar.id,
-    properties : [
+    type: 'progressbar',
+    id: progressbar.id,
+    properties: [
       {
-        name : 'tag',
-        value : ''
+        name: 'tag',
+        value: ''
       },
       {
-        name : 'minTag',
-        value : ''
+        name: 'minTag',
+        value: ''
       },
       {
-        name : 'minValue',
-        value : ''
+        name: 'minValue',
+        value: ''
       },
       {
-        name : 'maxTag',
-        value : ''
+        name: 'maxTag',
+        value: ''
       },
       {
-        name : 'maxValue',
-        value : ''
+        name: 'maxValue',
+        value: ''
       },
       {
-        name : 'isMinTag',
-        value : ''
+        name: 'isMinTag',
+        value: ''
       },
       {
-        name : 'isMaxTag',
-        value : ''
+        name: 'isMaxTag',
+        value: ''
       },
       {
-        name : 'hiddenWhen',
-        value : ''
+        name: 'hiddenWhen',
+        value: ''
       },
       {
-        name : 'isHideLabel',
-        value : ''
+        name: 'isHideLabel',
+        value: ''
       }
     ]
   }
@@ -3045,7 +3069,7 @@ function processbarMouseDownEventHandler(event) {
         else _bar.innerText = _bar.style.width;
 
         var _foundIndex = findElementHTMLById(progressElement.id);
-			  if (_foundIndex != -1) {
+        if (_foundIndex != -1) {
           elementHTML[_foundIndex].properties[0].value = progressElement.tag;
           elementHTML[_foundIndex].properties[1].value = progressElement.minTag;
           elementHTML[_foundIndex].properties[2].value = progressElement.minValue;
@@ -3055,7 +3079,7 @@ function processbarMouseDownEventHandler(event) {
           elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
           elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
           elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
-        } 
+        }
       });
 
       //Button Value browse tag
@@ -3143,31 +3167,31 @@ function symbolsetMouseDownEventHandler(event) {
   symbolSet.style.top = top;
   symbolSet.style.left = left;
 
-    //Create elementHTML object
-    var _sybObj = {
-      type : 'symbolSet',
-      id : symbolSet.id,
-      properties : [
-        {
-          name : 'onCondition',
-          value : ''
-        },
-        {
-          name : 'onSymbol',
-          value : ''
-        },
-        {
-          name : 'offSymbol',
-          value : ''
-        },
-        {
-          name : 'hiddenWhen',
-          value : ''
-        }
-      ]
-    }
-  
-    elementHTML.push(_sybObj);
+  //Create elementHTML object
+  var _sybObj = {
+    type: 'symbolSet',
+    id: symbolSet.id,
+    properties: [
+      {
+        name: 'onCondition',
+        value: ''
+      },
+      {
+        name: 'onSymbol',
+        value: ''
+      },
+      {
+        name: 'offSymbol',
+        value: ''
+      },
+      {
+        name: 'hiddenWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_sybObj);
 
   //Image mouse events
   $(symbolSet).on('mouseover', function (event) {

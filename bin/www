@@ -187,8 +187,7 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on('/write', function (rcvJson) {
-    var rcvObj = JSON.parse(rcvJson);
+  socket.on('/write', function (rcvObj) {
     mqttClient.publish('/' + rcvObj.deviceID + '/write', rcvObj.command);
   });
 
@@ -229,7 +228,15 @@ io.on('connection', function (socket) {
     }
   })
 
-  })
+  });
+
+  socket.on('/reqPublishParameters' , function(userObject) {
+    var elementFile = path.resolve(databasePath, userObject.user , 'Parameters' , 'Device_' + userObject.deviceID + '_Elements.json');
+    var variableFile = path.resolve(databasePath, userObject.user , 'Parameters' , 'Device_' + userObject.deviceID + '_VariableList.json');
+    var elementObj = JSON.parse(fs.readFileSync(elementFile));
+    var variableObj = JSON.parse(fs.readFileSync(variableFile)); 
+    socket.emit('/' + userObject.deviceID + '/resPublishParameters' , {htmlElements : elementObj , variableList : variableObj});
+  });
 
 });
 server.listen(port);

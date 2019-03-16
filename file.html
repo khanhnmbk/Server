@@ -1,65 +1,70 @@
+<!doctype html>
 <html lang="en">
 
 <head>
-    
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
-    
-    <link rel="stylesheet" href="/stylesheets/all.css" />
-    
-    <link rel="stylesheet" href="/stylesheets/bootstrap-formhelpers.min.css" />
-    
-    <link rel="stylesheet" href="/stylesheets/publish-style.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap form helpers -->
+    <!-- Own style -->
+    <link rel="stylesheet" href="/public/stylesheets/publish-style.css">
 
     <title>Published Page</title>
 </head>
 
 <body onbeforeunload="return confirm('Are you sure to reload?')">
-    
+    <!------------------------ MAIN PAGE ------------------------->
 
 
     <div class="container-fluid row mx-2 px-0">
 
 
-        
+        <!-- mainPagePanel -->
         <div id="mainPagePanel" class="col-md bg-dark my-0 no-gutter-all">
             <div class="container-fluid no-gutter-all">
-                
+                <!-- Nav tabs -->
 
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
                     <li class="nav-item mr-auto my-auto ml-4 text-white">
+                        <p id="deviceID" hidden>123456789</p>
                         <p class="my-auto">Siemens VietNam</p>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i class="fas fa-home mr-1"></i><strong>Home</strong></a>
+                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i
+                                class="fas fa-home mr-1"></i><strong>Home</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " data-toggle="tab" href="#alarm"><i class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
+                        <a class="nav-link " data-toggle="tab" href="#alarm"><i
+                                class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " data-toggle="tab" href="#history"><i class="fas fa-history mr-1"></i><strong>History</strong></a>
+                        <a class="nav-link " data-toggle="tab" href="#history"><i
+                                class="fas fa-history mr-1"></i><strong>History</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#dashboard"><i class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
+                        <a class="nav-link" data-toggle="tab" href="#dashboard"><i
+                                class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
-                        <p class="my-auto">nmkhanh@gmail.com</p>
+                        <p class="my-auto" id="user">nmkhanhbk@gmail.com</p>
                     </li>
-                    <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i
+                        class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                     
                 </ul>
 
 
 
-                
+                <!-- Tab panes -->
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height px-2">
-                    
-                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><img id="img0" class="contextMenu draggable ui-draggable ui-draggable-handle" src="../../images/png/default-image.png" style="height: 100px; width: 150px; position: absolute; top: 313px; left: 400px; cursor: pointer; opacity: 1;"></div>
+                    </div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height px-2">
                         <div class="row pt-3 px-2">
                             <button class="btn btn-primary ml-auto" id="btnAck">Acknowledge</button>
@@ -82,7 +87,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><input type="checkbox" /></td>
+                                        <td><input type="checkbox"></td>
                                         <td>10/03/2019</td>
                                         <td>20:00:00</td>
                                         <td>Level</td>
@@ -92,7 +97,7 @@
                                         <td>UNACK</td>
                                     </tr>
                                     <tr>
-                                        <td><input type="checkbox" /></td>
+                                        <td><input type="checkbox"></td>
                                         <td>10/03/2019</td>
                                         <td>20:00:00</td>
                                         <td>Khanh</td>
@@ -111,15 +116,15 @@
 
                             <label for="#inputFilter" class="my-auto mx-2">Filter</label>
                             <input class="form-control" id="inputFilter" type="text" placeholder="Search.."
-                                style="max-width : 400px" />
+                                style="max-width : 400px">
 
                             <label for="#inputFilter" class="my-auto ml-5 mr-2">From</label>
                             <input class="form-control inputTimeFilter" id="inputFrom" type="date"
-                                style="max-width : 200px" />
+                                style="max-width : 200px">
 
                             <label for="#inputFilter" class="my-auto ml-5 mr-2">To</label>
                             <input class="form-control inputTimeFilter" id="inputTo" type="date"
-                                style="max-width : 200px" />
+                                style="max-width : 200px">
 
                             <button class="btn btn-primary ml-auto mr-3" id="btnRefreshHistory">Refresh</button>
                             <button class="btn btn-primary mr-3" id="btnExportToPdf">Export</button>
@@ -148,7 +153,7 @@
                             </table>
                         </div>
                     </div>
-                    <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height px-2"><br />
+                    <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height px-2"><br>
                         <h3>Dashboard</h3>
                         <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
                             laudantium, totam rem aperiam.</p>
@@ -159,61 +164,22 @@
         </div>
 
     </div>
-    
-
-    
-    
-    <div class="dropdown-menu" id="context-menu">
-        <a class="dropdown-item" onclick="removeItem()"><i class="fas fa-trash mr-4"></i>Delete</a>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    <script src="/javascripts/jquery-3.3.1.min.js"></script>
-    
-    <script src="/javascripts/tableHTMLExport.js"></script>
-    <script src="/javascripts/jspdf.min.js"></script>
-    <script src="/javascripts/jspdf.plugin.autotable.js"></script>
-    
-    <script src="/javascripts/jquery-ui.min.js"></script>
-    
-    <script src="/javascripts/popper.min.js"></script>
-    <script src="/javascripts/bootstrap.min.js"></script>
-    
-    <script src="/javascripts/bootstrap-formhelpers.min.js"></script>
-    
-    <script src="/javascripts/contextmenu.js"></script>
-    
-    <script src="/javascripts/svg.min.js"></script>
-    
-    <script src="/javascripts/svg.draw.js"></script>
-    
-    <script src="/javascripts/plain-draggable.min.js"></script>
-    
-    <script src="/javascripts/socket.io.js"></script>
-
-    
-    
+    <!------------------------ SCRIPT ------------------------->
+    <!-- JQuery scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Bootstrap form helper script -->
+   
+    <!-- Context menu script -->
+    <!-- <script src="/javascripts/contextmenu.js"></script> -->
+    <!-- SVG script -->
+    <!-- Socket.io -->
+    <script src="public/javascripts/socket.io.js"></script>
+    <!-- My script -->
+    <script src="public/javascripts/Myscripts/publish.js"></script>
 
 </body>
 
