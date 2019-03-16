@@ -308,31 +308,28 @@ $(document).ready(function () {
         deviceID: deviceID,
         html: mainPage1,
         elements: elementHTML,
-        //variableList : variableList
-      }
-      $('#spinnerModal').modal('show');
-      console.log(mainPage1);
-      socket.on('/publishSuccess', function (data) {
-        setTimeout(function () {
-          $('#spinnerModal').modal('hide');
-          var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
-          console.log(href)
-          $('#publishedLink').attr('href', href)
-          $('#successModal').modal('show');
-        }, 3000);
-
-      })
-      socket.emit('/publish', _sendObject);
+        variableList : variableList
     }
+    socket.emit('/publish' , _sendObject);
+    $('#spinnerModal').modal('show');
+    console.log(mainPage1);
+    socket.on( '/' + deviceID + '/publishSuccess', function (data) {
+      console.log('Socket on ' + '/' + deviceID + '/publishSuccess');
+      setTimeout(function () {
+        $('#spinnerModal').modal('hide');
+        var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
+        console.log(href)
+        $('#publishedLink').attr('href', href)
+        $('#successModal').modal('show');
+      }, 3000); 
+    });
 
+  }
   });
-
-  $('#btnOpen').click(function () {
-    console.log(elementHTML);
-  });
-
-});
-
+}); 
+    
+  
+      
 /*
 ***********************************************************************************************
                                 Global variables and functions
@@ -881,13 +878,15 @@ var startDraw = function (shape) {
         switch (modalId) {
           case '#lineModal': {
             if (element) {
-              var elemX1 = Math.round(htmlElement.left - svgOffset.left),
-                elemY1 = Math.round(htmlElement.top - svgOffset.top),
-                elemX2 = Math.round(htmlElement.right - svgOffset.left),
-                elemY2 = Math.round(htmlElement.bottom - svgOffset.top),
+              var elemX1 = element.attr('x1'),
+                elemY1 = element.attr('y1'),
+                elemX2 = element.attr('x2'),
+                elemY2 = element.attr('y2'),
                 elemWidth = element.attr('stroke-width'),
                 elemLinecap = element.attr('stroke-linecap'),
                 elemColor = element.attr('stroke');
+
+              console.log(element.attr());
 
               var itemModal = $(modalId)[0];
 
@@ -3191,8 +3190,8 @@ function symbolsetMouseDownEventHandler(event) {
         elemHeight = parseInt(elemStyle.height, 10),
         elemPositionX = parseInt(elemStyle.left, 10),
         elemPositionY = parseInt(elemStyle.top, 10),
-        elemOnSymbol = elem.onSymbol;
-      elemOffSymbol = elem.offSymbol;
+        elemOnSymbol = elem.onSymbol,
+        elemOffSymbol = elem.offSymbol;
 
       var itemModal = $('#symbolSetModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
@@ -3296,6 +3295,3 @@ function symbolsetMouseDownEventHandler(event) {
   });
 
 }
-
-
-

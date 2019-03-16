@@ -1,5 +1,6 @@
 //Global variables
-let shapes = [];
+let elementHTML = [];
+let variableList = [];
 let $user = $('#user').text();
 let $deviceID = $('#deviceID').text();
 
@@ -11,6 +12,17 @@ $(document).ready(function () {
     $('#alarmTable tbody').empty();
 
     socket.on('connect', function (data) {
+
+        //Initialize variables and HTML elements
+        socket.emit('/reqPublishParameters' , {user : $user , deviceID : $deviceID});
+        socket.on('/' + $deviceID + '/resPublishParameters' , function(dataObject) {
+          elementHTML = dataObject.htmlElements;
+          variableList = dataObject.variableList;
+          initVariable(variableList);
+          initElementHTML(elementHTML);
+          socket.off('/' + $deviceID + '/resPublishParameters');
+        });
+        
 
         //History function
         socket.emit('/reqHistory', $deviceID);
@@ -177,7 +189,7 @@ $(document).ready(function () {
 
   $('#btnTest').click(function(){
     var imgs = $( "[id^='text']" );
-    console.log(imgs);
+    console.log(variableList);
   })
 
 });
@@ -197,4 +209,15 @@ function loadHistoryTable(arrHistory) {
           </tr>`;
           $('#historyTable tbody').append(_htmlMarkup);
     }
+}
+
+function initVariable(variableList) {
+  for (i = 0 ; i < variableList.length ; i++) {
+    var _expression = variableList[i].name + ' = ' + variableList[i].value;
+    eval(_expression);
+  }
+}
+
+function initElementHTML(elementHTML) {
+
 }

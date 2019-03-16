@@ -138,14 +138,14 @@ io.on('connection', function (socket) {
 
   socket.on('/reqDeviceConfig', function (user) {
     var arrConfig = [];
-    var userFolder = path.resolve(databasePath, user);
+    var userFolder = path.resolve(databasePath, user , 'Config');
     async.series([
       function (callback) {
         var fileList = fs.readdirSync(userFolder);
         if (fileList.length > 0) {
           fileList.forEach(function (file) {
             if (path.extname(file) == '.json')
-              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder, file))))
+              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder ,file))))
           });
         }
         callback();
@@ -163,7 +163,7 @@ io.on('connection', function (socket) {
       if (receivedObject) {
         receivedObject.fileName = 'deviceConfig_' + receivedObject.deviceID + '.json';
         receivedObjectJSON = JSON.stringify(receivedObject, null, 4);
-        var filePath = path.resolve(databasePath, receivedObject.user, 'deviceConfig_' + receivedObject.deviceID + '.json');
+        var filePath = path.resolve(databasePath, receivedObject.user,'Config' ,'deviceConfig_' + receivedObject.deviceID + '.json');
 
         fs.writeFile(filePath, receivedObjectJSON, function (err) {
           if (err) console.log(err);
@@ -209,10 +209,26 @@ io.on('connection', function (socket) {
     var htlmObject = HTMLParser.parse(template);
     htlmObject.querySelector('#mainPage1').appendChild(dataObj.html);
     var fileName = 'Device_' + dataObj.deviceID + '_publish.ejs';
-    fs.writeFileSync(path.resolve(databasePath, dataObj.user , fileName) , htlmObject);
-    fs.writeFileSync(path.resolve(databasePath, dataObj.user , 'variable'),JSON.stringify(dataObj.elements,null,4));
-    console.log(dataObj.elements);
-    socket.emit('/publishSuccess' , 1);
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user ,'Publish' ,fileName) , htlmObject);
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user , 'Parameters' , 'Device_' + dataObj.deviceID + '_Elements.json'),JSON.stringify(dataObj.elements,null,4));
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user , 'Parameters' , 'Device_' + dataObj.deviceID + '_VariableList.json'),JSON.stringify(dataObj.variableList,null,4));
+    socket.emit('/' + dataObj.deviceID + '/publishSuccess' , 1);
+
+    //Update published state in Config file
+  fs.readFile(path.resolve(databasePath , dataObj.user ,'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' )  , function(err , data) {
+    if (err) console.log(err);
+    else {
+      var deviceObj = JSON.parse(data);
+      deviceObj.published = true;
+      deviceObj.link = '/published/' + deviceObj.user + '/Device_' + deviceObj.deviceID + '_publish.ejs';
+      fs.writeFile(path.resolve(databasePath , dataObj.user , 'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' ), JSON.stringify(deviceObj , null, 4) , function(err) {
+        if (err) console.log(err);
+        else console.log('Write success in ' + path.resolve(databasePath , dataObj.user , 'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' ));
+      })
+
+    }
+  })
+
   })
 
 });

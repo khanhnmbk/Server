@@ -226,7 +226,7 @@ $(document).ready(function () {
                                     rcvDeviceObject.splice(rcvDeviceObject.indexOf(device), 1);
                                     console.log(rcvDeviceObject);
                                 });
-                                socket.emit('deleteDevice', device.user + '/' + device.fileName);
+                                socket.emit('deleteDevice', device.user + '/Config/' + device.fileName);
                                 break;
                             }
                         }
