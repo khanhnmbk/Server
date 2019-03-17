@@ -1,19 +1,11 @@
 [
     {
-        "type": "checkbox",
-        "id": "checkbox0",
+        "type": "img",
+        "id": "img0",
         "properties": [
             {
-                "name": "checkedCommand",
-                "value": "S7_1500_Bien_5 = 1"
-            },
-            {
-                "name": "unCheckedCommand",
-                "value": "S7_1500_Bien_5 = 0"
-            },
-            {
-                "name": "disableWhen",
-                "value": "S7_1500_Bien_5 == 2"
+                "name": "hiddenWhen",
+                "value": ""
             }
         ]
     }

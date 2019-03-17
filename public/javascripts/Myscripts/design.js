@@ -3048,6 +3048,16 @@ function processbarMouseDownEventHandler(event) {
           selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
         }
 
+
+        // if (itemModal.querySelector('.inputRotate').value != null) {
+        //   var rot = itemModal.querySelector('.inputRotate').value + 'deg';
+        //   $(progressElement).css({
+        //     '-ms-transform': 'rotate(' + rot + ')', /* IE 9 */
+        //     '-webkit-transform': 'rotate(' + rot + ')', /* Safari */
+        //     'transform': 'rotate(' + rot + ')'
+        //   });
+        // }
+
         progressElement.tag = itemModal.querySelector('.inputValue').value;
         progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
         progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
@@ -3055,6 +3065,7 @@ function processbarMouseDownEventHandler(event) {
         progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
         progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
+        
 
         if (itemModal.querySelector('.inputMinTag').value)
           progressElement.isMinTag = true;

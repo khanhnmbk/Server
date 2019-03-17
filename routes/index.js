@@ -165,7 +165,9 @@ router.get('/design/:user/:filename', checkAuthtication, function(req, res, next
 
 /* GET published page */
 router.get('/published/:user/:fileName' , checkAuthtication, function(req , res , next){
-  res.render(req.params.user + '/Publish/' + req.params.fileName);
+  var deviceId = req.params.fileName.replace('Device_','').replace('_publish.ejs','');
+  console.log(deviceId);
+  res.render(req.params.user + '/Publish/' + req.params.fileName , {user : req.params.user , deviceID : deviceId});
 })
 
 // router.get('/design', checkAuthtication, function(req, res, next) {

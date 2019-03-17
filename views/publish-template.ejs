@@ -33,8 +33,10 @@
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
                     <li class="nav-item mr-auto my-auto ml-4 text-white">
-                        <p id="deviceID" hidden>123456789</p>
-                        <p class="my-auto">Siemens VietNam</p>
+                        <div class="row">
+                            <a class="btn returnLink" href = "/device"><i class="fas fa-undo mr-2" ></i>Device Page</a>
+                            <p id="deviceID" hidden><%= deviceID %></p>
+                    </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i
@@ -53,7 +55,7 @@
                                 class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
-                        <p class="my-auto" id="user">nmkhanhbk@gmail.com</p>
+                        <p class="my-auto" id="user"><%= user %></p>
                     </li>
                     <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i
                         class="fas fa-sign-out-alt mr-2"></i>Logout</a>

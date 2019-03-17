@@ -4,6 +4,9 @@ let variableList = [];
 let $user = $('#user').text();
 let $deviceID = $('#deviceID').text();
 
+console.log($user);
+console.log($deviceID);
+
 
 $(document).ready(function () {
     let socket = io();

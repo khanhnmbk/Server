@@ -32,8 +32,10 @@
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
                     <li class="nav-item mr-auto my-auto ml-4 text-white">
-                        <p id="deviceID" hidden>123456789</p>
-                        <p class="my-auto">Siemens VietNam</p>
+                        <div class="row">
+                                <a class="btn returnLink"  href="/device"><i class="fas fa-undo mr-2"></i>Device Page</a>
+                                <p id="deviceID" hidden><%= deviceID %></p>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i class="fas fa-home mr-1"></i><strong>Home</strong></a>
@@ -48,7 +50,7 @@
                         <a class="nav-link" data-toggle="tab" href="#dashboard"><i class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
-                        <p class="my-auto" id="user">nmkhanhbk@gmail.com</p>
+                        <p class="my-auto" id="user"><%= user %></p>
                     </li>
                     <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                     
@@ -60,7 +62,7 @@
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height px-2">
                     
-                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><div class="custom-control custom-checkbox contextMenu plain-draggable" style="position: absolute; top: 295px; left: 213.172px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; margin: 0px;"><input type="checkbox" class="custom-control-input" id="cbInput0"><label class="custom-control-label" for="cbInput0" id="checkbox0" style="opacity: 1;">Checkbox</label></div></div>
+                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><img id="img0" class="contextMenu draggable ui-draggable ui-draggable-handle" src="../../images/png/default-image.png" style="height: 100px; width: 150px; position: absolute; top: 304px; left: 507.844px; cursor: pointer; opacity: 1;"></div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height px-2">
                         <div class="row pt-3 px-2">
                             <button class="btn btn-primary ml-auto" id="btnAck">Acknowledge</button>
