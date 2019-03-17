@@ -1,10 +1,92 @@
 [
     {
-        "type": "img",
-        "id": "img0",
+        "type": "progressbar",
+        "id": "progressbar0",
         "properties": [
             {
+                "name": "tag",
+                "value": "S7_1500_Bien_5"
+            },
+            {
+                "name": "minTag",
+                "value": ""
+            },
+            {
+                "name": "minValue",
+                "value": "50"
+            },
+            {
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "100"
+            },
+            {
+                "name": "isMinTag",
+                "value": false
+            },
+            {
+                "name": "isMaxTag",
+                "value": false
+            },
+            {
                 "name": "hiddenWhen",
+                "value": ""
+            },
+            {
+                "name": "isHideLabel",
+                "value": false
+            },
+            {
+                "name": "isRawValue",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "verticalprogressbar",
+        "id": "verticalProgressbar1",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_Bien_5"
+            },
+            {
+                "name": "minTag",
+                "value": ""
+            },
+            {
+                "name": "minValue",
+                "value": "50"
+            },
+            {
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "100"
+            },
+            {
+                "name": "isMinTag",
+                "value": false
+            },
+            {
+                "name": "isMaxTag",
+                "value": false
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            },
+            {
+                "name": "isHideLabel",
+                "value": false
+            },
+            {
+                "name": "isRawValue",
                 "value": ""
             }
         ]

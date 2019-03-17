@@ -379,6 +379,11 @@ function SCADA (elementHTML , variableName) {
         scadaProgressbar(_id , variableName);
         break;
       }
+      //Vertical progressbar
+      case 'verticalprogressbar' : {
+        scadaVerticalProgressbar(_id , variableName);
+        break;
+      }
       //Checkbox
       case 'checkbox' : {
         scadaCheckbox(_id , variableName);
@@ -486,12 +491,73 @@ function scadaProgressbar(id, variableName) {
 
   if (bar.tag) {
     if (bar.tag.includes(variableName)) {
-      var _width = eval(bar.tag) / _range * 100 + '%';
+      if (eval(bar.tag) <= bar.min) {
+        var _width = '0%';
+      } else if (eval(bar.tag) >= bar.max) {
+        var _width = '100%';
+      } else {
+        var _width = (eval(bar.tag) - bar.min) / _range * 100 + '%';
+      }
       $(bar).children('div').css({
         'width': _width,
       });
       if (bar.isHideLabel) $(bar).children('div').text('');
-      else $(bar).children('div').text(_width);
+      else {
+        if (!bar.isRawValue) $(bar).children('div').text(_width);
+        else $(bar).children('div').text(eval(bar.tag));
+      } 
+    }
+  }
+}
+
+//Vertical progressbar scada
+function scadaVerticalProgressbar(id, variableName) {
+  var verticalbar = document.getElementById(id);
+  if (verticalbar.isMinTag) {
+    if (verticalbar.minTag.includes(variableName)) verticalbar.min = eval(verticalbar.minTag);
+  }
+  else {
+    if (verticalbar.minValue) verticalbar.min = verticalbar.minValue;
+  }
+
+  if (verticalbar.isMaxTag) {
+    if (verticalbar.maxTag.includes(variableName)) verticalbar.max = eval(verticalbar.maxTag);
+  }
+  else {
+    if (verticalbar.maxValue) verticalbar.max = verticalbar.maxValue;
+  }
+
+  var _range = verticalbar.max - verticalbar.min;
+
+  if (verticalbar.hiddenWhen) {
+    if (verticalbar.hiddenWhen.includes(variableName)) {
+      if (eval(verticalbar.hiddenWhen)) $(verticalbar).hide();
+      else $(verticalbar).show();
+    }
+  }
+
+  if (verticalbar.tag) {
+    if (verticalbar.tag.includes(variableName)) {
+      if (eval(verticalbar.tag) <= verticalbar.min) {
+        var _height = '0%';
+        var _top = '100%'
+      } else if (eval(verticalbar.tag) >= verticalbar.max) {
+        var _height = '100%';
+        var _top = '0%'
+      } else {
+        var _height = (eval(verticalbar.tag) - verticalbar.min) / _range * 100 + '%';
+        var _top = (100 - (eval(verticalbar.tag) - verticalbar.min) / _range * 100) + '%';
+      }
+      $(verticalbar).children('div').css({
+        'height': _height,
+        'top' : _top,
+        'width' : '100%'
+      });
+      if (verticalbar.isHideLabel) $(verticalbar).children('div').text('');
+      else {
+        if (!verticalbar.isRawValue) $(verticalbar).children('div').text(_height);
+        else $(verticalbar).children('div').text(eval(verticalbar.tag));
+      } 
     }
   }
 }

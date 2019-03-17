@@ -603,6 +603,10 @@ function SCADA(arrHtmlElems, variableName) {
         scadaProgressBarObject(_shape, variableName);
         break;
       }
+      case 'verticalprogressbar' : {
+        scadaVerticalProgressBarObject(_shape, variableName);
+        break;
+      }
       case 'checkbox': {
         scadaCheckboxObject(_shape, variableName);
         break;
@@ -692,7 +696,6 @@ function scadaProgressBarObject(item, variableName) {
 
   var _range = item.max - item.min;
 
-  console.log($(item).children('div'))
   if (item.hiddenWhen) {
     if (item.hiddenWhen.includes(variableName)) {
       if (eval(item.hiddenWhen)) $(item).hide();
@@ -702,12 +705,72 @@ function scadaProgressBarObject(item, variableName) {
 
   if (item.tag) {
     if (item.tag.includes(variableName)) {
-      var _width = eval(item.tag) / _range * 100 + '%';
+      if (eval(item.tag) <= item.min) {
+        var _width = '0%';
+      } else if (eval(item.tag) >= item.max) {
+        var _width = '100%';
+      } else {
+        var _width = (eval(item.tag) - item.min) / _range * 100 + '%';
+      }
       $(item).children('div').css({
         'width': _width,
       });
       if (item.isHideLabel) $(item).children('div').text('');
-      else $(item).children('div').text(_width);
+      else {
+        if (!item.isRawValue) $(item).children('div').text(_width);
+        else $(item).children('div').text(eval(item.tag));
+      }
+    }
+  }
+}
+
+//Vertical Progressbar scada
+function scadaVerticalProgressBarObject(item, variableName) {
+  if (item.isMinTag) {
+    if (item.minTag.includes(variableName)) item.min = eval(item.minTag);
+  }
+  else {
+    if (item.minValue) item.min = item.minValue;
+  }
+
+  if (item.isMaxTag) {
+    if (item.maxTag.includes(variableName)) item.max = eval(item.maxTag);
+  }
+  else {
+    if (item.maxValue) item.max = item.maxValue;
+  }
+
+  var _range = item.max - item.min;
+
+  if (item.hiddenWhen) {
+    if (item.hiddenWhen.includes(variableName)) {
+      if (eval(item.hiddenWhen)) $(item).hide();
+      else $(item).show();
+    }
+  }
+
+  if (item.tag) {
+    if (item.tag.includes(variableName)) {
+      if (eval(item.tag) <= item.min) {
+        var _height = '0%';
+        var _top = '100%'
+      } else if (eval(item.tag) >= item.max) {
+        var _height = '100%';
+        var _top = '0%'
+      } else {
+        var _height = (eval(item.tag) - item.min) / _range * 100 + '%';
+        var _top = (100 - (eval(item.tag) - item.min) / _range * 100) + '%';
+      }
+      
+      $(item).children('div').css({
+        'height': _height,
+        'top' : _top,
+      });
+      if (item.isHideLabel) $(item).children('div').text('');
+      else {
+        if (!item.isRawValue) $(item).children('div').text(_height);
+        else $(item).children('div').text(eval(item.tag));
+      }
     }
   }
 }
@@ -1585,10 +1648,22 @@ function addNewSlider() {
   $('#mainPage1').on('mousedown', sliderMouseDownEventHandler);
 }
 
+//Add new vertical slider
+function addNewVerticalSlider() {
+  stopDraw(false);
+  $('#mainPage1').on('mousedown', verticalSliderMouseDownEventHandler);
+}
+
 //Add new process bar
 function addNewProcessbar() {
   stopDraw(false);
   $('#mainPage1').on('mousedown', processbarMouseDownEventHandler);
+}
+
+//Add new vertical process bar
+function addNewVerticalProcessbar() {
+  stopDraw(false);
+  $('#mainPage1').on('mousedown', verticalProcessbarMouseDownEventHandler);
 }
 
 //Add new symbol set
@@ -1614,7 +1689,9 @@ var stopDraw = function (addContext) {
   $('#mainPage1').off('mousedown', inputMouseDownEventHandler);
   $('#mainPage1').off('mousedown', checkboxMouseDownEventHandler);
   $('#mainPage1').off('mousedown', sliderMouseDownEventHandler);
+  $('#mainPage1').off('mousedown', verticalSliderMouseDownEventHandler);
   $('#mainPage1').off('mousedown', processbarMouseDownEventHandler);
+  $('#mainPage1').off('mousedown', verticalProcessbarMouseDownEventHandler);
   $('#mainPage1').off('mousedown', symbolsetMouseDownEventHandler);
 
   if (addContext) addContextMenu();
@@ -2165,17 +2242,17 @@ function buttonMouseDownEventHandler(event) {
           elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
         }
 
-        var html = document.getElementById(elemId);
-        for (draggableItem of draggableObjects) {
-          if (draggableItem.element.id == html.id) {
-            draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
-            break;
-          }
-        }
-        draggable = new PlainDraggable(html, { leftTop: true });
-        draggable.autoScroll = true;
-        draggable.containment = document.getElementById('mainPage1');
-        draggableObjects.push(draggable);
+        // var html = document.getElementById(elemId);
+        // for (draggableItem of draggableObjects) {
+        //   if (draggableItem.element.id == html.id) {
+        //     draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+        //     break;
+        //   }
+        // }
+        // draggable = new PlainDraggable(html, { leftTop: true });
+        // draggable.autoScroll = true;
+        // draggable.containment = document.getElementById('mainPage1');
+        // draggableObjects.push(draggable);
       });
 
       $('.btnCommand').on('click', function (onConditionClickEvent) {
@@ -2209,10 +2286,16 @@ function buttonMouseDownEventHandler(event) {
   index++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(btn, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(btn, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+  btn.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel : false,
+  });
 
 
 }
@@ -2409,7 +2492,7 @@ function inputMouseDownEventHandler(event) {
   //Image mouse events
   $(input).on('mouseover', function (event) {
     event.target.style.opacity = 0.4;
-    //event.target.style.cursor = 'move';
+    event.target.style.cursor = 'pointer';
   });
   //Subscribe mouseout event for each polygon
   $(input).on('mouseout', function (event) {
@@ -2491,10 +2574,16 @@ function inputMouseDownEventHandler(event) {
   index++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(input, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(input, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+  input.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel : false,
+  });
 
 
 }
@@ -2874,12 +2963,251 @@ function sliderMouseDownEventHandler(event) {
   index++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(slider, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(slider, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+  slider.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel : false
+  });
 
 }
+
+//Vertical slider mouse down event handler: To create new Checkbox
+function verticalSliderMouseDownEventHandler(event) {
+  var leftOffset = document.getElementById('mainPage1').getBoundingClientRect().left;
+  var topOffset = document.getElementById('mainPage1').getBoundingClientRect().top;
+
+  var left = event.pageX - leftOffset + 'px';
+  var top = event.pageY - topOffset + 'px';
+
+  //Declare new paragrap
+  var slider = document.createElement('input');
+  slider.type = 'range';
+  slider.className = 'custom-range contextMenu ';
+  slider.id = 'slider' + index;
+  slider.min = 0;
+  slider.max = 100;
+  slider.minValue = slider.min;
+  slider.maxValue = slider.max;
+
+  //Image css style
+  slider.style.position = 'absolute';
+  slider.style.top = top;
+  slider.style.left = left;
+  slider.style.width = '400px';
+
+  //Create elementHTML object
+  var _sliderObj = {
+    type: 'slider',
+    id: slider.id,
+    properties: [
+      {
+        name: 'tag',
+        value: ''
+      },
+      {
+        name: 'minTag',
+        value: ''
+      },
+      {
+        name: 'minValue',
+        value: ''
+      },
+      {
+        name: 'maxTag',
+        value: ''
+      },
+      {
+        name: 'maxValue',
+        value: ''
+      },
+      {
+        name: 'isMinTag',
+        value: ''
+      },
+      {
+        name: 'isMaxTag',
+        value: ''
+      },
+      {
+        name: 'disableWhen',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_sliderObj);
+
+  //Image mouse events
+  $(slider).on('mouseover', function (event) {
+    event.target.style.opacity = 0.4;
+    $(this).tooltip('dispose');
+    $(this).tooltip({
+      animation: false,
+      offset: (this.value - (this.max - this.min) / 2) * (parseInt(this.style.width, 10) / (this.max - this.min)),
+      title: this.value
+    });
+    $(this).tooltip('show');
+
+  });
+  //Subscribe mouseout event for each polygon
+  $(slider).on('mouseout', function (event) {
+    event.target.style.opacity = 1;
+    $(this).tooltip('hide');
+  });
+  //Subscribe mouse double click event
+  $(slider).on('dblclick', function (mouseEvent) {
+    $('#sliderModal').one('show.bs.modal', function (showEvent) {
+
+      var elem = document.getElementById(mouseEvent.target.id);
+      var elemStyle = elem.style;
+
+      var elemWidth = parseInt(elemStyle.width, 10);
+
+      var itemModal = $('#sliderModal')[0];
+      itemModal.querySelector('.inputWidth').value = elemWidth;
+
+      if (mouseEvent.target.tag) {
+        itemModal.querySelector('.inputValue').value = mouseEvent.target.tag;
+      }
+      else {
+        itemModal.querySelector('.inputValue').value = '';
+      }
+
+      if (mouseEvent.target.minTag) {
+        itemModal.querySelector('.inputMinTag').value = mouseEvent.target.minTag;
+      }
+      else {
+        itemModal.querySelector('.inputMinTag').value = '';
+      }
+
+      if (mouseEvent.target.minValue) {
+        itemModal.querySelector('.inputMinValue').value = mouseEvent.target.minValue;
+      }
+      else {
+        itemModal.querySelector('.inputMinValue').value = '';
+      }
+
+      if (mouseEvent.target.maxTag) {
+        itemModal.querySelector('.inputMaxTag').value = mouseEvent.target.maxTag;
+      }
+      else {
+        itemModal.querySelector('.inputMaxTag').value = '';
+      }
+
+      if (mouseEvent.target.maxValue) {
+        itemModal.querySelector('.inputMaxValue').value = mouseEvent.target.maxValue;
+      }
+      else {
+        itemModal.querySelector('.inputMaxValue').value = '';
+      }
+
+      if (mouseEvent.target.disableWhen) {
+        itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+      }
+      else {
+        itemModal.querySelector('.inputDisableWhen').value = '';
+      }
+
+      //Button save 
+      $('.saveChangeButton').on('click', function (event) {
+        elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
+        mouseEvent.target.tag = itemModal.querySelector('.inputValue').value;
+        mouseEvent.target.minTag = itemModal.querySelector('.inputMinTag').value;
+        mouseEvent.target.minValue = itemModal.querySelector('.inputMinValue').value;
+        mouseEvent.target.maxTag = itemModal.querySelector('.inputMaxTag').value;
+        mouseEvent.target.maxValue = itemModal.querySelector('.inputMaxValue').value;
+        mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+
+        if (itemModal.querySelector('.inputMinTag').value)
+          mouseEvent.target.isMinTag = true;
+        else mouseEvent.target.isMinTag = false;
+
+        if (itemModal.querySelector('.inputMaxTag').value)
+          mouseEvent.target.isMaxTag = true;
+        else mouseEvent.target.isMaxTag = false;
+
+        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.minTag;
+          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.minValue;
+          elementHTML[_foundIndex].properties[3].value = mouseEvent.target.maxTag;
+          elementHTML[_foundIndex].properties[4].value = mouseEvent.target.maxValue;
+          elementHTML[_foundIndex].properties[5].value = mouseEvent.target.isMinTag;
+          elementHTML[_foundIndex].properties[6].value = mouseEvent.target.isMaxTag;
+          elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
+        }
+      });
+
+      //Browse button
+      $('.btnValue').on('click', function (onConditionClickEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnMinTag').on('click', function (onConditionClickEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnMaxTag').on('click', function (onConditionClickEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+    });
+
+    $('#sliderModal').one('hide.bs.modal', function (hideEvent) {
+      $('.saveChangeButton').off('click');
+      $('.btnValue').off('click');
+      $('.btnMinTag').off('click');
+      $('.btnMaxTag').off('click');
+      $('.btnDisableWhen').off('click');
+    });
+
+    $('#sliderModal').modal();
+  });
+
+  $('#mainPage1').append(slider);
+  shapes[index] = slider;
+  index++;
+
+  //Add draggable feature
+  // draggable = new PlainDraggable(slider, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+  slider.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel : false
+  });
+
+}
+
 
 //Process bar mouse down event handler: To create new Checkbox
 function processbarMouseDownEventHandler(event) {
@@ -2896,6 +3224,9 @@ function processbarMouseDownEventHandler(event) {
   progressbar.isHideLabel = false;
   progressbar.min = 0;
   progressbar.max = 100;
+
+  progressbar.minValue = progressbar.min;
+  progressbar.maxValue = progressbar.max;
 
   var bar = document.createElement('div');
   bar.className = 'progress-bar';
@@ -2952,6 +3283,10 @@ function processbarMouseDownEventHandler(event) {
       {
         name: 'isHideLabel',
         value: ''
+      },
+      {
+        name: 'isRawValue',
+        value: ''
       }
     ]
   }
@@ -2962,7 +3297,7 @@ function processbarMouseDownEventHandler(event) {
   //Image mouse events
   $(progressbar).on('mouseover', function (event) {
     event.target.style.opacity = 0.4;
-    //event.target.style.cursor = 'move';
+    event.target.style.cursor = 'pointer';
   });
   //Subscribe mouseout event for each polygon
   $(progressbar).on('mouseout', function (event) {
@@ -2976,6 +3311,7 @@ function processbarMouseDownEventHandler(event) {
       var elemWidth, elemHeight;
       var progressElement;
       var isHideLabel = false;
+      var isRawValue = false;
 
       if (selectedItem.id) { //Progress is chosen
         progressElement = selectedItem;
@@ -2988,11 +3324,13 @@ function processbarMouseDownEventHandler(event) {
         elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
       }
       isHideLabel = progressElement.isHideLabel;
+      isRawValue = progressElement.isRawValue;
 
       var itemModal = $('#progressBarModal')[0];
       itemModal.querySelector('.inputWidth').value = elemWidth;
       itemModal.querySelector('.inputHeight').value = elemHeight;
       itemModal.querySelector('#hideLabelCheckbox').checked = isHideLabel;
+      itemModal.querySelector('#rawValueCheckbox').checked = isRawValue;
 
       if (progressElement.tag) {
         itemModal.querySelector('.inputValue').value = progressElement.tag;
@@ -3048,16 +3386,6 @@ function processbarMouseDownEventHandler(event) {
           selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
         }
 
-
-        // if (itemModal.querySelector('.inputRotate').value != null) {
-        //   var rot = itemModal.querySelector('.inputRotate').value + 'deg';
-        //   $(progressElement).css({
-        //     '-ms-transform': 'rotate(' + rot + ')', /* IE 9 */
-        //     '-webkit-transform': 'rotate(' + rot + ')', /* Safari */
-        //     'transform': 'rotate(' + rot + ')'
-        //   });
-        // }
-
         progressElement.tag = itemModal.querySelector('.inputValue').value;
         progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
         progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
@@ -3065,6 +3393,7 @@ function processbarMouseDownEventHandler(event) {
         progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
         progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
+        progressElement.isRawValue = itemModal.querySelector('#rawValueCheckbox').checked;
         
 
         if (itemModal.querySelector('.inputMinTag').value)
@@ -3144,10 +3473,299 @@ function processbarMouseDownEventHandler(event) {
   index++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(progressbar, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(progressbar, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+  progressbar.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+  });
+
+
+}
+
+//Vertical process bar mouse down event handler: To create new Checkbox
+function verticalProcessbarMouseDownEventHandler(event) {
+  var leftOffset = document.getElementById('mainPage1').getBoundingClientRect().left;
+  var topOffset = document.getElementById('mainPage1').getBoundingClientRect().top;
+
+  var left = event.pageX - leftOffset + 'px';
+  var top = event.pageY - topOffset + 'px';
+
+  //Declare new paragrap
+  var verticalProgressbar = document.createElement('div');
+  verticalProgressbar.className = 'progress contextMenu vertical-progress ';
+  verticalProgressbar.id = 'verticalProgressbar' + index;
+  verticalProgressbar.isHideLabel = false;
+  verticalProgressbar.min = 0;
+  verticalProgressbar.max = 100;
+
+  verticalProgressbar.minValue = verticalProgressbar.min;
+  verticalProgressbar.maxValue = verticalProgressbar.max;
+
+  var bar = document.createElement('div');
+  bar.className = 'progress-bar';
+  bar.style.position = 'absolute';
+  bar.style.top = '30%';
+  bar.style.width = '100%';
+  bar.style.height = '70%';
+  bar.innerText = '70%';
+
+
+  verticalProgressbar.appendChild(bar);
+
+  //Image css style
+  verticalProgressbar.style.position = 'absolute';
+  verticalProgressbar.style.top = top;
+  verticalProgressbar.style.left = left;
+  verticalProgressbar.style.width = '30px';
+  verticalProgressbar.style.height = '300px';
+  verticalProgressbar.style.opacity = 0.8;
+  verticalProgressbar.style.filter = 'alpha(opacity=80)';
+  //Create elementHTML object
+  var _verticalProgressObj = {
+    type: 'verticalprogressbar',
+    id: verticalProgressbar.id,
+    properties: [
+      {
+        name: 'tag',
+        value: ''
+      },
+      {
+        name: 'minTag',
+        value: ''
+      },
+      {
+        name: 'minValue',
+        value: ''
+      },
+      {
+        name: 'maxTag',
+        value: ''
+      },
+      {
+        name: 'maxValue',
+        value: ''
+      },
+      {
+        name: 'isMinTag',
+        value: ''
+      },
+      {
+        name: 'isMaxTag',
+        value: ''
+      },
+      {
+        name: 'hiddenWhen',
+        value: ''
+      },
+      {
+        name: 'isHideLabel',
+        value: ''
+      },
+      {
+        name: 'isRawValue',
+        value: ''
+      }
+    ]
+  }
+
+  elementHTML.push(_verticalProgressObj);
+
+
+  //Image mouse events
+  $(verticalProgressbar).on('mouseover', function (event) {
+    event.target.style.opacity = 0.4;
+    event.target.style.cursor = 'pointer';
+  });
+  //Subscribe mouseout event for each polygon
+  $(verticalProgressbar).on('mouseout', function (event) {
+    event.target.style.opacity = 1;
+  });
+  //Subscribe mouse double click event
+  $(verticalProgressbar).on('dblclick', function (mouseEvent) {
+    $('#verticalProgressBarModal').one('show.bs.modal', function (showEvent) {
+
+      var selectedItem = mouseEvent.target;
+      var elemWidth, elemHeight;
+      var progressElement;
+      var isHideLabel = false;
+      var isRawValue = false;
+      
+      if (selectedItem.id) { //Progress is chosen
+        progressElement = selectedItem;
+        elemWidth = parseInt(selectedItem.style.width, 10);
+        elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
+      }
+      else { //Bar is chosen
+        progressElement = selectedItem.parentNode;
+        elemWidth = parseInt(selectedItem.parentNode.style.width, 10);
+        elemHeight = Math.round(selectedItem.parentNode.getBoundingClientRect().bottom - selectedItem.parentNode.getBoundingClientRect().top);
+      }
+      console.log(elemHeight + ' ' + elemWidth);
+      isHideLabel = progressElement.isHideLabel;
+      isRawValue = progressElement.isRawValue;
+
+      var itemModal = $('#verticalProgressBarModal')[0];
+      itemModal.querySelector('.inputWidth').value = elemWidth;
+      itemModal.querySelector('.inputHeight').value = elemHeight;
+      itemModal.querySelector('#hideVerticalLabelCheckbox').checked = isHideLabel;
+      itemModal.querySelector('#rawVerticalValueCheckbox').checked = isRawValue;
+
+      if (progressElement.tag) {
+        itemModal.querySelector('.inputValue').value = progressElement.tag;
+      }
+      else {
+        itemModal.querySelector('.inputValue').value = '';
+      }
+
+      if (progressElement.minTag) {
+        itemModal.querySelector('.inputMinTag').value = progressElement.minTag;
+      }
+      else {
+        itemModal.querySelector('.inputMinTag').value = '';
+      }
+
+      if (progressElement.minValue) {
+        itemModal.querySelector('.inputMinValue').value = progressElement.minValue;
+      }
+      else {
+        itemModal.querySelector('.inputMinValue').value = '';
+      }
+
+      if (progressElement.maxTag) {
+        itemModal.querySelector('.inputMaxTag').value = progressElement.maxTag;
+      }
+      else {
+        itemModal.querySelector('.inputMaxTag').value = '';
+      }
+
+      if (progressElement.maxValue) {
+        itemModal.querySelector('.inputMaxValue').value = progressElement.maxValue;
+      }
+      else {
+        itemModal.querySelector('.inputMaxValue').value = '';
+      }
+
+      if (progressElement.hiddenWhen) {
+        itemModal.querySelector('.inputHiddenWhen').value = progressElement.hiddenWhen;
+      }
+      else {
+        itemModal.querySelector('.inputHiddenWhen').value = '';
+      }
+
+
+      //Button save 
+      $('.saveChangeButton').on('click', function (event) {
+        if (selectedItem.id) { //Progress is chosen
+          selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+          selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+        }
+        else {  //Bar is chosen
+          selectedItem.parentNode.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+          selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+        }
+
+        progressElement.tag = itemModal.querySelector('.inputValue').value;
+        progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
+        progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
+        progressElement.maxTag = itemModal.querySelector('.inputMaxTag').value;
+        progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
+        progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+        progressElement.isHideLabel = itemModal.querySelector('#hideVerticalLabelCheckbox').checked;
+        progressElement.isRawValue = itemModal.querySelector('#rawVerticalValueCheckbox').checked;
+        
+
+        if (itemModal.querySelector('.inputMinTag').value)
+          progressElement.isMinTag = true;
+        else progressElement.isMinTag = false;
+
+        if (itemModal.querySelector('.inputMaxTag').value)
+          progressElement.isMaxTag = true;
+        else progressElement.isMaxTag = false;
+
+        var _bar = $(progressElement).find('.progress-bar')[0];
+        if (progressElement.isHideLabel) _bar.innerText = '';
+        else _bar.innerText = _bar.style.width;
+
+        var _foundIndex = findElementHTMLById(progressElement.id);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = progressElement.tag;
+          elementHTML[_foundIndex].properties[1].value = progressElement.minTag;
+          elementHTML[_foundIndex].properties[2].value = progressElement.minValue;
+          elementHTML[_foundIndex].properties[3].value = progressElement.maxTag;
+          elementHTML[_foundIndex].properties[4].value = progressElement.maxValue;
+          elementHTML[_foundIndex].properties[5].value = progressElement.isMinTag;
+          elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
+          elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
+          elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
+        }
+      });
+
+      //Button Value browse tag
+      $('.btnValueTag').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnMinTag').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnMaxTag').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnHiddenWhen').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+    });
+
+    $('#verticalProgressBarModal').one('hide.bs.modal', function (hideEvent) {
+      $('.saveChangeButton').off('click');
+      $('.btnValueTag').off('click');
+      $('.btnMinTag').off('click');
+      $('.btnMaxTag').off('click');
+      $('.btnHiddenWhen').off('click');
+    });
+
+    $('#verticalProgressBarModal').modal();
+  });
+
+  $('#mainPage1').append(verticalProgressbar);
+  shapes[index] = verticalProgressbar;
+  index++;
+
+  //Add draggable feature
+  // draggable = new PlainDraggable(progressbar, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+  verticalProgressbar.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+  });
 
 
 }
