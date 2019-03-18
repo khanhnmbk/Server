@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="/stylesheets/all.css">
     <!-- Bootstrap form helpers -->
     <link rel="stylesheet" href="/stylesheets/bootstrap-formhelpers.min.css">
+    <!-- Bootstrap slider -->
+    <link rel="stylesheet" href="/stylesheets/bootstrap-slider.min.css">
     <!-- Own style -->
     <link rel="stylesheet" href="/stylesheets/style.css">
 
@@ -1730,6 +1732,120 @@
         </div>
     </div>
 
+    <!--Vertical slider modal-->
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="verticalSliderModal" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Properties</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pt-0"><strong>Appearance</strong></legend>
+                        <div class='row'>
+                            <div class="col-sm">
+                                <div class="form-group row my-2">
+                                    <label for="inputImageWidth" class="col-sm-2 col-form-label">Height</label>
+                                    <div class="col-sm">
+                                        <input type="number" class="form-control ml-auto inputWidth inputModal"
+                                            value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pr-1"><strong>Input</strong></legend>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Value</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputValue inputModal"
+                                            placeholder="Expression">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success btnValue btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Min tag</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputMinTag inputModal"
+                                            placeholder="Expression">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success btnMinTag btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Min value</label>
+                                    <div class="col-sm ml-4 pl-4">
+                                        <input type="text" class="form-control ml-auto inputMinValue inputModal"
+                                            placeholder="Insert tag">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Max tag</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputMaxTag inputModal"
+                                            placeholder="Expression">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success btnMaxTag btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Max value</label>
+                                    <div class="col-sm ml-4 pl-4">
+                                        <input type="text" class="form-control ml-auto inputMaxValue inputModal"
+                                            id="inputHidden" placeholder="Insert tag">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pt-0"><strong>Animation</strong></legend>
+                        <div class="form-group row my-2">
+                            <label for="inputHidden" class="col-sm-2 col-form-label">Disable when</label>
+                            <div class="input-group col-sm">
+                                <input type="text" class="form-control inputDisableWhen inputModal"
+                                    placeholder="Expression">
+                                <div class="input-group-append">
+                                    <button class="btn btn-success btnDisableWhen btnBrowseTag" data-toggle="modal"
+                                        data-target="#tagModal" data-backdrop="static">Browse tag</button>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary saveChangeButton">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--Progress bar modal-->
     <div class="modal fade" tabindex="-1" role="dialog" id="progressBarModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
@@ -2380,6 +2496,8 @@
     <script src="/javascripts/bootstrap.min.js"></script>
     <!-- Bootstrap form helper script -->
     <script src="/javascripts/bootstrap-formhelpers.min.js"></script>
+    <!-- Bootstrap slider -->
+    <script src="/javascripts/bootstrap-slider.min.js"></script>
     <!-- Context menu script -->
     <script src="/javascripts/contextmenu.js"></script>
     <!-- SVG script -->

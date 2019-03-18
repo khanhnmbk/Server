@@ -328,7 +328,8 @@ $(document).ready(function () {
   });
 
   $('#btnOpen').click(function () {
-    console.log(elementHTML);
+    
+   
   })
 
 });
@@ -865,6 +866,21 @@ function findElementHTMLById(_id) {
     if (elementHTML[i].id == _id) return elementHTML.indexOf(elementHTML[i]);
   }
   return -1;
+}
+
+//Fix tooltip for vertical slider
+function fixTooltip(sliderID) {
+  
+  $('.slider-vertical').each(function() {
+    $(this).children('.tooltip')[0].classList.add('bs-tooltip-left');
+    $(this).children('.tooltip')[0].childNodes[0].classList.add('arrow' , 'my-2');
+  })
+  
+  
+  //Fix background color
+  $('.slider-vertical').find('.slider-handle').each(function(){
+    $(this).css({background : '#007bff'})
+  });
 }
 
 /*
@@ -2985,25 +3001,48 @@ function verticalSliderMouseDownEventHandler(event) {
   var top = event.pageY - topOffset + 'px';
 
   //Declare new paragrap
-  var slider = document.createElement('input');
-  slider.type = 'range';
-  slider.className = 'custom-range contextMenu ';
-  slider.id = 'slider' + index;
-  slider.min = 0;
-  slider.max = 100;
-  slider.minValue = slider.min;
-  slider.maxValue = slider.max;
+  var verticalSliderDiv = document.createElement('div');
+  //verticalSlider.type = 'text';
+  verticalSliderDiv.className = ' contextMenu ';
+  verticalSliderDiv.style.background = 'transparent';
+  
+  var verticalSlider = document.createElement('input');
+  verticalSlider.type = 'range';
+  verticalSlider.id = 'verticalSlider' + index;
+  verticalSlider.min = 0;
+  verticalSlider.max = 100;
+  verticalSlider.minValue = verticalSlider.min;
+  verticalSlider.maxValue = verticalSlider.max;
+
 
   //Image css style
-  slider.style.position = 'absolute';
-  slider.style.top = top;
-  slider.style.left = left;
-  slider.style.width = '400px';
+  verticalSliderDiv.style.position = 'absolute';
+  verticalSliderDiv.style.top = top;
+  verticalSliderDiv.style.left = left;
+  
+  
+
+  verticalSliderDiv.append(verticalSlider);
+  $('#mainPage1').append(verticalSliderDiv);
+
+  //Create vertical slider
+  $(verticalSlider).bootstrapSlider({
+    min: verticalSlider.min,
+    max: verticalSlider.max,
+    value: 50,
+    orientation: 'vertical',
+    tooltip_position:'left',
+    reversed : true,
+    enabled : false,
+  });
+
+  fixTooltip(); //Fix tooltip for vertical slider
+  $(verticalSlider).siblings('div')[0].style.height = '300px';
 
   //Create elementHTML object
-  var _sliderObj = {
-    type: 'slider',
-    id: slider.id,
+  var _verticalSliderObj = {
+    type: 'verticalslider',
+    id: verticalSlider.id,
     properties: [
       {
         name: 'tag',
@@ -3040,36 +3079,30 @@ function verticalSliderMouseDownEventHandler(event) {
     ]
   }
 
-  elementHTML.push(_sliderObj);
+  elementHTML.push(_verticalSliderObj);
 
   //Image mouse events
-  $(slider).on('mouseover', function (event) {
+  $(verticalSliderDiv).on('mouseover', function (event) {
     event.target.style.opacity = 0.4;
-    $(this).tooltip('dispose');
-    $(this).tooltip({
-      animation: false,
-      offset: (this.value - (this.max - this.min) / 2) * (parseInt(this.style.width, 10) / (this.max - this.min)),
-      title: this.value
-    });
-    $(this).tooltip('show');
-
+    console.log('Mouse over');
   });
   //Subscribe mouseout event for each polygon
-  $(slider).on('mouseout', function (event) {
+  $(verticalSliderDiv).on('mouseout', function (event) {
     event.target.style.opacity = 1;
-    $(this).tooltip('hide');
   });
   //Subscribe mouse double click event
-  $(slider).on('dblclick', function (mouseEvent) {
-    $('#sliderModal').one('show.bs.modal', function (showEvent) {
+  $(verticalSliderDiv).on('dblclick', function (mouseEvent) {
+    var elem = $(mouseEvent.target).closest('.slider')[0];
+    $('#verticalSliderModal').one('show.bs.modal', function (showEvent) {
 
-      var elem = document.getElementById(mouseEvent.target.id);
-      var elemStyle = elem.style;
+      var elemHeight = elem.style.height ;
+      if (elemHeight) elemHeight = parseInt(elemHeight, 10);
 
-      var elemWidth = parseInt(elemStyle.width, 10);
+      var _input = $(elem).siblings('input')[0];
+      console.log(_input);
 
-      var itemModal = $('#sliderModal')[0];
-      itemModal.querySelector('.inputWidth').value = elemWidth;
+      var itemModal = $('#verticalSliderModal')[0];
+      itemModal.querySelector('.inputWidth').value = elemHeight;
 
       if (mouseEvent.target.tag) {
         itemModal.querySelector('.inputValue').value = mouseEvent.target.tag;
@@ -3115,7 +3148,7 @@ function verticalSliderMouseDownEventHandler(event) {
 
       //Button save 
       $('.saveChangeButton').on('click', function (event) {
-        elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
+        $(elem).siblings('div')[0].style.height = itemModal.querySelector('.inputWidth').value + 'px';
         mouseEvent.target.tag = itemModal.querySelector('.inputValue').value;
         mouseEvent.target.minTag = itemModal.querySelector('.inputMinTag').value;
         mouseEvent.target.minValue = itemModal.querySelector('.inputMinValue').value;
@@ -3179,7 +3212,7 @@ function verticalSliderMouseDownEventHandler(event) {
 
     });
 
-    $('#sliderModal').one('hide.bs.modal', function (hideEvent) {
+    $('#verticalSliderModal').one('hide.bs.modal', function (hideEvent) {
       $('.saveChangeButton').off('click');
       $('.btnValue').off('click');
       $('.btnMinTag').off('click');
@@ -3187,11 +3220,11 @@ function verticalSliderMouseDownEventHandler(event) {
       $('.btnDisableWhen').off('click');
     });
 
-    $('#sliderModal').modal();
+    $('#verticalSliderModal').modal();
   });
 
-  $('#mainPage1').append(slider);
-  shapes[index] = slider;
+
+  shapes[index] = verticalSlider;
   index++;
 
   //Add draggable feature
@@ -3199,7 +3232,7 @@ function verticalSliderMouseDownEventHandler(event) {
   // draggable.autoScroll = true;
   // draggable.containment = document.getElementById('mainPage1');
   // draggableObjects.push(draggable);
-  slider.classList.add('draggable');
+  verticalSliderDiv.classList.add('draggable');
   $('.draggable').draggable({
     refreshPositions: true,
     containment: $('#mainPage1'),

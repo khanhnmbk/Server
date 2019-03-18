@@ -305,3 +305,28 @@ label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
     border:0px;
 }
 /*--thank you pop ends here--*/
+
+/*
+***********************************************************************************************
+                                Tooltip for vertical slider
+***********************************************************************************************
+*/
+
+.slider::before {
+    background: none;
+}
+
+.tooltip.tooltip-main {
+    opacity: 0.7;
+}
+
+.slider-vertical {
+    background: none;
+}
+
+
+.slider-track div {
+    background: #dee2e6
+}
+
+
