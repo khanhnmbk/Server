@@ -1,0 +1,58 @@
+{
+    "deviceName": "Automation Lab",
+    "deviceID": "0379699593",
+    "longitude": "106.629662",
+    "latitude": "10.823099",
+    "period": "4000",
+    "PLCs": [
+        {
+            "name": "S7_1500",
+            "protocol": "S7-connection",
+            "ipAddress": "192.168.100.150",
+            "variables": [
+                {
+                    "name": "M0_0",
+                    "dataType": "Bool",
+                    "plc": "S7_1500",
+                    "address": "M0.0",
+                    "access": "read/write",
+                    "unit": "",
+                    "isAlarm": true,
+                    "alarmType": "0",
+                    "parameters": {
+                        "lolo": "",
+                        "lo": "",
+                        "hi": "",
+                        "hihi": "",
+                        "deadband": ""
+                    },
+                    "isHistory": true
+                },
+                {
+                    "name": "MW2",
+                    "dataType": "Int",
+                    "plc": "S7_1500",
+                    "address": "MW2",
+                    "access": "read/write",
+                    "unit": "RPM",
+                    "isAlarm": true,
+                    "alarmType": "1",
+                    "parameters": {
+                        "lolo": "10",
+                        "lo": "20",
+                        "hi": "80",
+                        "hihi": "90",
+                        "deviation": "5"
+                    },
+                    "isHistory": true
+                }
+            ]
+        }
+    ],
+    "user": "nmkhanhbk@gmail.com",
+    "creationTime": "4/10/2019, 12:18:53 AM",
+    "lastActive": "",
+    "published": false,
+    "status": false,
+    "fileName": "deviceConfig_0379699593.json"
+}

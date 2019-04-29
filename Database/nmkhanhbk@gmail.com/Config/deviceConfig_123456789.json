@@ -8,7 +8,7 @@
         {
             "name": "S7_1500",
             "protocol": "S7-connection",
-            "ipAddress": "192.168.1.150",
+            "ipAddress": "192.168.100.150",
             "variables": [
                 {
                     "name": "Bien_5",

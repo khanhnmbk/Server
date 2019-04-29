@@ -9,63 +9,66 @@ console.log($deviceID);
 
 
 $(document).ready(function () {
-    let socket = io();
+  let socket = io();
 
-    //Empty alarm table first
-    $('#alarmTable tbody').empty();
+  //Empty alarm table first
+  $('#alarmTable tbody').empty();
 
-    //Button style when click
-    $('.btn.contextMenu').on('mousedown' , function(){ $(this).css({'opacity' : 0.5})});
-    $('.btn.contextMenu').on('mouseup' , function(){ $(this).css({'opacity' : 1})});
+  //Button style when click
+  $('.btn.contextMenu').on('mousedown', function () { $(this).css({ 'opacity': 0.5 }) });
+  $('.btn.contextMenu').on('mouseup', function () { $(this).css({ 'opacity': 1 }) });
 
-    socket.on('connect', function (data) {
 
-        //Initialize variables and HTML elements
-        socket.emit('/reqPublishParameters' , {user : $user , deviceID : $deviceID});
-        socket.on('/' + $deviceID + '/resPublishParameters' , function(dataObject) {
-          elementHTML = dataObject.htmlElements;
-          variableList = dataObject.variableList;
-          initVariable(variableList);
-          initElementHTML(elementHTML);
-          initSCADA(elementHTML , socket);
-          socket.off('/' + $deviceID + '/resPublishParameters');
-        });
-        
-        //History function
-        socket.emit('/reqHistory', $deviceID);
-        socket.on('/' + $deviceID + '/resHistory' , function (arrHistory) {
-            loadHistoryTable(arrHistory);
-        });
+  socket.on('connect', function (data) {
 
-        //Alarm function
-        socket.on('/' + $deviceID + '/alarm', function (alarmObject) {
-            var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
-            var _isExist = false;
-            var _timeStamp = new Date(alarmObject.timestamp)
+    //Initialize variables and HTML elements
+    socket.emit('/reqPublishParameters', { user: $user, deviceID: $deviceID });
+    socket.on('/' + $deviceID + '/resPublishParameters', function (dataObject) {
+      elementHTML = dataObject.htmlElements;
+      variableList = dataObject.variableList;
+      initVariable(variableList);
+      reInitVerticalSlider();
+      fixTooltip();
+      initElementHTML(elementHTML);
+      initSCADA(elementHTML, socket);
+      socket.off('/' + $deviceID + '/resPublishParameters');
+    });
 
-            for (var _item of arrAlarmSource) {
-              if (_item.innerText == alarmObject.source) {
-                if (alarmObject.state == 'UNACK') {
-                  var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
-                  var tableRow = $(_expression);
-                  tableRow[1].innerText = _timeStamp.toLocaleDateString();
-                  tableRow[2].innerText = _timeStamp.toLocaleTimeString();
-                  tableRow[4].innerText = alarmObject.value;
-                  tableRow[5].innerText = alarmObject.message;
-                  tableRow[6].innerText = alarmObject.type;
-                  tableRow[7].innerText = alarmObject.state;
-                }
-                else { //ACKED
-                  _item.closest('tr').remove();
-                }
-                _isExist = true;
-                break;
-              }
-            }
-    
-            if (!_isExist) {//Not found item 
-              var _htmlMarkup =
-                `<tr class = "row-pointer">
+    //History function
+    socket.emit('/reqHistory', $deviceID);
+    socket.on('/' + $deviceID + '/resHistory', function (arrHistory) {
+      loadHistoryTable(arrHistory);
+    });
+
+    //Alarm function
+    socket.on('/' + $deviceID + '/alarm', function (alarmObject) {
+      var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
+      var _isExist = false;
+      var _timeStamp = new Date(alarmObject.timestamp)
+
+      for (var _item of arrAlarmSource) {
+        if (_item.innerText == alarmObject.source) {
+          if (alarmObject.state == 'UNACK') {
+            var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
+            var tableRow = $(_expression);
+            tableRow[1].innerText = _timeStamp.toLocaleDateString();
+            tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+            tableRow[4].innerText = alarmObject.value;
+            tableRow[5].innerText = alarmObject.message;
+            tableRow[6].innerText = alarmObject.type;
+            tableRow[7].innerText = alarmObject.state;
+          }
+          else { //ACKED
+            _item.closest('tr').remove();
+          }
+          _isExist = true;
+          break;
+        }
+      }
+
+      if (!_isExist) {//Not found item 
+        var _htmlMarkup =
+          `<tr class = "row-pointer">
                     <td><input type="checkbox" class = "alarmCheckbox"></td>
                     <td>` + _timeStamp.toLocaleDateString() + `</td>
                     <td>` + _timeStamp.toLocaleTimeString() + `</td>
@@ -75,33 +78,33 @@ $(document).ready(function () {
                     <td>` + alarmObject.type + `</td>
                     <td>` + alarmObject.state + `</td>
                   </tr>`
-              $('#alarmTable').prepend(_htmlMarkup);
-    
-              $('#alarmTable tbody tr:nth-child(1)').click(function () {
-                var _checkbox = $(this).children('td').children('input');
-                _checkbox.prop('checked', !_checkbox.prop('checked'));
-                if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
-                else $(this).removeClass('alarm-selected');
-              });
-    
-            }
-    
+        $('#alarmTable').prepend(_htmlMarkup);
+
+        $('#alarmTable tbody tr:nth-child(1)').click(function () {
+          var _checkbox = $(this).children('td').children('input');
+          _checkbox.prop('checked', !_checkbox.prop('checked'));
+          if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
+          else $(this).removeClass('alarm-selected');
         });
 
-        //Scada function
-        socket.on('/' + $deviceID + '/tag', function (data) {
-          var arrVarObjects = JSON.parse(data);
-          if (arrVarObjects) {
-            arrVarObjects.variables.forEach(function (varObject) {
-              eval(varObject.tagName + '=' + varObject.value);
-              SCADA(elementHTML, varObject.tagName);
-            });
-          }
-        });
-        
+      }
+
     });
 
-    
+    //Scada function
+    socket.on('/' + $deviceID + '/tag', function (data) {
+      var arrVarObjects = JSON.parse(data);
+      if (arrVarObjects) {
+        arrVarObjects.variables.forEach(function (varObject) {
+          eval(varObject.tagName + '=' + varObject.value);
+          SCADA(elementHTML, varObject.tagName);
+        });
+      }
+    });
+
+  });
+
+
   $('#btnRefreshHistory').click(function () {
     socket.emit('/reqHistory', $deviceID);
   });
@@ -178,8 +181,8 @@ $(document).ready(function () {
     table = document.getElementById("historyTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-      
-      if (!tr[i].classList.contains('ignore-row'))  {
+
+      if (!tr[i].classList.contains('ignore-row')) {
         tds = Array.from(tr[i].getElementsByTagName("td"));
         rowData.push(tds);
       }
@@ -194,18 +197,18 @@ $(document).ready(function () {
     doc.setFontSize(18);
     doc.text('History table', 14, 22);
     doc.setFontSize(12);
-    if (inputFrom.value) doc.text('From: ' + filterFrom.toLocaleDateString() , 16 , 30);
-    if (inputTo.value) doc.text('To:   ' + filterTo.toLocaleDateString() , 16 , 35);
+    if (inputFrom.value) doc.text('From: ' + filterFrom.toLocaleDateString(), 16, 30);
+    if (inputTo.value) doc.text('To:   ' + filterTo.toLocaleDateString(), 16, 35);
 
     doc.autoTable({
       head: [['Tag', 'Data type', 'Address', 'Value', 'Timestamp']],
       body: rowData,
-      startY : 50
+      startY: 50
     });
     doc.save('table.pdf');
   });
 
-  $('#btnTest').click(function(){
+  $('#btnTest').click(function () {
     var _elem = $('#mainPage1').children();
     console.log(_elem);
   })
@@ -215,52 +218,52 @@ $(document).ready(function () {
 
 /* **************** FUNCTIONS ****************** */
 function loadHistoryTable(arrHistory) {
-    $('#historyTable tbody').empty();
-    for (i = 0; i< arrHistory.length ; i++ ) {
-        var _htmlMarkup =
-            `<tr>
+  $('#historyTable tbody').empty();
+  for (i = 0; i < arrHistory.length; i++) {
+    var _htmlMarkup =
+      `<tr>
             <td>` + arrHistory[i].tag + `</td>
             <td>` + arrHistory[i].type + `</td>
             <td>` + arrHistory[i].address + `</td>
             <td>` + arrHistory[i].value + `</td>
             <td>` + arrHistory[i].timestamp + `</td>
           </tr>`;
-          $('#historyTable tbody').append(_htmlMarkup);
-    }
+    $('#historyTable tbody').append(_htmlMarkup);
+  }
 }
 
 function initVariable(variableList) {
-  for (i = 0 ; i < variableList.length ; i++) {
+  for (i = 0; i < variableList.length; i++) {
     var _expression = variableList[i].name + ' = ' + variableList[i].value;
     eval(_expression);
   }
 }
 
 function initElementHTML(elementHTML) {
-  for (i = 0; i < elementHTML.length ; i++) {
+  for (i = 0; i < elementHTML.length; i++) {
     var _htmlElem = document.getElementById(elementHTML[i].id);
     if (_htmlElem) {
-      for (j = 0; j < elementHTML[i].properties.length ; j++) {
+      for (j = 0; j < elementHTML[i].properties.length; j++) {
         _htmlElem[elementHTML[i].properties[j].name] = elementHTML[i].properties[j].value;
-      } 
+      }
     }
   }
 }
 
-function initSCADA (elementHTML , socket) {
-  for (i = 0; i < elementHTML.length ; i++) {
+function initSCADA(elementHTML, socket) {
+  for (i = 0; i < elementHTML.length; i++) {
     var _id = '#' + elementHTML[i].id;
-    switch(elementHTML[i].type.toLowerCase()) {
+    switch (elementHTML[i].type.toLowerCase()) {
       //Button
-      case 'button' : {
-       $(_id).on('click' , function() {
-         var _sendObj = {deviceID : $deviceID , command : this.command};
-         socket.emit('/write' , _sendObj);
-       });
-       break;
+      case 'button': {
+        $(_id).on('click', function () {
+          var _sendObj = { deviceID: $deviceID, command: this.command };
+          socket.emit('/write', _sendObj);
+        });
+        break;
       }
       //Switch
-      case 'switch' : {
+      case 'switch': {
         var _checkbox = $(_id).siblings('input')[0];
         var _span = $(_id)[0];
         if (_checkbox) {
@@ -278,7 +281,7 @@ function initSCADA (elementHTML , socket) {
         break;
       }
       //Input
-      case 'input' : {
+      case 'input': {
         $(_id).on('keyup', function (event) {
           if (event.keyCode == 13) {
             if (this.tag) {
@@ -311,6 +314,19 @@ function initSCADA (elementHTML , socket) {
         });
         break;
       }
+      //Vertical slider
+      case 'verticalslider': {
+        var htmlSlider = document.getElementById(elementHTML[i].id);
+        $(_id).on('slideStop', function (event) {
+          var _sendObj = {
+            deviceID: $deviceID,
+            command: this.tag + ' = ' + this.value
+          }
+          console.log(_sendObj);
+          if (this.tag) socket.emit('/write', _sendObj);
+        });
+        break;
+      }
       //Checkbox
       case 'checkbox': {
         var _label = $(_id)[0];
@@ -334,69 +350,74 @@ function initSCADA (elementHTML , socket) {
   }
 }
 
-function SCADA (elementHTML , variableName) {
-  for (i = 0; i < elementHTML.length ; i++) {
+function SCADA(elementHTML, variableName) {
+  for (i = 0; i < elementHTML.length; i++) {
     var _id = elementHTML[i].id;
     var _type = elementHTML[i].type.toLowerCase();
     switch (_type) {
       //Text
-      case 'text' : {
-        scadaText(_id , variableName);
+      case 'text': {
+        scadaText(_id, variableName);
         break;
       }
       //Img
-      case 'img' : {
-        scadaImage(_id , variableName);
+      case 'img': {
+        scadaImage(_id, variableName);
         break;
       }
       //Display value
-      case 'displayvalue' : {
-        scadaDisplayValue(_id , variableName);
+      case 'displayvalue': {
+        scadaDisplayValue(_id, variableName);
         break;
       }
       //Input
-      case 'input' : {
-        scadaInput(_id , variableName);
+      case 'input': {
+        scadaInput(_id, variableName);
         break;
       }
       //Switch
-      case 'switch' : {
-        scadaSwitch(_id , variableName);
+      case 'switch': {
+        scadaSwitch(_id, variableName);
         break;
       }
       //Button
-      case 'button' : {
-        scadaButton(_id , variableName);
+      case 'button': {
+        scadaButton(_id, variableName);
         break;
       }
       //Slider
-      case 'slider' : {
-        scadaSliderObject(_id , variableName);
+      case 'slider': {
+        scadaSlider(_id, variableName);
+        break;
+      }
+      //Vertical slider
+      case 'verticalslider': {
+        scadaVerticalSlider(_id, variableName);
         break;
       }
       //Progressbar
-      case 'progressbar' : {
-        scadaProgressbar(_id , variableName);
+      case 'progressbar': {
+        scadaProgressbar(_id, variableName);
         break;
       }
       //Vertical progressbar
-      case 'verticalprogressbar' : {
-        scadaVerticalProgressbar(_id , variableName);
+      case 'verticalprogressbar': {
+        scadaVerticalProgressbar(_id, variableName);
         break;
       }
       //Checkbox
-      case 'checkbox' : {
-        scadaCheckbox(_id , variableName);
+      case 'checkbox': {
+        scadaCheckbox(_id, variableName);
         break;
       }
       //SymbolSet
-      case 'symbolset' : {
-        scadaSymbolSet(_id , variableName);
+      case 'symbolset': {
+        scadaSymbolSet(_id, variableName);
         break;
       }
       //SVG
-      case 'svg' : {
-        scadaSvg(_id , variableName);
+      case 'svg': {
+        scadaSvg(_id, variableName);
         break;
       }
     }
@@ -404,7 +425,7 @@ function SCADA (elementHTML , variableName) {
 }
 
 //SVG scada
-function scadaSvg(id , variableName) {
+function scadaSvg(id, variableName) {
   var svg = document.getElementById(id);
   if (svg) {
     if (svg.hiddenWhen) {
@@ -417,7 +438,7 @@ function scadaSvg(id , variableName) {
 }
 
 //Text scada
-function scadaText(id , variableName) {
+function scadaText(id, variableName) {
   var txt = document.getElementById(id);
   if (txt) {
     if (txt.hiddenWhen) {
@@ -430,7 +451,7 @@ function scadaText(id , variableName) {
 }
 
 //Image scada
-function scadaImage(id , variableName) {
+function scadaImage(id, variableName) {
   var img = document.getElementById(id);
   if (img) {
     if (img.hiddenWhen) {
@@ -443,7 +464,7 @@ function scadaImage(id , variableName) {
 }
 
 //Display value scada
-function scadaDisplayValue(id , variableName) {
+function scadaDisplayValue(id, variableName) {
   var disp = document.getElementById(id);
   if (disp) {
     if (disp.hiddenWhen) {
@@ -505,7 +526,7 @@ function scadaProgressbar(id, variableName) {
       else {
         if (!bar.isRawValue) $(bar).children('div').text(_width);
         else $(bar).children('div').text(eval(bar.tag));
-      } 
+      }
     }
   }
 }
@@ -550,14 +571,14 @@ function scadaVerticalProgressbar(id, variableName) {
       }
       $(verticalbar).children('div').css({
         'height': _height,
-        'top' : _top,
-        'width' : '100%'
+        'top': _top,
+        'width': '100%'
       });
       if (verticalbar.isHideLabel) $(verticalbar).children('div').text('');
       else {
         if (!verticalbar.isRawValue) $(verticalbar).children('div').text(_height);
         else $(verticalbar).children('div').text(eval(verticalbar.tag));
-      } 
+      }
     }
   }
 }
@@ -603,7 +624,7 @@ function scadaInput(id, variableName) {
 }
 
 //Slider scada
-function scadaSliderObject(id, variableName) {
+function scadaSlider(id, variableName) {
   var slider = document.getElementById(id);
   if (slider.disableWhen) {
     if (slider.disableWhen.includes(variableName)) {
@@ -633,6 +654,37 @@ function scadaSliderObject(id, variableName) {
   }
 }
 
+//Vertical slider scada
+function scadaVerticalSlider(id, variableName) {
+  var verticalSlider = document.getElementById(id);
+  if (verticalSlider.disableWhen) {
+    if (verticalSlider.disableWhen.includes(variableName)) {
+      if (eval(verticalSlider.disableWhen)) $(verticalSlider).bootstrapSlider('disable');
+      else $(verticalSlider).bootstrapSlider('enable');
+    }
+  }
+
+  if (verticalSlider.tag) {
+    if (verticalSlider.tag.includes(variableName)) {
+      $(verticalSlider).bootstrapSlider('setValue', eval(verticalSlider.tag));
+    }
+  }
+
+  if (verticalSlider.isMinTag) {
+    if (verticalSlider.minTag.includes(variableName)) verticalSlider.min = eval(verticalSlider.minTag);
+  }
+  else {
+    if (verticalSlider.minValue) verticalSlider.min = verticalSlider.minValue;
+  }
+
+  if (verticalSlider.isMaxTag) {
+    if (verticalSlider.maxTag.includes(variableName)) verticalSlider.max = eval(verticalSlider.maxTag);
+  }
+  else {
+    if (verticalSlider.maxValue) verticalSlider.max = verticalSlider.maxValue;
+  }
+}
+
 //Switch scada
 function scadaSwitch(id, variableName) {
   var _span = document.getElementById(id);
@@ -653,3 +705,60 @@ function scadaCheckbox(id, variableName) {
   }
 }
 
+//Fix tooltip for vertical slider
+function fixTooltip() {
+
+  $('.slider-vertical').each(function () {
+    $(this).children('.tooltip')[0].classList.add('bs-tooltip-left');
+    $(this).children('.tooltip')[0].childNodes[0].classList.add('arrow', 'my-2');
+  })
+
+
+  //Fix background color
+  $('.slider-vertical').find('.slider-handle').each(function () {
+    $(this).css({ background: '#007bff' })
+  });
+}
+
+//Re-initialize vertical slider 
+function reInitVerticalSlider() {
+  for (i = 0; i < elementHTML.length; i++) {
+    if (elementHTML[i].type == 'verticalslider') {
+      var min, max, height;
+      if (elementHTML[i].properties[5].value) min = eval((elementHTML[i].properties[1].value));
+      else min = elementHTML[i].properties[2].value;
+
+      if (elementHTML[i].properties[6].value) max = eval((elementHTML[i].properties[3].value));
+      else max = elementHTML[i].properties[4].value;
+
+      height = $('#' + elementHTML[i].id).siblings('.slider')[0].style.height;
+
+      var htmlObj = document.getElementById(elementHTML[i].id).cloneNode(true);
+      htmlObj.min = min;
+      htmlObj.max = max;
+      var topDiv = document.getElementById(elementHTML[i].id).parentNode.style.top;
+      var leftDiv = document.getElementById(elementHTML[i].id).parentNode.style.left;
+      //Remove current slider
+      $(document.getElementById(elementHTML[i].id).parentNode).remove();
+
+      //Create new slider
+      var verticalSliderDiv = document.createElement('div');
+      verticalSliderDiv.style.position = 'absolute';
+      verticalSliderDiv.style.top = topDiv;
+      verticalSliderDiv.style.left = leftDiv;
+      verticalSliderDiv.append(htmlObj);
+      $('#mainPage1').append(verticalSliderDiv);
+      //Create vertical slider
+      $(htmlObj).bootstrapSlider({
+        min: min,
+        max: max,
+        value: 50,
+        orientation: 'vertical',
+        tooltip_position: 'left',
+        reversed: true,
+      });
+      $('#' + elementHTML[i].id).siblings('.slider')[0].style.height = height;
+      console.log($('#' + elementHTML[i].id));
+    }
+  }
+}

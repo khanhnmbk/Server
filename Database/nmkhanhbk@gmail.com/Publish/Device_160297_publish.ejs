@@ -1,36 +1,35 @@
-<!doctype html>
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
+    
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-    <!-- Font Awesome CSS -->
-    <link rel="stylesheet" href="/stylesheets/all.css">
-    <!-- Bootstrap form helpers -->
-    <link rel="stylesheet" href="/stylesheets/bootstrap-formhelpers.min.css">
-    <!-- Bootstrap slider -->
-    <link rel="stylesheet" href="/stylesheets/bootstrap-slider.min.css">
-    <!-- Own style -->
-    <link rel="stylesheet" href="/stylesheets/publish-style.css">
+    
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
+    
+    <link rel="stylesheet" href="/stylesheets/all.css" />
+    
+    <link rel="stylesheet" href="/stylesheets/bootstrap-formhelpers.min.css" />
+    
+    <link rel="stylesheet" href="/stylesheets/bootstrap-slider.min.css" />
+    
+    <link rel="stylesheet" href="/stylesheets/publish-style.css" />
 
     <title>Published Page</title>
 </head>
 
 <body onbeforeunload="return confirm('Are you sure to reload?')">
-    <!------------------------ MAIN PAGE ------------------------->
+    
 
 
     <div class="container-fluid row mx-2 px-0">
 
 
-        <!-- mainPagePanel -->
+        
         <div id="mainPagePanel" class="col-md bg-dark my-0 no-gutter-all">
             <div class="container-fluid no-gutter-all">
-                <!-- Nav tabs -->
+                
 
 
                 <ul class="nav nav-tabs bg-primary toggle-nav justify-content-center" role="tablist">
@@ -41,35 +40,31 @@
                     </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i
-                                class="fas fa-home mr-1"></i><strong>Home</strong></a>
+                        <a class="nav-link active" data-toggle="tab" href="#mainPage1"><i class="fas fa-home mr-1"></i><strong>Home</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " data-toggle="tab" href="#alarm"><i
-                                class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
+                        <a class="nav-link " data-toggle="tab" href="#alarm"><i class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " data-toggle="tab" href="#history"><i
-                                class="fas fa-history mr-1"></i><strong>History</strong></a>
+                        <a class="nav-link " data-toggle="tab" href="#history"><i class="fas fa-history mr-1"></i><strong>History</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#dashboard"><i
-                                class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
+                        <a class="nav-link" data-toggle="tab" href="#dashboard"><i class="far fa-chart-bar mr-1"></i><strong>Dashboard</strong></a>
                     </li>
                     <li class="nav-item ml-auto my-auto mr-2 text-white row">
                         <p class="my-auto" id="user"><%= user %></p>
                     </li>
-                    <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i
-                        class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a class="btn mr-4" href="/logout" onclick="return confirm('Are you sure to logout?')"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
                     
                 </ul>
 
 
 
-                <!-- Tab panes -->
+                
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height px-2">
-                    </div>
+                    
+                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><p id="displayValue0" class="contextMenu plain-draggable" style="font-size: 40px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 320px; left: 231.5px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">##.##</p><p id="displayValue1" class="contextMenu plain-draggable" style="font-size: 40px; font-family: Arial; font-style: normal; color: rgb(0, 0, 0); position: absolute; top: 421px; left: 781.5px; will-change: left, top; -webkit-tap-highlight-color: transparent; box-shadow: transparent 0px 0px 1px; cursor: grab; user-select: none; opacity: 1; margin: 0px;">##.##</p><button id="button2" class="btn btn-primary contextMenu draggable ui-draggable ui-draggable-handle" style="position: absolute; top: 262px; left: 822.5px; color: rgb(255, 255, 255); background: rgb(66, 133, 244); font-family: &quot;Helvetica Neue&quot;; font-size: 16px; font-style: normal;">Button</button></div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height px-2">
                         <div class="row pt-3 px-2">
                             <button class="btn btn-primary ml-auto" id="btnAck">Acknowledge</button>
@@ -92,7 +87,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><input type="checkbox"></td>
+                                        <td><input type="checkbox" /></td>
                                         <td>10/03/2019</td>
                                         <td>20:00:00</td>
                                         <td>Level</td>
@@ -102,7 +97,7 @@
                                         <td>UNACK</td>
                                     </tr>
                                     <tr>
-                                        <td><input type="checkbox"></td>
+                                        <td><input type="checkbox" /></td>
                                         <td>10/03/2019</td>
                                         <td>20:00:00</td>
                                         <td>Khanh</td>
@@ -121,15 +116,15 @@
 
                             <label for="#inputFilter" class="my-auto mx-2">Filter</label>
                             <input class="form-control" id="inputFilter" type="text" placeholder="Search.."
-                                style="max-width : 400px">
+                                style="max-width : 400px" />
 
                             <label for="#inputFilter" class="my-auto ml-5 mr-2">From</label>
                             <input class="form-control inputTimeFilter" id="inputFrom" type="date"
-                                style="max-width : 200px">
+                                style="max-width : 200px" />
 
                             <label for="#inputFilter" class="my-auto ml-5 mr-2">To</label>
                             <input class="form-control inputTimeFilter" id="inputTo" type="date"
-                                style="max-width : 200px">
+                                style="max-width : 200px" />
 
                             <button class="btn btn-primary ml-auto mr-3" id="btnRefreshHistory">Refresh</button>
                             <button class="btn btn-primary mr-3" id="btnExportToPdf">Export</button>
@@ -158,7 +153,7 @@
                             </table>
                         </div>
                     </div>
-                    <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height px-2"><br>
+                    <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height px-2"><br />
                         <h3>Dashboard</h3>
                         <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
                             laudantium, totam rem aperiam.</p>
@@ -169,32 +164,32 @@
         </div>
 
     </div>
-    </div>
+    
 
-    <!------------------------ SCRIPT ------------------------->
-    <!-- JQuery scripts -->
+    
+    
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
     
     <script src="/javascripts/jspdf.min.js"></script>
     <script src="/javascripts/jspdf.plugin.autotable.js"></script>
-    <!--Jquery UI draggable-->
-    <!-- <script src="/javascripts/jquery-ui.min.js"></script> -->
-    <!-- BootStrap scripts -->
+    
+    
+    
     <script src="/javascripts/popper.min.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
-    <!-- Bootstrap form helper script -->
-    <!-- <script src="/javascripts/bootstrap-formhelpers.min.js"></script> -->
-    <!-- Bootstrap slider -->
+    
+    
+    
     <script src="/javascripts/bootstrap-slider.min.js"></script>
-    <!-- SVG script -->
-    <!-- <script src="/javascripts/svg.min.js"></script> -->
-    <!-- SVG draw script -->
-    <!-- <script src="/javascripts/svg.draw.js"></script> -->
-    <!-- Draggable script -->
-    <!-- <script src="/javascripts/plain-draggable.min.js"></script> -->
-    <!-- Socket.io -->
+    
+    
+    
+    
+    
+    
+    
     <script src="/javascripts/socket.io.js"></script>
-    <!-- My script -->
+    
     <script src="/javascripts/Myscripts/publish.js"></script>
 
 </body>

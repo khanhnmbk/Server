@@ -26,7 +26,8 @@
     "user": "nmkhanhbk@gmail.com",
     "creationTime": "3/3/2019, 12:51:30 AM",
     "lastActive": "10/03/2019",
-    "published": false,
+    "published": true,
     "status": false,
-    "fileName": "deviceConfig_160297.json"
+    "fileName": "deviceConfig_160297.json",
+    "link": "/published/nmkhanhbk@gmail.com/Device_160297_publish.ejs"
 }

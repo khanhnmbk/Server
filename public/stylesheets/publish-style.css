@@ -137,3 +137,27 @@ input:checked+.slider:before {
 .returnLink:hover {
     opacity: 0.4;
 }   
+
+
+/*
+***********************************************************************************************
+                                Tooltip for vertical slider
+***********************************************************************************************
+*/
+
+.slider::before {
+    background: none;
+}
+
+.tooltip.tooltip-main {
+    opacity: 0.7;
+}
+
+.slider-vertical {
+    background: none;
+}
+
+
+.slider-track div {
+    background: #dee2e6
+}

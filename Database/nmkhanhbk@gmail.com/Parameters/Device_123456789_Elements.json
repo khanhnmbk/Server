@@ -1,7 +1,7 @@
 [
     {
-        "type": "progressbar",
-        "id": "progressbar0",
+        "type": "verticalslider",
+        "id": "verticalSlider0",
         "properties": [
             {
                 "name": "tag",
@@ -9,11 +9,11 @@
             },
             {
                 "name": "minTag",
-                "value": ""
+                "value": "S7_1500_Bien6"
             },
             {
                 "name": "minValue",
-                "value": "50"
+                "value": "0"
             },
             {
                 "name": "maxTag",
@@ -21,33 +21,25 @@
             },
             {
                 "name": "maxValue",
-                "value": "100"
+                "value": "300"
             },
             {
                 "name": "isMinTag",
-                "value": false
+                "value": true
             },
             {
                 "name": "isMaxTag",
                 "value": false
             },
             {
-                "name": "hiddenWhen",
-                "value": ""
-            },
-            {
-                "name": "isHideLabel",
-                "value": false
-            },
-            {
-                "name": "isRawValue",
-                "value": ""
+                "name": "disableWhen",
+                "value": "OPCUA_Bien7 > 1"
             }
         ]
     },
     {
-        "type": "verticalprogressbar",
-        "id": "verticalProgressbar1",
+        "type": "verticalslider",
+        "id": "verticalSlider1",
         "properties": [
             {
                 "name": "tag",
@@ -59,15 +51,15 @@
             },
             {
                 "name": "minValue",
-                "value": "50"
+                "value": "0"
             },
             {
                 "name": "maxTag",
-                "value": ""
+                "value": "S7_1500_Bien6"
             },
             {
                 "name": "maxValue",
-                "value": "100"
+                "value": "400"
             },
             {
                 "name": "isMinTag",
@@ -75,19 +67,11 @@
             },
             {
                 "name": "isMaxTag",
-                "value": false
+                "value": true
             },
             {
-                "name": "hiddenWhen",
-                "value": ""
-            },
-            {
-                "name": "isHideLabel",
-                "value": false
-            },
-            {
-                "name": "isRawValue",
-                "value": ""
+                "name": "disableWhen",
+                "value": "OPCUA_Bien7"
             }
         ]
     }

@@ -132,6 +132,8 @@ $(document).ready(function () {
       $('.btnBrowseTag').prop('disabled', false);
       $('.btnChooseImage').prop('disabled', false);
       $('.saveChangeButton').prop('disabled', false);
+      //Disable vertical slider
+      $('.slider-vertical').siblings('input').bootstrapSlider('disable');
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
       socket.off('/' + deviceID + '/resHistory');
@@ -302,6 +304,15 @@ $(document).ready(function () {
   $('#btnPublish').click(function () {
     var _confirm = confirm('Do you want to publish your design? This cannot be back!');
     if (_confirm) {
+      //Enable vertical slider first
+      for (i = 0 ; i < shapes.length ; i++) {
+        if (shapes[i].id) {
+          if (shapes[i].id.includes('verticalSlider')) {
+            console.log(shapes[i]);
+            $(shapes[i]).bootstrapSlider('enable');
+          }
+        }
+      }
       var mainPage1 = document.getElementById('mainPage1').innerHTML;
       var _sendObject = {
         user: user,
@@ -370,10 +381,16 @@ const defaultLineOption = {
 //Add context menu
 function addContextMenu() {
   $('.contextMenu').on('contextmenu', function (e) {
-
+   
     selectedItemId = e.target.id;
-    while (!selectedItemId) {
+    if (!selectedItemId) {
       selectedItemId = e.target.parentNode.id;
+    }
+
+    //For vertical slider
+    if (!selectedItemId) {
+      var _slider = $(e.target).closest('.slider')[0];
+      if (_slider) selectedItemId = $(_slider).siblings('input')[0].id;
     }
 
     var top = e.pageY + 10;
@@ -400,7 +417,10 @@ function addContextMenu() {
 function removeItem() {
   if (selectedItemId) {
     var item = document.getElementById(selectedItemId);
-    item.parentNode.removeChild(item);
+    if (selectedItemId.includes('verticalSlider')) {
+      $(item.parentNode).remove();
+    }
+    else item.parentNode.removeChild(item);
 
     for (var elem of shapes) {
       try {
@@ -518,6 +538,18 @@ function initSCADA(_shapes, _socket) {
         });
         break;
       }
+      case 'verticalslider': {
+        $(_shape).bootstrapSlider('enable');
+        $(_shape).on('slideStop', function (event) {
+          var _sendObj = {
+            deviceID: deviceID,
+            command: this.tag + ' = ' + this.value
+          }
+          console.log(_sendObj)
+          if (this.tag) _socket.emit('/write', _sendObj);
+        });
+        break;
+      }
       default: {
         if ($(_shape).find('span')[0]) {
           var _checkbox = $(_shape).find('input')[0];
@@ -598,6 +630,10 @@ function SCADA(arrHtmlElems, variableName) {
       }
       case 'slider': {
         scadaSliderObject(_shape, variableName);
+        break;
+      }
+      case 'verticalslider' : {
+        scadaVerticalSliderObject(_shape , variableName);
         break;
       }
       case 'progressbar': {
@@ -843,6 +879,36 @@ function scadaSliderObject(item, variableName) {
   if (item.tag) {
     if (item.tag.includes(variableName)) {
       item.value = eval(item.tag);
+    }
+  }
+
+  if (item.isMinTag) {
+    if (item.minTag.includes(variableName)) item.min = eval(item.minTag);
+  }
+  else {
+    if (item.minValue) item.min = item.minValue;
+  }
+
+  if (item.isMaxTag) {
+    if (item.maxTag.includes(variableName)) item.max = eval(item.maxTag);
+  }
+  else {
+    if (item.maxValue) item.max = item.maxValue;
+  }
+}
+
+//Vertical slider scada
+function scadaVerticalSliderObject(item, variableName) {
+  if (item.disableWhen) {
+    if (item.disableWhen.includes(variableName)) {
+      if (eval(item.disableWhen)) $(item).bootstrapSlider('disable');
+      else $(item).bootstrapSlider('enable');
+    }
+  }
+
+  if (item.tag) {
+    if (item.tag.includes(variableName)) {
+     $(item).bootstrapSlider('setValue' , eval(item.tag))
     }
   }
 
@@ -2333,7 +2399,7 @@ function switchMouseDownEventHandler(event) {
   inputsw.className = ' primary ';
 
   var spansw = document.createElement('span');
-  spansw.className = 'slider round';
+  spansw.className = 'slider-sw round';
   spansw.id = 'switch' + index;
 
   sw.appendChild(inputsw);
@@ -3054,7 +3120,7 @@ function verticalSliderMouseDownEventHandler(event) {
       },
       {
         name: 'minValue',
-        value: ''
+        value: verticalSlider.minValue
       },
       {
         name: 'maxTag',
@@ -3062,7 +3128,7 @@ function verticalSliderMouseDownEventHandler(event) {
       },
       {
         name: 'maxValue',
-        value: ''
+        value: verticalSlider.maxValue
       },
       {
         name: 'isMinTag',
@@ -3082,14 +3148,14 @@ function verticalSliderMouseDownEventHandler(event) {
   elementHTML.push(_verticalSliderObj);
 
   //Image mouse events
-  $(verticalSliderDiv).on('mouseover', function (event) {
-    event.target.style.opacity = 0.4;
-    console.log('Mouse over');
-  });
+  // $(verticalSliderDiv).on('mouseover', function (event) {
+  //   event.target.style.opacity = 0.4;
+  //   console.log('Mouse over');
+  // });
   //Subscribe mouseout event for each polygon
-  $(verticalSliderDiv).on('mouseout', function (event) {
-    event.target.style.opacity = 1;
-  });
+  // $(verticalSliderDiv).on('mouseout', function (event) {
+  //   event.target.style.opacity = 1;
+  // });
   //Subscribe mouse double click event
   $(verticalSliderDiv).on('dblclick', function (mouseEvent) {
     var elem = $(mouseEvent.target).closest('.slider')[0];
@@ -3099,48 +3165,47 @@ function verticalSliderMouseDownEventHandler(event) {
       if (elemHeight) elemHeight = parseInt(elemHeight, 10);
 
       var _input = $(elem).siblings('input')[0];
-      console.log(_input);
 
       var itemModal = $('#verticalSliderModal')[0];
       itemModal.querySelector('.inputWidth').value = elemHeight;
 
-      if (mouseEvent.target.tag) {
-        itemModal.querySelector('.inputValue').value = mouseEvent.target.tag;
+      if (_input.tag) {
+        itemModal.querySelector('.inputValue').value = _input.tag;
       }
       else {
         itemModal.querySelector('.inputValue').value = '';
       }
 
-      if (mouseEvent.target.minTag) {
-        itemModal.querySelector('.inputMinTag').value = mouseEvent.target.minTag;
+      if (_input.minTag) {
+        itemModal.querySelector('.inputMinTag').value = _input.minTag;
       }
       else {
         itemModal.querySelector('.inputMinTag').value = '';
       }
 
-      if (mouseEvent.target.minValue) {
-        itemModal.querySelector('.inputMinValue').value = mouseEvent.target.minValue;
+      if (_input.minValue) {
+        itemModal.querySelector('.inputMinValue').value = _input.minValue;
       }
       else {
         itemModal.querySelector('.inputMinValue').value = '';
       }
 
-      if (mouseEvent.target.maxTag) {
-        itemModal.querySelector('.inputMaxTag').value = mouseEvent.target.maxTag;
+      if (_input.maxTag) {
+        itemModal.querySelector('.inputMaxTag').value = _input.maxTag;
       }
       else {
         itemModal.querySelector('.inputMaxTag').value = '';
       }
 
-      if (mouseEvent.target.maxValue) {
-        itemModal.querySelector('.inputMaxValue').value = mouseEvent.target.maxValue;
+      if (_input.maxValue) {
+        itemModal.querySelector('.inputMaxValue').value = _input.maxValue;
       }
       else {
         itemModal.querySelector('.inputMaxValue').value = '';
       }
 
-      if (mouseEvent.target.disableWhen) {
-        itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+      if (_input.disableWhen) {
+        itemModal.querySelector('.inputDisableWhen').value = _input.disableWhen;
       }
       else {
         itemModal.querySelector('.inputDisableWhen').value = '';
@@ -3148,32 +3213,32 @@ function verticalSliderMouseDownEventHandler(event) {
 
       //Button save 
       $('.saveChangeButton').on('click', function (event) {
-        $(elem).siblings('div')[0].style.height = itemModal.querySelector('.inputWidth').value + 'px';
-        mouseEvent.target.tag = itemModal.querySelector('.inputValue').value;
-        mouseEvent.target.minTag = itemModal.querySelector('.inputMinTag').value;
-        mouseEvent.target.minValue = itemModal.querySelector('.inputMinValue').value;
-        mouseEvent.target.maxTag = itemModal.querySelector('.inputMaxTag').value;
-        mouseEvent.target.maxValue = itemModal.querySelector('.inputMaxValue').value;
-        mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+        elem.style.height = itemModal.querySelector('.inputWidth').value + 'px';
+        _input.tag = itemModal.querySelector('.inputValue').value;
+        _input.minTag = itemModal.querySelector('.inputMinTag').value;
+        _input.minValue = itemModal.querySelector('.inputMinValue').value;
+        _input.maxTag = itemModal.querySelector('.inputMaxTag').value;
+        _input.maxValue = itemModal.querySelector('.inputMaxValue').value;
+        _input.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
 
         if (itemModal.querySelector('.inputMinTag').value)
-          mouseEvent.target.isMinTag = true;
-        else mouseEvent.target.isMinTag = false;
+          _input.isMinTag = true;
+        else _input.isMinTag = false;
 
         if (itemModal.querySelector('.inputMaxTag').value)
-          mouseEvent.target.isMaxTag = true;
-        else mouseEvent.target.isMaxTag = false;
+        _input.isMaxTag = true;
+        else _input.isMaxTag = false;
 
-        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+        var _foundIndex = findElementHTMLById(_input.id);
         if (_foundIndex != -1) {
-          elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
-          elementHTML[_foundIndex].properties[1].value = mouseEvent.target.minTag;
-          elementHTML[_foundIndex].properties[2].value = mouseEvent.target.minValue;
-          elementHTML[_foundIndex].properties[3].value = mouseEvent.target.maxTag;
-          elementHTML[_foundIndex].properties[4].value = mouseEvent.target.maxValue;
-          elementHTML[_foundIndex].properties[5].value = mouseEvent.target.isMinTag;
-          elementHTML[_foundIndex].properties[6].value = mouseEvent.target.isMaxTag;
-          elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
+          elementHTML[_foundIndex].properties[0].value = _input.tag;
+          elementHTML[_foundIndex].properties[1].value = _input.minTag;
+          elementHTML[_foundIndex].properties[2].value = _input.minValue;
+          elementHTML[_foundIndex].properties[3].value = _input.maxTag;
+          elementHTML[_foundIndex].properties[4].value = _input.maxValue;
+          elementHTML[_foundIndex].properties[5].value = _input.isMinTag;
+          elementHTML[_foundIndex].properties[6].value = _input.isMaxTag;
+          elementHTML[_foundIndex].properties[7].value = _input.disableWhen;
         }
       });
 

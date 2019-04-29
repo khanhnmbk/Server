@@ -40,6 +40,9 @@
     <!------------------------ MAIN PAGE ------------------------->
 <div class="container p-5 mt-5">
     <button id="button">Rotate</button>
+    <button id="btnHide">Hide</button>
+    <button id="btnEnable">Enable</button>
+    <button id="btnSet">Set value</button>
     <div id="wrapper">
       <input type="range" id="verticalSlider">
     </div>
@@ -75,7 +78,7 @@
   tooltip : 'show',
   tooltip_position:'left',
   reversed : true,
-  // enabled : false
+   enabled : false
             });
 
             fixTooltip();
@@ -96,6 +99,21 @@
             $('.slider-vertical').children('.tooltip')[0].childNodes[0].classList.add('arrow' , 'my-2');
         }
         
+      $('#btnHide').click(function() {
+        $('#verticalSlider').hide();
+      })
+
+      $('#btnEnable').click(function() {
+        $('#verticalSlider').bootstrapSlider('enable');
+        $('#verticalSlider').on('input', function() {
+          console.log('Change');
+        })
+      })
+
+      $('#btnSet').click(function() {
+         $('#wrapper').remove()
+        
+      })
     </script>
 </body>
 

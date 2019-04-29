@@ -18,6 +18,21 @@ var alarmMongoose = require('../model/alarm');
 var historyMongoose = require('../model/history');
 
 var databasePath = '../Server/Database';
+var certificatePath = '../Server/public/certificate/mqtt_ca.crt';
+
+//MQTT VARIABLES
+let mqttHost = '45.124.94.180';
+let mqttPort = 8883;
+let trustedCA = fs.readFileSync(certificatePath);
+let mqttOptions = {
+    host: mqttHost,
+    port: mqttPort,
+    rejectUnauthorized: false,
+    ca: trustedCA,
+    protocol: 'mqtts'
+}
+
+
 /**
  * Get port from environment and store in Express.
  */
@@ -34,7 +49,7 @@ global.io = require('socket.io')(server);
 
 /* MQTT */
 var mqtt = require('mqtt');
-var mqttClient = mqtt.connect('mqtt://localhost:1883');
+var mqttClient = mqtt.connect(mqttOptions);
 
 
 
@@ -181,6 +196,13 @@ io.on('connection', function (socket) {
   });
 
   socket.on('deleteDevice', function (filePath) {
+    var fileBase = path.parse(filePath).base;
+    var deviceID = fileBase.replace('deviceConfig_', '').replace('.json', '');
+    var mqttResetTopic = '/' + deviceID + '/reset';
+    console.log(mqttResetTopic);
+    mqttClient.publish(mqttResetTopic, JSON.stringify({CMD : true}, null, 4));
+    
+
     fs.unlink(path.resolve(databasePath, filePath), function (err) {
       if (err) console.log(err)
       else socket.emit('deleteSuccess', 1);

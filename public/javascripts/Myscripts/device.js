@@ -10,6 +10,8 @@ $(document).ready(function () {
     var _user = $('#user').text();
     var socket = io();
 
+    //Init view
+    $('.input-alarm').prop('disabled', true)
     
     socket.on('connect', function () {
        
@@ -74,17 +76,18 @@ $(document).ready(function () {
                     //Add new row to device table
                     var htmlMarkup = `
                     <tr>
-                        <td><input type = "checkbox"></td>
-                        <td>` + deviceObject.deviceName + `</td>
-                        <td>` + deviceObject.creationTime + `</td>
-                        <td>` + deviceObject.lastActive + `</td>
-                        <td>` + deviceObject.longitude + `</td>
-                        <td>` + deviceObject.latitude + `</td>
-                        <td>` + deviceObject.period + `</td>
-                        <td><span class="rounded-circle bg-secondary status"></span></td>
-                        <td>
+                        <td class = "text-center"><input type = "checkbox"></td>
+                        <td class = "text-center">` + deviceObject.deviceName + `</td>
+                        <td class = "text-center">` + deviceObject.creationTime + `</td>
+                        <td class = "text-center">` + deviceObject.lastActive + `</td>
+                        <td class = "text-center">` + deviceObject.longitude + `</td>
+                        <td class = "text-center">` + deviceObject.latitude + `</td>
+                        <td class = "text-center">` + deviceObject.period + `</td>
+                        <td class = "text-center"><span class="rounded-circle bg-secondary status"></span></td>
+                        <td class = "text-center">
                             <i class="fas fa-cog variable-icon" data-toggle="modal" data-target="#gatewayChildrenModal">
                         </td>
+                        <td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + _user + '/deviceConfig_' + deviceObject.deviceID + '.json' + `">Design page</a></td>
                     </tr>
                     `
                     $('#deviceTable tbody').append(htmlMarkup);
@@ -167,8 +170,27 @@ $(document).ready(function () {
                     variableObject.access = modalItem.find('[name=access]').val();
                     variableObject.unit = modalItem.find('.inputUnit')[0].value;
                     variableObject.isAlarm = modalItem.find('.inputAlarm')[0].checked;
+                    if (variableObject.isAlarm) { //isAlarm is ON
+                        variableObject.alarmType = modalItem.find('.alarm-type').val();
+                        variableObject.parameters = {
+                            lolo : modalItem.find('.lolo')[0].value,
+                            lo : modalItem.find('.lo')[0].value,
+                            hi : modalItem.find('.hi')[0].value,
+                            hihi : modalItem.find('.hihi')[0].value,
+                            deadband : modalItem.find('.deadband')[0].value,
+                        }
+                    } else { //Alarm is off
+                        variableObject.alarmType = null;
+                        variableObject.parameters = {
+                            lolo : null,
+                            lo : null,
+                            hi : null,
+                            hihi : null,
+                            deadband : null,
+                        }
+                    }
                     variableObject.isHistory = modalItem.find('.inputHistory')[0].checked;
-
+                    
                     for (var plc of deviceObject.PLCs) {
                         if (plc.name == variableObject.plc) {
                             plc.variables.push(variableObject);
@@ -202,6 +224,7 @@ $(document).ready(function () {
                     modalItem.find('.inputUnit')[0].value = '';
                     modalItem.find('.inputAlarm')[0].checked = false;
                     modalItem.find('.inputHistory')[0].checked = false;
+                    $('.input-alarm').prop('disabled', true);
                 }
             });
 
@@ -375,3 +398,9 @@ function loadMap(arrDeviceObject) {
 setTimeout(function () {
     loadMap(rcvDeviceObject);
 }, 500);
+
+//Show alarm setup when enable
+$('#alarmCheck').on('change' , function() {
+    if (this.checked) $('.input-alarm').prop('disabled', false)
+    else $('.input-alarm').prop('disabled', true)
+})

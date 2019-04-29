@@ -51,3 +51,7 @@
     display: none;
 }
 
+
+select option[disabled]:first-child {
+	display: none;
+}
