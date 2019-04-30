@@ -46,6 +46,8 @@ $(document).ready(function () {
       //Clear table body first
       $('#alarmTable tbody').empty();
       socket.on('/' + deviceID + '/alarm', function (alarmObject) {
+        console.log('Alarm Object');
+        console.log(alarmObject);
         var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
         var _isExist = false;
         var _timeStamp = new Date(alarmObject.timestamp)
@@ -164,6 +166,7 @@ $(document).ready(function () {
       $('.alarm-selected').each(function () {
         var _selectedItem = $(this).find('td');
         _resAlarm.resAlarm.push({
+          deviceID : deviceID,
           source: _selectedItem[3].innerText,
           value: _selectedItem[4].innerText,
           message: _selectedItem[5].innerText,

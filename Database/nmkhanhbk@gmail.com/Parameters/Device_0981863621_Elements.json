@@ -1,0 +1,20 @@
+[
+    {
+        "type": "displayValue",
+        "id": "displayValue0",
+        "properties": [
+            {
+                "name": "tag",
+                "value": ""
+            },
+            {
+                "name": "format",
+                "value": ""
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    }
+]

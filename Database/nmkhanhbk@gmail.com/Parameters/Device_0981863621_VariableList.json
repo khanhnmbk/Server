@@ -1,0 +1,26 @@
+[
+    {
+        "name": "MotorControl_Motor_1_Start",
+        "value": null
+    },
+    {
+        "name": "MotorControl_Motor_1_Stop",
+        "value": null
+    },
+    {
+        "name": "MotorControl_Motor_1_Status",
+        "value": null
+    },
+    {
+        "name": "MotorControl_Motor_1_MaintAlarm",
+        "value": null
+    },
+    {
+        "name": "MotorControl_Motor_1_Speed",
+        "value": null
+    },
+    {
+        "name": "MotorControl_Motor_1_Setpoint",
+        "value": null
+    }
+]

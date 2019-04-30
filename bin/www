@@ -186,11 +186,7 @@ io.on('connection', function (socket) {
         });
 
         //Send configuration to gateway via MQTT
-        var configObject = {
-          command: 'set',
-          value: receivedObjectJSON,
-        }
-        mqttClient.publish('/' + receivedObject.deviceID + '/config', JSON.stringify(configObject, null, 4));
+        mqttClient.publish('/' + receivedObject.deviceID + '/config', receivedObjectJSON);
       }
     }
   });
