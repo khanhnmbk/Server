@@ -1,15 +1,57 @@
 [
     {
+        "type": "symbolSet",
+        "id": "symbolSet0",
+        "properties": [
+            {
+                "name": "onCondition",
+                "value": "MotorControl_Motor_1_Alarm"
+            },
+            {
+                "name": "onSymbol",
+                "value": "/images/symbols/Light/light-on.png"
+            },
+            {
+                "name": "offSymbol",
+                "value": "/images/symbols/Light/light-off.png"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "text",
+        "id": "text1",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "text",
+        "id": "text2",
+        "properties": [
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
         "type": "displayValue",
-        "id": "displayValue0",
+        "id": "displayValue3",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "MotorControl_Motor_1_Speed"
             },
             {
                 "name": "format",
-                "value": ""
+                "value": "3"
             },
             {
                 "name": "hiddenWhen",

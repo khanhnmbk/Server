@@ -49,13 +49,15 @@ $(document).ready(function () {
         console.log('Alarm Object');
         console.log(alarmObject);
         var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
+        var arrAlarmType = Array.from($('#alarmTable tr td:nth-child(7)'));
+        var arrAlarmState = Array.from($('#alarmTable tr td:nth-child(8)'));
         var _isExist = false;
         var _timeStamp = new Date(alarmObject.timestamp)
 
-        for (var _item of arrAlarmSource) {
-          if (_item.innerText == alarmObject.source) {
+        for (var i = 0; i < arrAlarmSource.length; i++) { //_item => arrAlarmSource[i]
+          if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) { 
             if (alarmObject.state == 'UNACK') {
-              var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
+              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
               var tableRow = $(_expression);
               tableRow[1].innerText = _timeStamp.toLocaleDateString();
               tableRow[2].innerText = _timeStamp.toLocaleTimeString();
@@ -65,7 +67,12 @@ $(document).ready(function () {
               tableRow[7].innerText = alarmObject.state;
             }
             else { //ACKED
-              _item.closest('tr').remove();
+              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
+              var tableRow = $(_expression);
+              tableRow[1].innerText = _timeStamp.toLocaleDateString();
+              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+              tableRow[7].innerText = alarmObject.state;
+              $(arrAlarmSource[i].closest('tr')).css('color' , 'black');
             }
             _isExist = true;
             break;
@@ -165,17 +172,20 @@ $(document).ready(function () {
       }
       $('.alarm-selected').each(function () {
         var _selectedItem = $(this).find('td');
-        _resAlarm.resAlarm.push({
-          deviceID : deviceID,
-          source: _selectedItem[3].innerText,
-          value: _selectedItem[4].innerText,
-          message: _selectedItem[5].innerText,
-          type: _selectedItem[6].innerText,
-          state: 'ACKED',
-          timestamp: new Date().toLocaleString(),
-        })
+        if (_selectedItem[7].innerText != 'ACKED') {
+          _resAlarm.resAlarm.push({
+            deviceID : deviceID,
+            source: _selectedItem[3].innerText,
+            value: _selectedItem[4].innerText,
+            message: _selectedItem[5].innerText,
+            type: _selectedItem[6].innerText,
+            state: 'ACKED',
+            timestamp: new Date().toLocaleString(),
+          })
+        }
       });
-      socket.emit('/resAlarm', _resAlarm);
+      
+      if (_resAlarm.resAlarm.length > 0) socket.emit('/resAlarm', _resAlarm);
     }
   });
 
@@ -198,6 +208,8 @@ $(document).ready(function () {
           })
       });
       socket.emit('/resAlarm', _resAlarm);
+      console.log('ACK all');
+      console.log(_resAlarm);
     }
   });
 

@@ -25,11 +25,11 @@ let mqttHost = '45.124.94.180';
 let mqttPort = 8883;
 let trustedCA = fs.readFileSync(certificatePath);
 let mqttOptions = {
-    host: mqttHost,
-    port: mqttPort,
-    rejectUnauthorized: false,
-    ca: trustedCA,
-    protocol: 'mqtts'
+  host: mqttHost,
+  port: mqttPort,
+  rejectUnauthorized: false,
+  ca: trustedCA,
+  protocol: 'mqtts'
 }
 
 
@@ -127,6 +127,8 @@ mqttClient.on('message', function (topic, message) {
 
   if (topic.endsWith('alarm')) {
     var alarmObject = JSON.parse(message.toString());
+    console.log('Receive alarm object MQTT');
+    console.log(alarmObject);
     io.emit('/' + alarmObject.deviceID + '/alarm', alarmObject);
     //Save to mongo
     var alarmModel = alarmMongoose.createModel('Device_' + alarmObject.deviceID + '_alarm');
@@ -139,7 +141,6 @@ mqttClient.on('message', function (topic, message) {
       timestamp: alarmObject.timestamp,
     });
     alarmMongoose.createNewAlarm(_newAlarm);
-
   }
 });
 
@@ -153,14 +154,14 @@ io.on('connection', function (socket) {
 
   socket.on('/reqDeviceConfig', function (user) {
     var arrConfig = [];
-    var userFolder = path.resolve(databasePath, user , 'Config');
+    var userFolder = path.resolve(databasePath, user, 'Config');
     async.series([
       function (callback) {
         var fileList = fs.readdirSync(userFolder);
         if (fileList.length > 0) {
           fileList.forEach(function (file) {
             if (path.extname(file) == '.json')
-              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder ,file))))
+              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder, file))))
           });
         }
         callback();
@@ -178,7 +179,7 @@ io.on('connection', function (socket) {
       if (receivedObject) {
         receivedObject.fileName = 'deviceConfig_' + receivedObject.deviceID + '.json';
         receivedObjectJSON = JSON.stringify(receivedObject, null, 4);
-        var filePath = path.resolve(databasePath, receivedObject.user,'Config' ,'deviceConfig_' + receivedObject.deviceID + '.json');
+        var filePath = path.resolve(databasePath, receivedObject.user, 'Config', 'deviceConfig_' + receivedObject.deviceID + '.json');
 
         fs.writeFile(filePath, receivedObjectJSON, function (err) {
           if (err) console.log(err);
@@ -196,8 +197,8 @@ io.on('connection', function (socket) {
     var deviceID = fileBase.replace('deviceConfig_', '').replace('.json', '');
     var mqttResetTopic = '/' + deviceID + '/reset';
     console.log(mqttResetTopic);
-    mqttClient.publish(mqttResetTopic, JSON.stringify({CMD : true}, null, 4));
-    
+    mqttClient.publish(mqttResetTopic, JSON.stringify({ CMD: true }, null, 4));
+
 
     fs.unlink(path.resolve(databasePath, filePath), function (err) {
       if (err) console.log(err)
@@ -216,44 +217,44 @@ io.on('connection', function (socket) {
 
   socket.on('/reqHistory', function (_id) {
     var historyModel = historyMongoose.createModel('Device_' + _id + '_history');
-    historyModel.find({}, {_id : 0 , __v : 0} ,function (err , results) { 
-      socket.emit('/' + _id + '/resHistory' , results);
+    historyModel.find({}, { _id: 0, __v: 0 }, function (err, results) {
+      socket.emit('/' + _id + '/resHistory', results);
     });
   });
 
-  socket.on('/publish' , function(dataObj) {
+  socket.on('/publish', function (dataObj) {
     var template = fs.readFileSync('../Server/views/publish-template.ejs').toString();
     var htlmObject = HTMLParser.parse(template);
     htlmObject.querySelector('#mainPage1').appendChild(dataObj.html);
     var fileName = 'Device_' + dataObj.deviceID + '_publish.ejs';
-    fs.writeFileSync(path.resolve(databasePath, dataObj.user ,'Publish' ,fileName) , htlmObject);
-    fs.writeFileSync(path.resolve(databasePath, dataObj.user , 'Parameters' , 'Device_' + dataObj.deviceID + '_Elements.json'),JSON.stringify(dataObj.elements,null,4));
-    fs.writeFileSync(path.resolve(databasePath, dataObj.user , 'Parameters' , 'Device_' + dataObj.deviceID + '_VariableList.json'),JSON.stringify(dataObj.variableList,null,4));
-    socket.emit('/' + dataObj.deviceID + '/publishSuccess' , 1);
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Publish', fileName), htlmObject);
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_Elements.json'), JSON.stringify(dataObj.elements, null, 4));
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_VariableList.json'), JSON.stringify(dataObj.variableList, null, 4));
+    socket.emit('/' + dataObj.deviceID + '/publishSuccess', 1);
 
     //Update published state in Config file
-  fs.readFile(path.resolve(databasePath , dataObj.user ,'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' )  , function(err , data) {
-    if (err) console.log(err);
-    else {
-      var deviceObj = JSON.parse(data);
-      deviceObj.published = true;
-      deviceObj.link = '/published/' + deviceObj.user + '/Device_' + deviceObj.deviceID + '_publish.ejs';
-      fs.writeFile(path.resolve(databasePath , dataObj.user , 'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' ), JSON.stringify(deviceObj , null, 4) , function(err) {
-        if (err) console.log(err);
-        else console.log('Write success in ' + path.resolve(databasePath , dataObj.user , 'Config' ,'deviceConfig_' + dataObj.deviceID + '.json' ));
-      })
+    fs.readFile(path.resolve(databasePath, dataObj.user, 'Config', 'deviceConfig_' + dataObj.deviceID + '.json'), function (err, data) {
+      if (err) console.log(err);
+      else {
+        var deviceObj = JSON.parse(data);
+        deviceObj.published = true;
+        deviceObj.link = '/published/' + deviceObj.user + '/Device_' + deviceObj.deviceID + '_publish.ejs';
+        fs.writeFile(path.resolve(databasePath, dataObj.user, 'Config', 'deviceConfig_' + dataObj.deviceID + '.json'), JSON.stringify(deviceObj, null, 4), function (err) {
+          if (err) console.log(err);
+          else console.log('Write success in ' + path.resolve(databasePath, dataObj.user, 'Config', 'deviceConfig_' + dataObj.deviceID + '.json'));
+        })
 
-    }
-  })
+      }
+    })
 
   });
 
-  socket.on('/reqPublishParameters' , function(userObject) {
-    var elementFile = path.resolve(databasePath, userObject.user , 'Parameters' , 'Device_' + userObject.deviceID + '_Elements.json');
-    var variableFile = path.resolve(databasePath, userObject.user , 'Parameters' , 'Device_' + userObject.deviceID + '_VariableList.json');
+  socket.on('/reqPublishParameters', function (userObject) {
+    var elementFile = path.resolve(databasePath, userObject.user, 'Parameters', 'Device_' + userObject.deviceID + '_Elements.json');
+    var variableFile = path.resolve(databasePath, userObject.user, 'Parameters', 'Device_' + userObject.deviceID + '_VariableList.json');
     var elementObj = JSON.parse(fs.readFileSync(elementFile));
-    var variableObj = JSON.parse(fs.readFileSync(variableFile)); 
-    socket.emit('/' + userObject.deviceID + '/resPublishParameters' , {htmlElements : elementObj , variableList : variableObj});
+    var variableObj = JSON.parse(fs.readFileSync(variableFile));
+    socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj });
   });
 
 });

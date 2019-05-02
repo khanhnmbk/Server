@@ -12,14 +12,26 @@ $(document).ready(function () {
 
     //Init view
     $('.input-alarm').prop('disabled', true)
-    
+
     socket.on('connect', function () {
-       
+
         socket.on('/' + _user + '/resDeviceConfig', function (data) {
             console.log(data);
             rcvDeviceObject = data;
             loadDeviceTable(rcvDeviceObject);
             socketOnStatus(socket); //Subscribe status topic
+
+            //Choose first td when click on tr
+            $('table tbody tr').each(function () {
+                $(this).click(function () {
+                    var checkbox = $(this).find('input');
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                });
+
+                $(this).hover(function () {
+                    $(this).css('cursor', 'pointer');
+                })
+            });
         });
 
         socket.emit('/reqDeviceConfig', _user); //Get device config array
@@ -132,6 +144,14 @@ $(document).ready(function () {
                         'overflow-y': 'scroll'
                     });
 
+                    $('#plcTable tbody tr:last').click(function() {
+                        var checkbox =  $(this).find('input');
+                        checkbox.prop('checked', !checkbox.prop('checked'));
+                    });
+                    $('#plcTable tbody tr:last').hover(function() {
+                        $(this).css('cursor', 'pointer');
+                    });
+
                     //Clear old PLC
                     modalItem.find('.inputName')[0].value = '';
                     modalItem.find('.inputIPAddress')[0].value = '';
@@ -159,7 +179,7 @@ $(document).ready(function () {
                 if (!(modalItem.find('.inputName')[0].value && modalItem.find('.inputAddress')[0].value)) {
                     alert('Please fill required parameters');
                 }
-                else if (!regexPattern.test(modalItem.find('.inputName')[0].value)) 
+                else if (!regexPattern.test(modalItem.find('.inputName')[0].value))
                     alert('Invalid variable name');
                 else {
                     var variableObject = {};
@@ -173,24 +193,24 @@ $(document).ready(function () {
                     if (variableObject.isAlarm) { //isAlarm is ON
                         variableObject.alarmType = modalItem.find('.alarm-type').val();
                         variableObject.parameters = {
-                            lolo : modalItem.find('.lolo')[0].value,
-                            lo : modalItem.find('.lo')[0].value,
-                            hi : modalItem.find('.hi')[0].value,
-                            hihi : modalItem.find('.hihi')[0].value,
-                            deadband : modalItem.find('.deadband')[0].value,
+                            lolo: modalItem.find('.lolo')[0].value,
+                            lo: modalItem.find('.lo')[0].value,
+                            hi: modalItem.find('.hi')[0].value,
+                            hihi: modalItem.find('.hihi')[0].value,
+                            deadband: modalItem.find('.deadband')[0].value,
                         }
                     } else { //Alarm is off
                         variableObject.alarmType = null;
                         variableObject.parameters = {
-                            lolo : null,
-                            lo : null,
-                            hi : null,
-                            hihi : null,
-                            deadband : null,
+                            lolo: null,
+                            lo: null,
+                            hi: null,
+                            hihi: null,
+                            deadband: null,
                         }
                     }
                     variableObject.isHistory = modalItem.find('.inputHistory')[0].checked;
-                    
+
                     for (var plc of deviceObject.PLCs) {
                         if (plc.name == variableObject.plc) {
                             plc.variables.push(variableObject);
@@ -217,6 +237,15 @@ $(document).ready(function () {
                         'max-height': '600px',
                         'overflow-y': 'scroll'
                     });
+
+                    $('#tableVariableList tbody tr:last').click(function() {
+                        var checkbox =  $(this).find('input');
+                        checkbox.prop('checked', !checkbox.prop('checked'));
+                    });
+                    $('#tableVariableList tbody tr:last').hover(function() {
+                        $(this).css('cursor', 'pointer');
+                    });
+
 
                     //Clear old variable
                     modalItem.find('.inputName')[0].value = '';
@@ -254,7 +283,44 @@ $(document).ready(function () {
                             }
                         }
                     }
-                    else $(this).parents("tr").remove();
+                    else { //Delete PLC, variable
+
+                        //Remove from deviceObject
+                        var tableId = $(this).closest('table')[0].id;
+                        var deleteRow = $(this).parents('tr');
+                        var tds = deleteRow.find('td');
+
+                        if (tableId == 'plcTable') {    //PLC
+                            var plcName = tds[1].innerText;
+                            var plcAddress = tds[3].innerText;
+
+                            for (var i = 0; i < deviceObject.PLCs.length; i++) {
+                                if ((deviceObject.PLCs[i].name == plcName) && (deviceObject.PLCs[i].ipAddress == plcAddress)) {
+                                    deviceObject.PLCs.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        } else {    //VARIABLE
+                            var variableName = tds[1].innerText;
+                            var variableAddress = tds[4].innerText;
+                            var plcName = tds[3].innerText;
+
+                            for (var i = 0; i < deviceObject.PLCs.length; i++) {
+                                if (deviceObject.PLCs[i].name == plcName) {
+                                    for (var j = 0; j < deviceObject.PLCs[i].variables.length; j++) {
+                                        if ((deviceObject.PLCs[i].variables[j].name == variableName) && (deviceObject.PLCs[i].variables[j].address == variableAddress)) {
+                                            deviceObject.PLCs[i].variables.splice(j, 1);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //Remove from table
+                        $(this).parents("tr").remove();
+                        console.log(deviceObject);
+                    }
 
                 }
             });
@@ -313,9 +379,9 @@ function socketOnStatus(socket) {
                                 return $(this).text() == object.deviceName;
                             }).closest("tr");
                             tableRow[0].cells[3].innerHTML = `<td>` + statusObject.timestamp + `</td>`;
-                            if (statusObject.status) 
+                            if (statusObject.status)
                                 tableRow[0].cells[7].innerHTML = '<td><span class="rounded-circle bg-primary status"></span></td>';
-                            else 
+                            else
                                 tableRow[0].cells[7].innerHTML = '<td><span class="rounded-circle bg-secondary status"></span></td>';
                             break;
                         }
@@ -400,7 +466,8 @@ setTimeout(function () {
 }, 500);
 
 //Show alarm setup when enable
-$('#alarmCheck').on('change' , function() {
+$('#alarmCheck').on('change', function () {
     if (this.checked) $('.input-alarm').prop('disabled', false)
     else $('.input-alarm').prop('disabled', true)
-})
+});
+

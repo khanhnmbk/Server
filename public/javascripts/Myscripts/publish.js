@@ -43,27 +43,34 @@ $(document).ready(function () {
     //Alarm function
     socket.on('/' + $deviceID + '/alarm', function (alarmObject) {
       var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
+      var arrAlarmType = Array.from($('#alarmTable tr td:nth-child(7)'));
+      var arrAlarmState = Array.from($('#alarmTable tr td:nth-child(8)'));
       var _isExist = false;
       var _timeStamp = new Date(alarmObject.timestamp)
 
-      for (var _item of arrAlarmSource) {
-        if (_item.innerText == alarmObject.source) {
-          if (alarmObject.state == 'UNACK') {
-            var _expression = '#alarmTable tr:nth(' + (arrAlarmSource.indexOf(_item) + 1) + ') td';
-            var tableRow = $(_expression);
-            tableRow[1].innerText = _timeStamp.toLocaleDateString();
-            tableRow[2].innerText = _timeStamp.toLocaleTimeString();
-            tableRow[4].innerText = alarmObject.value;
-            tableRow[5].innerText = alarmObject.message;
-            tableRow[6].innerText = alarmObject.type;
-            tableRow[7].innerText = alarmObject.state;
+      for (var i = 0; i < arrAlarmSource.length; i++) {
+        if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) { 
+            if (alarmObject.state == 'UNACK') {
+              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
+              var tableRow = $(_expression);
+              tableRow[1].innerText = _timeStamp.toLocaleDateString();
+              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+              tableRow[4].innerText = alarmObject.value;
+              tableRow[5].innerText = alarmObject.message;
+              tableRow[6].innerText = alarmObject.type;
+              tableRow[7].innerText = alarmObject.state;
+            }
+            else { //ACKED
+              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
+              var tableRow = $(_expression);
+              tableRow[1].innerText = _timeStamp.toLocaleDateString();
+              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+              tableRow[7].innerText = alarmObject.state;
+              $(arrAlarmSource[i].closest('tr')).css('color' , 'black');
+            }
+            _isExist = true;
+            break;
           }
-          else { //ACKED
-            _item.closest('tr').remove();
-          }
-          _isExist = true;
-          break;
-        }
       }
 
       if (!_isExist) {//Not found item 
@@ -102,6 +109,57 @@ $(document).ready(function () {
       }
     });
 
+    
+  $('#btnAck').click(function () {
+    if ($('.alarm-selected').length > 0) {
+      var _resAlarm = {
+        deviceID: $deviceID,
+        resAlarm: []
+      }
+      $('.alarm-selected').each(function () {
+        var _selectedItem = $(this).find('td');
+        if (_selectedItem[7].innerText != 'ACKED') {
+          _resAlarm.resAlarm.push({
+            deviceID : $deviceID,
+            source: _selectedItem[3].innerText,
+            value: _selectedItem[4].innerText,
+            message: _selectedItem[5].innerText,
+            type: _selectedItem[6].innerText,
+            state: 'ACKED',
+            timestamp: new Date().toLocaleString(),
+          })
+        }
+      });
+      console.log('ACK button');
+      console.log(_resAlarm);
+      if (_resAlarm.resAlarm.length > 0) socket.emit('/resAlarm', _resAlarm);
+    }
+  });
+
+  $('#btnAckAll').click(function () {
+    var rows = $('#alarmTable tbody tr');
+    if (rows.length > 0) {
+      var _resAlarm = {
+        deviceID: $deviceID,
+        resAlarm: []
+      }
+      rows.each(function () {
+        if ($(this).find('td')[7].innerText == 'UNACK')
+          _resAlarm.resAlarm.push({
+            deviceID : $deviceID,
+            source: $(this).find('td')[3].innerText,
+            value: $(this).find('td')[4].innerText,
+            message: $(this).find('td')[5].innerText,
+            type: $(this).find('td')[6].innerText,
+            state: 'ACKED',
+            timestamp: new Date().toLocaleString(),
+          })
+      });
+      socket.emit('/resAlarm', _resAlarm);
+      console.log('ACK all');
+      console.log(_resAlarm);
+    }
+  });
   });
 
 
@@ -211,7 +269,8 @@ $(document).ready(function () {
   $('#btnTest').click(function () {
     var _elem = $('#mainPage1').children();
     console.log(_elem);
-  })
+  });
+
 
 });
 
