@@ -3,6 +3,8 @@ let elementHTML = [];
 let variableList = [];
 let $user = $('#user').text();
 let $deviceID = $('#deviceID').text();
+let alarmEffectInterval; //For flashing the alarm title when getting unacked alarm
+let isFlashing = false; //Flashing flag
 
 console.log($user);
 console.log($deviceID);
@@ -13,6 +15,7 @@ $(document).ready(function () {
 
   //Empty alarm table first
   $('#alarmTable tbody').empty();
+
 
   //Button style when click
   $('.btn.contextMenu').on('mousedown', function () { $(this).css({ 'opacity': 0.5 }) });
@@ -93,9 +96,33 @@ $(document).ready(function () {
           if (_checkbox.prop('checked')) $(this).addClass('alarm-selected');
           else $(this).removeClass('alarm-selected');
         });
+        $('#alarmTable tbody tr').css('cursor', 'pointer');
 
       }
 
+
+      //Alarm effect
+      var isUNACK = false;
+      var arrAlarmState_New = Array.from($('#alarmTable tr td:nth-child(8)'));
+      var arrAlarmStateValue = [];
+      for (var i = 0; i < arrAlarmState_New.length; i++) {
+        arrAlarmStateValue.push(arrAlarmState_New[i].innerText);
+      };
+
+      if (arrAlarmStateValue.includes('UNACK')) {
+        if (!isFlashing) {
+          alarmEffectInterval = setInterval(function() {
+            if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color','orange');
+            else $('#alarmTitle').css('color','');
+          },1000);
+          isFlashing = true;
+        }
+      } else {
+        isFlashing = false;
+        clearInterval(alarmEffectInterval);
+        $('#alarmTitle').css('color','');
+      }
+      
     });
 
     //Scada function

@@ -3,8 +3,11 @@
                                 Document ready 
 ***********************************************************************************************
 */
-$(document).ready(function () {
+let alarmEffectInterval;
+let isFlashing = false;
 
+
+$(document).ready(function () {
   //Disable all elements in alarm and history when not RUN
   $('#alarm *').prop('disabled', true);
   $('#history *').prop('disabled', true);
@@ -103,6 +106,28 @@ $(document).ready(function () {
 
         }
 
+        //Alarm effect
+        var isUNACK = false;
+        var arrAlarmState_New = Array.from($('#alarmTable tr td:nth-child(8)'));
+        var arrAlarmStateValue = [];
+        for (var i = 0; i < arrAlarmState_New.length; i++) {
+          arrAlarmStateValue.push(arrAlarmState_New[i].innerText);
+        };
+
+        if (arrAlarmStateValue.includes('UNACK')) {
+          if (!isFlashing) {
+            alarmEffectInterval = setInterval(function() {
+              if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color','orange');
+              else $('#alarmTitle').css('color','');
+            },1000);
+            isFlashing = true;
+          }
+        } else {
+          isFlashing = false;
+          clearInterval(alarmEffectInterval);
+          $('#alarmTitle').css('color','');
+        }
+
       });
 
       //Clear history table body first
@@ -146,7 +171,8 @@ $(document).ready(function () {
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
       socket.off('/' + deviceID + '/resHistory');
-
+      //Reset alarm color
+      $('#alarmTitle').css('color', '');
     });
   });
 
@@ -189,29 +215,29 @@ $(document).ready(function () {
     }
   });
 
-  $('#btnAckAll').click(function () {
-    var rows = $('#alarmTable tbody tr');
-    if (rows.length > 0) {
-      var _resAlarm = {
-        deviceID: deviceID,
-        resAlarm: []
-      }
-      rows.each(function () {
-        if ($(this).find('td')[7].innerText == 'UNACK')
-          _resAlarm.resAlarm.push({
-            source: $(this).find('td')[3].innerText,
-            value: $(this).find('td')[4].innerText,
-            message: $(this).find('td')[5].innerText,
-            type: $(this).find('td')[6].innerText,
-            state: 'ACKED',
-            timestamp: new Date().toLocaleString(),
-          })
-      });
-      socket.emit('/resAlarm', _resAlarm);
-      console.log('ACK all');
-      console.log(_resAlarm);
-    }
-  });
+  // $('#btnAckAll').click(function () {
+  //   var rows = $('#alarmTable tbody tr');
+  //   if (rows.length > 0) {
+  //     var _resAlarm = {
+  //       deviceID: deviceID,
+  //       resAlarm: []
+  //     }
+  //     rows.each(function () {
+  //       if ($(this).find('td')[7].innerText == 'UNACK')
+  //         _resAlarm.resAlarm.push({
+  //           source: $(this).find('td')[3].innerText,
+  //           value: $(this).find('td')[4].innerText,
+  //           message: $(this).find('td')[5].innerText,
+  //           type: $(this).find('td')[6].innerText,
+  //           state: 'ACKED',
+  //           timestamp: new Date().toLocaleString(),
+  //         })
+  //     });
+  //     socket.emit('/resAlarm', _resAlarm);
+  //     console.log('ACK all');
+  //     console.log(_resAlarm);
+  //   }
+  // });
 
   $('#btnRefreshHistory').click(function () {
     socket.emit('/reqHistory', deviceID);

@@ -33,8 +33,8 @@
                         class="far fa-file mr-2"></i>New</button>
             </div>
             <div class="btn-group" role="group" aria-label="Clipboard group">
-                <button type="button" class="btn btn-dark" id="btnOpen" 
-                    ><i class="far fa-folder-open mr-2"></i>Open</button>
+                <button type="button" class="btn btn-dark" id="btnOpen"><i
+                        class="far fa-folder-open mr-2"></i>Open</button>
             </div>
             <div class="btn-group" role="group" aria-label="Clipboard group">
                 <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#textModal"><i
@@ -200,7 +200,8 @@
                                         <!-- Vertical Slider -->
                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
                                             title="Vertical slider" onclick="addNewVerticalSlider()">
-                                            <img src="/images/toolboxIcon/vertical-slider.png" class="img-icon" alt="Vertical Slider">
+                                            <img src="/images/toolboxIcon/vertical-slider.png" class="img-icon"
+                                                alt="Vertical Slider">
                                         </button>
                                         <!-- /Vertical Slider -->
 
@@ -252,7 +253,7 @@
                                 class="fas fa-home mr-1"></i><strong>Home</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link " data-toggle="tab" href="#alarm"><i
+                        <a class="nav-link " data-toggle="tab" href="#alarm" id="alarmTitle"><i
                                 class="fas fa-exclamation-triangle mr-1"></i><strong>Alarm</strong></a>
                     </li>
                     <li class="nav-item">
@@ -268,11 +269,16 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div id="mainPage1" class="container-fluid tab-pane active bg-white full-height no-gutter-all">
+                        <!-- <div class="alert alert-warning alert-dismissible ml-auto fade show" style = "width:20%">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <i
+                                class="fas fa-exclamation-triangle mr-1"></i><strong>Warning!</strong> New alarm
+                        </div> -->
                     </div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height">
                         <div class="row pt-3">
-                            <button class="btn btn-primary ml-auto" id="btnAck">Acknowledge</button>
-                            <button class="btn btn-primary mx-3" id="btnAckAll">Acknowledge All</button>
+                            <button class="btn btn-primary ml-auto mr-5" id="btnAck">Acknowledge</button>
+                            <!-- <button class="btn btn-primary mx-3" id="btnAckAll">Acknowledge All</button> -->
                         </div>
 
                         <div class="row mt-3">
@@ -1733,7 +1739,8 @@
     </div>
 
     <!--Vertical slider modal-->
-    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="verticalSliderModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="verticalSliderModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1906,12 +1913,12 @@
                             </div>
 
                             <div class="col-sm">
-                                    <div class="custom-control custom-checkbox mt-3 mb-0">
-                                        <input type="checkbox" class="custom-control-input inputModal"
-                                            id="rawValueCheckbox">
-                                        <label class="custom-control-label" for="rawValueCheckbox">Raw value</label>
-                                    </div>
+                                <div class="custom-control custom-checkbox mt-3 mb-0">
+                                    <input type="checkbox" class="custom-control-input inputModal"
+                                        id="rawValueCheckbox">
+                                    <label class="custom-control-label" for="rawValueCheckbox">Raw value</label>
                                 </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -1988,143 +1995,144 @@
 
     <!--Vertical progress bar modal-->
     <div class="modal fade" tabindex="-1" role="dialog" id="verticalProgressBarModal" data-backdrop="static">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Properties</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <fieldset class="form-group border px-4 pb-2 pt-1">
-                            <legend class="col-form-label col-sm-2 pt-0"><strong>Appearance</strong></legend>
-                            <div class='row'>
-                                <div class="col-sm">
-                                    <div class="form-group row my-2">
-                                        <label for="inputImageWidth" class="col-sm-2 col-form-label">Width</label>
-                                        <div class="col-sm">
-                                            <input type="number" class="form-control ml-auto inputWidth inputModal"
-                                                value="1">
-                                        </div>
-                                    </div>
-    
-                                    <div class="form-group row my-2">
-                                        <label for="inputImageHeight" class="col-sm-2 col-form-label">Height</label>
-                                        <div class="col-sm">
-                                            <input type="number" class="form-control ml-auto inputHeight inputModal"
-                                                value="1">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-    
-                        <fieldset class="form-group border px-4 pb-2 pt-1">
-                            <legend class="col-form-label col-sm-2 pr-1"><strong>Input</strong></legend>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group row my-2">
-                                        <label for="inputHidden" class="col-sm-3 col-form-label">Value</label>
-                                        <div class="input-group ml-4 pl-4 col-sm">
-                                            <input type="text" class="form-control inputValue inputModal"
-                                                placeholder="Expression">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-success btnValueTag btnBrowseTag" data-toggle="modal"
-                                                    data-target="#tagModal" data-backdrop="static">Browse</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-    
-                                <div class="col-sm">
-                                    <div class="custom-control custom-checkbox mt-3 mb-0">
-                                        <input type="checkbox" class="custom-control-input inputModal"
-                                            id="hideVerticalLabelCheckbox">
-                                        <label class="custom-control-label" for="hideVerticalLabelCheckbox">Hide value label</label>
-                                    </div>
-                                </div>
-    
-                                <div class="col-sm">
-                                        <div class="custom-control custom-checkbox mt-3 mb-0">
-                                            <input type="checkbox" class="custom-control-input inputModal"
-                                                id="rawVerticalValueCheckbox">
-                                            <label class="custom-control-label" for="rawVerticalValueCheckbox">Raw value</label>
-                                        </div>
-                                    </div>
-                            </div>
-    
-                            <div class="row">
-                                <div class="col-sm">
-                                    <div class="form-group row my-2">
-                                        <label for="inputHidden" class="col-sm-3 col-form-label">Min tag</label>
-                                        <div class="input-group ml-4 pl-4 col-sm">
-                                            <input type="text" class="form-control inputMinTag inputModal"
-                                                placeholder="Expression">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-success btnMinTag btnBrowseTag" data-toggle="modal"
-                                                    data-target="#tagModal" data-backdrop="static">Browse</button>
-                                            </div>
-                                        </div>
-                                    </div>
-    
-                                    <div class="form-group row my-2">
-                                        <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Min value</label>
-                                        <div class="col-sm ml-4 pl-4">
-                                            <input type="text" class="form-control ml-auto inputMinValue inputModal"
-                                                id="inputHidden" placeholder="Insert tag">
-                                        </div>
-                                    </div>
-                                </div>
-    
-                                <div class="col-sm">
-                                    <div class="form-group row my-2">
-                                        <label for="inputHidden" class="col-sm-3 col-form-label">Max tag</label>
-                                        <div class="input-group ml-4 pl-4 col-sm">
-                                            <input type="text" class="form-control inputMaxTag inputModal"
-                                                placeholder="Expression">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-success btnMaxTag btnBrowseTag" data-toggle="modal"
-                                                    data-target="#tagModal" data-backdrop="static">Browse</button>
-                                            </div>
-                                        </div>
-                                    </div>
-    
-                                    <div class="form-group row my-2">
-                                        <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Max value</label>
-                                        <div class="col-sm ml-4 pl-4">
-                                            <input type="text" class="form-control ml-auto inputMaxValue inputModal"
-                                                id="inputHidden" placeholder="Insert tag">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-    
-                        <fieldset class="form-group border px-2 pb-2 pt-1">
-                            <legend class="col-form-label col-sm-2 pt-0 ml-2 px-3"><strong>Animation</strong></legend>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Properties</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pt-0"><strong>Appearance</strong></legend>
+                        <div class='row'>
                             <div class="col-sm">
                                 <div class="form-group row my-2">
-                                    <label for="inputHidden" class="col-sm-2 col-form-label">Hidden when</label>
-                                    <div class="input-group col-sm">
-                                        <input type="text" class="form-control inputHiddenWhen inputModal"
+                                    <label for="inputImageWidth" class="col-sm-2 col-form-label">Width</label>
+                                    <div class="col-sm">
+                                        <input type="number" class="form-control ml-auto inputWidth inputModal"
+                                            value="1">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row my-2">
+                                    <label for="inputImageHeight" class="col-sm-2 col-form-label">Height</label>
+                                    <div class="col-sm">
+                                        <input type="number" class="form-control ml-auto inputHeight inputModal"
+                                            value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-4 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pr-1"><strong>Input</strong></legend>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Value</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputValue inputModal"
                                             placeholder="Expression">
                                         <div class="input-group-append">
-                                            <button class="btn btn-success btnHiddenWhen btnBrowseTag" data-toggle="modal"
-                                                data-target="#tagModal" data-backdrop="static">Browse tag</button>
+                                            <button class="btn btn-success btnValueTag btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </fieldset>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary saveChangeButton">Save changes</button>
-                    </div>
+
+                            <div class="col-sm">
+                                <div class="custom-control custom-checkbox mt-3 mb-0">
+                                    <input type="checkbox" class="custom-control-input inputModal"
+                                        id="hideVerticalLabelCheckbox">
+                                    <label class="custom-control-label" for="hideVerticalLabelCheckbox">Hide value
+                                        label</label>
+                                </div>
+                            </div>
+
+                            <div class="col-sm">
+                                <div class="custom-control custom-checkbox mt-3 mb-0">
+                                    <input type="checkbox" class="custom-control-input inputModal"
+                                        id="rawVerticalValueCheckbox">
+                                    <label class="custom-control-label" for="rawVerticalValueCheckbox">Raw value</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Min tag</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputMinTag inputModal"
+                                            placeholder="Expression">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success btnMinTag btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Min value</label>
+                                    <div class="col-sm ml-4 pl-4">
+                                        <input type="text" class="form-control ml-auto inputMinValue inputModal"
+                                            id="inputHidden" placeholder="Insert tag">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm">
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label">Max tag</label>
+                                    <div class="input-group ml-4 pl-4 col-sm">
+                                        <input type="text" class="form-control inputMaxTag inputModal"
+                                            placeholder="Expression">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-success btnMaxTag btnBrowseTag" data-toggle="modal"
+                                                data-target="#tagModal" data-backdrop="static">Browse</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row my-2">
+                                    <label for="inputHidden" class="col-sm-3 col-form-label pr-0">Max value</label>
+                                    <div class="col-sm ml-4 pl-4">
+                                        <input type="text" class="form-control ml-auto inputMaxValue inputModal"
+                                            id="inputHidden" placeholder="Insert tag">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group border px-2 pb-2 pt-1">
+                        <legend class="col-form-label col-sm-2 pt-0 ml-2 px-3"><strong>Animation</strong></legend>
+                        <div class="col-sm">
+                            <div class="form-group row my-2">
+                                <label for="inputHidden" class="col-sm-2 col-form-label">Hidden when</label>
+                                <div class="input-group col-sm">
+                                    <input type="text" class="form-control inputHiddenWhen inputModal"
+                                        placeholder="Expression">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success btnHiddenWhen btnBrowseTag" data-toggle="modal"
+                                            data-target="#tagModal" data-backdrop="static">Browse tag</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary saveChangeButton">Save changes</button>
                 </div>
             </div>
         </div>
+    </div>
 
     <!--Checkbox modal-->
     <div class="modal fade" tabindex="-1" role="dialog" id="checkboxModal" data-backdrop="static">
@@ -2468,19 +2476,19 @@
 
     <!-- Success modal -->
     <div class="modal fade" id="successModal" role="dialog" data-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-						<div class="thank-you-pop">
-							<img src="/images/png/success.png" alt="">
-							<h1 class="text-success">Succeed!</h1>
-							<p>Your design has been published</p>
-							<h3 class="cupon-pop"><a id="publishedLink">Go to your page</a></h3>
- 						</div>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="thank-you-pop">
+                        <img src="/images/png/success.png" alt="">
+                        <h1 class="text-success">Succeed!</h1>
+                        <p>Your design has been published</p>
+                        <h3 class="cupon-pop"><a id="publishedLink">Go to your page</a></h3>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
     <!------------------------ SCRIPT ------------------------->
