@@ -55,3 +55,9 @@
 select option[disabled]:first-child {
 	display: none;
 }
+
+/* Side bar modal */
+.logo {
+    height: 100px;
+    width: 100px;
+}

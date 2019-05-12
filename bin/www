@@ -21,17 +21,17 @@ var databasePath = '../Server/Database';
 var certificatePath = '../Server/public/certificate/mqtt_ca.crt';
 
 //MQTT VARIABLES
-let mqttHost = '127.0.0.1';
-let mqttPort = 1883;
-// let mqttHost = '45.124.94.180';
-// let mqttPort = 8883;
+// let mqttHost = '127.0.0.1';
+// let mqttPort = 1883;
+let mqttHost = '45.124.94.180';
+let mqttPort = 8883;
 let trustedCA = fs.readFileSync(certificatePath);
 let mqttOptions = {
   host: mqttHost,
   port: mqttPort,
   rejectUnauthorized: false,
-  //ca: trustedCA,
-  //protocol: 'mqtts'
+  ca: trustedCA,
+  protocol: 'mqtts'
 }
 
 
@@ -224,7 +224,7 @@ io.on('connection', function (socket) {
     });
   });
 
-  socket.on('/publish', function (dataObj) {
+  socket.on('/publish', function (dataObj, backgroundObject) {
     var template = fs.readFileSync('../Server/views/publish-template.ejs').toString();
     var htlmObject = HTMLParser.parse(template);
     htlmObject.querySelector('#mainPage1').appendChild(dataObj.html);
@@ -232,6 +232,7 @@ io.on('connection', function (socket) {
     fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Publish', fileName), htlmObject);
     fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_Elements.json'), JSON.stringify(dataObj.elements, null, 4));
     fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_VariableList.json'), JSON.stringify(dataObj.variableList, null, 4));
+    fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_Background.json'), JSON.stringify(backgroundObject, null, 4));
     socket.emit('/' + dataObj.deviceID + '/publishSuccess', 1);
 
     //Update published state in Config file
@@ -254,9 +255,11 @@ io.on('connection', function (socket) {
   socket.on('/reqPublishParameters', function (userObject) {
     var elementFile = path.resolve(databasePath, userObject.user, 'Parameters', 'Device_' + userObject.deviceID + '_Elements.json');
     var variableFile = path.resolve(databasePath, userObject.user, 'Parameters', 'Device_' + userObject.deviceID + '_VariableList.json');
+    var backgroundFile = path.resolve(databasePath, userObject.user, 'Parameters', 'Device_' + userObject.deviceID + '_Background.json');
     var elementObj = JSON.parse(fs.readFileSync(elementFile));
     var variableObj = JSON.parse(fs.readFileSync(variableFile));
-    socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj });
+    var backgroundObj = JSON.parse(fs.readFileSync(backgroundFile));
+    socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj, background : backgroundObj });
   });
 
 });

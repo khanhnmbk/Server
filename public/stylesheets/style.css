@@ -330,3 +330,13 @@ label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
 }
 
 
+/*
+***********************************************************************************************
+                                Symbol sets scrollable modal
+***********************************************************************************************
+*/
+.modal-scrollable {
+    max-height: 700px;
+    overflow-y:auto;
+}
+

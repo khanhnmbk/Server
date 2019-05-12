@@ -448,13 +448,17 @@ function loadMap(arrDeviceObject) {
     });
 
     arrDeviceObject.forEach(function (device) {
-        var center = new Microsoft.Maps.Location(device.latitude, device.longitude);
-        var pin = new Microsoft.Maps.Pushpin(center, {
-            title: device.deviceName,
-            icon: '/images/png/pushpin.png',
-            anchor: new Microsoft.Maps.Point(12, 39),
-        });
-        map.entities.push(pin);
+        if (device) {
+            if (device.longitude && device.latitude) {
+                var center = new Microsoft.Maps.Location(device.latitude, device.longitude);
+                var pin = new Microsoft.Maps.Pushpin(center, {
+                    title: device.deviceName,
+                    icon: '/images/png/pushpin.png',
+                    anchor: new Microsoft.Maps.Point(12, 39),
+                });
+                map.entities.push(pin);
+            }
+        }
     });
 }
 

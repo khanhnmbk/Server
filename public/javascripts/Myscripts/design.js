@@ -362,7 +362,28 @@ $(document).ready(function () {
         elements: elementHTML,
         variableList: variableList
       }
-      socket.emit('/publish', _sendObject);
+
+      var mainPageColor = $('#mainPage1')[0].style.background;
+    if (mainPageColor) mainPageColor = rgb2hex(mainPageColor);
+
+    var alarmPageColor = $('#alarm')[0].style.background;
+    if (alarmPageColor) alarmPageColor = rgb2hex(alarmPageColor);
+
+    var historyPageColor = $('#history')[0].style.background;
+    if (historyPageColor) historyPageColor = rgb2hex(historyPageColor);
+
+    var dashboardPageColor = $('#dashboard')[0].style.background;
+    if (dashboardPageColor) dashboardPageColor = rgb2hex(dashboardPageColor);
+
+    var backgroundObject = {
+      mainPage : mainPageColor,
+      alarmPage : alarmPageColor,
+      historyPage : historyPageColor,
+      dashboardPage : dashboardPageColor
+    }
+
+
+      socket.emit('/publish', _sendObject, backgroundObject);
       $('#spinnerModal').modal('show');
       console.log(mainPage1);
       socket.on('/' + deviceID + '/publishSuccess', function (data) {
@@ -379,10 +400,29 @@ $(document).ready(function () {
     }
   });
 
-  $('#btnOpen').click(function () {
-    
-   
-  })
+  //Settings: Change background color
+  $('#settingModal').on('show.bs.modal', function () {
+    var mainPageColor = $('#mainPage1')[0].style.background;
+    if (mainPageColor) $('#mainPageColor').prop({'value' : rgb2hex(mainPageColor)});
+
+    var alarmPageColor = $('#alarm')[0].style.background;
+    if (alarmPageColor) $('#alarmPageColor').prop({'value' : rgb2hex(alarmPageColor)});
+
+    var historyPageColor = $('#history')[0].style.background;
+    if (historyPageColor) $('#historyPageColor').prop({'value' : rgb2hex(historyPageColor)});
+
+    var dashboardPageColor = $('#dashboard')[0].style.background;
+    if (dashboardPageColor) $('#dashboardPageColor').prop({'value' : rgb2hex(dashboardPageColor) });
+  });
+
+  $('#btnSaveColors').click(function(){
+    console.log($('#mainPageColor').prop('value') + ' !important');
+    //$('#mainPage1')[0].style.cssText = '#ff0000';
+    $('#mainPage1')[0].style.setProperty('background' , $('#mainPageColor').prop('value'), 'important');
+    $('#alarm')[0].style.setProperty('background' , $('#alarmPageColor').prop('value'), 'important');
+    $('#history')[0].style.setProperty('background' , $('#historyPageColor').prop('value'), 'important');
+    $('#dashboard')[0].style.setProperty('background' , $('#dashboardPageColor').prop('value'), 'important');
+  });
 
 });
 

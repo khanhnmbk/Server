@@ -27,7 +27,7 @@
         <nav id="sidebar">
             <div class="sidebar-header">
                 <div class="row">
-                    <h3 class="mx-2">Devices</h3>
+                    <h3 class="mx-2">Information</h3>
                     <button class="btn text-white ml-auto mx-2" id="sidebarButton"><i class="fas fa-arrow-left"
                             style="font-size:24px"></i></i></button>
                 </div>
@@ -36,16 +36,16 @@
 
             <ul class="list-unstyled components mx-2">
                 <li>
-                    <a href="#">
-                        Device 1
+                    <a href="userManual">
+                        User manual
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        Device 2
+                    <a href="#" data-toggle="modal" data-target="#aboutUsModal">
+                        About us
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="#">
                         Device 3
                     </a>
@@ -54,7 +54,7 @@
                     <a href="#">
                         Device 4
                     </a>
-                </li>
+                </li> -->
 
             </ul>
         </nav>
@@ -488,26 +488,29 @@
                                     </div>
 
                                     <div class="col-sm-9">
-                                            <select class="custom-select my-0 input-alarm alarm-type" >
-                                                <option selected disabled>Alarm type</option>
-                                                <option value="0">Digital</option>
-                                                <option value="1">Analog</option>
-                                            </select>
-                                            <input type="number" class="form-control my-1 input-alarm hihi" placeholder="HI HI">
-                                            <input type="number" class="form-control my-1 input-alarm hi" placeholder="HI">
-                                            <input type="number" class="form-control my-1 input-alarm lo" placeholder="LO">
-                                            <input type="number" class="form-control my-1 input-alarm lolo" placeholder="LO LO">
-                                            <input type="number" class="form-control my-1 input-alarm deadband" placeholder="Deadband">
+                                        <select class="custom-select my-0 input-alarm alarm-type">
+                                            <option selected disabled>Alarm type</option>
+                                            <option value="0">Digital</option>
+                                            <option value="1">Analog</option>
+                                        </select>
+                                        <input type="number" class="form-control my-1 input-alarm hihi"
+                                            placeholder="HI HI">
+                                        <input type="number" class="form-control my-1 input-alarm hi" placeholder="HI">
+                                        <input type="number" class="form-control my-1 input-alarm lo" placeholder="LO">
+                                        <input type="number" class="form-control my-1 input-alarm lolo"
+                                            placeholder="LO LO">
+                                        <input type="number" class="form-control my-1 input-alarm deadband"
+                                            placeholder="Deadband">
 
                                     </div>
                                 </div>
                                 <div class="row py-1">
                                     <div class="col-sm">
-                                            <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input inputHistory"
-                                                        id="historyCheck" name="example1">
-                                                    <label class="custom-control-label" for="historyCheck">History</label>
-                                                </div>
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input inputHistory"
+                                                id="historyCheck" name="example1">
+                                            <label class="custom-control-label" for="historyCheck">History</label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -575,6 +578,38 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary btnSave" data-dismiss="modal">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--About us modal-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="aboutUsModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">About us</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-3  my-auto">
+                            <object type="image/svg+xml" data="/images/svg/Logo-hcmut.svg" class="logo"></object>
+                        </div>
+                        <div class="col-sm-9">
+                            <h4 style="color:blue" class="mb-3">Hồ Chí Minh City University of Technology</h4>
+                            <p style="color:black"><b>Author:</b>&nbsp Nguyễn Minh Khánh</p>
+                            <p style="color:black"><b>Tel:</b><a href="tel:+84 379 699 593">&nbsp +84 379 699 593</a>
+                            </p>
+                            <p style="color:black"><b>Email:</b><a href="mailto:nmkhanhbk@gmail.com">&nbsp
+                                    nmkhanhbk@gmail.com</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

@@ -8,6 +8,7 @@ var async = require('async');
 
 var databasePath = '../Server/Database';
 var symbolPath = '../Server/public/images/symbols';
+var userManualPath = '../Server/public/document/user_manual.pdf';
 
 var userModel = require('../model/user');
 var file = require('../model/fileSystem');
@@ -168,6 +169,11 @@ router.get('/published/:user/:fileName' , checkAuthtication, function(req , res 
   var deviceId = req.params.fileName.replace('Device_','').replace('_publish.ejs','');
   console.log(deviceId);
   res.render(req.params.user + '/Publish/' + req.params.fileName , {user : req.params.user , deviceID : deviceId});
+})
+
+/* GET user manual */
+router.get('/userManual' , checkAuthtication, function(req , res , next){
+  res.download(userManualPath);
 })
 
 // router.get('/design', checkAuthtication, function(req, res, next) {

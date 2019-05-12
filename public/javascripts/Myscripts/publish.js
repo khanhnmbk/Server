@@ -34,6 +34,19 @@ $(document).ready(function () {
       fixTooltip();
       initElementHTML(elementHTML);
       initSCADA(elementHTML, socket);
+      //Change background color
+      if (dataObject.background.mainPage) {
+        $('#mainPage1')[0].style.setProperty('background' , dataObject.background.mainPage , 'important');
+      };
+      if (dataObject.background.alarmPage) {
+        $('#alarm')[0].style.setProperty('background' , dataObject.background.alarmPage , 'important');
+      }
+      if (dataObject.background.historyPage) {
+        $('#history')[0].style.setProperty('background' , dataObject.background.historyPage , 'important');
+      }
+      if (dataObject.background.dashboardPage) {
+        $('#dashboard')[0].style.setProperty('background' , dataObject.background.dashboardPage , 'important');
+      }
       socket.off('/' + $deviceID + '/resPublishParameters');
     });
 
