@@ -1,6 +1,7 @@
 //Global variables
 let elementHTML = [];
 let variableList = [];
+let arrChartJS = [];
 let $user = $('#user').text();
 let $deviceID = $('#deviceID').text();
 let alarmEffectInterval; //For flashing the alarm title when getting unacked alarm
@@ -36,16 +37,16 @@ $(document).ready(function () {
       initSCADA(elementHTML, socket);
       //Change background color
       if (dataObject.background.mainPage) {
-        $('#mainPage1')[0].style.setProperty('background' , dataObject.background.mainPage , 'important');
+        $('#mainPage1')[0].style.setProperty('background', dataObject.background.mainPage, 'important');
       };
       if (dataObject.background.alarmPage) {
-        $('#alarm')[0].style.setProperty('background' , dataObject.background.alarmPage , 'important');
+        $('#alarm')[0].style.setProperty('background', dataObject.background.alarmPage, 'important');
       }
       if (dataObject.background.historyPage) {
-        $('#history')[0].style.setProperty('background' , dataObject.background.historyPage , 'important');
+        $('#history')[0].style.setProperty('background', dataObject.background.historyPage, 'important');
       }
       if (dataObject.background.dashboardPage) {
-        $('#dashboard')[0].style.setProperty('background' , dataObject.background.dashboardPage , 'important');
+        $('#dashboard')[0].style.setProperty('background', dataObject.background.dashboardPage, 'important');
       }
       socket.off('/' + $deviceID + '/resPublishParameters');
     });
@@ -65,28 +66,28 @@ $(document).ready(function () {
       var _timeStamp = new Date(alarmObject.timestamp)
 
       for (var i = 0; i < arrAlarmSource.length; i++) {
-        if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) { 
-            if (alarmObject.state == 'UNACK') {
-              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
-              var tableRow = $(_expression);
-              tableRow[1].innerText = _timeStamp.toLocaleDateString();
-              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
-              tableRow[4].innerText = alarmObject.value;
-              tableRow[5].innerText = alarmObject.message;
-              tableRow[6].innerText = alarmObject.type;
-              tableRow[7].innerText = alarmObject.state;
-            }
-            else { //ACKED
-              var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
-              var tableRow = $(_expression);
-              tableRow[1].innerText = _timeStamp.toLocaleDateString();
-              tableRow[2].innerText = _timeStamp.toLocaleTimeString();
-              tableRow[7].innerText = alarmObject.state;
-              $(arrAlarmSource[i].closest('tr')).css('color' , 'black');
-            }
-            _isExist = true;
-            break;
+        if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) {
+          if (alarmObject.state == 'UNACK') {
+            var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
+            var tableRow = $(_expression);
+            tableRow[1].innerText = _timeStamp.toLocaleDateString();
+            tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+            tableRow[4].innerText = alarmObject.value;
+            tableRow[5].innerText = alarmObject.message;
+            tableRow[6].innerText = alarmObject.type;
+            tableRow[7].innerText = alarmObject.state;
           }
+          else { //ACKED
+            var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
+            var tableRow = $(_expression);
+            tableRow[1].innerText = _timeStamp.toLocaleDateString();
+            tableRow[2].innerText = _timeStamp.toLocaleTimeString();
+            tableRow[7].innerText = alarmObject.state;
+            $(arrAlarmSource[i].closest('tr')).css('color', 'black');
+          }
+          _isExist = true;
+          break;
+        }
       }
 
       if (!_isExist) {//Not found item 
@@ -124,18 +125,18 @@ $(document).ready(function () {
 
       if (arrAlarmStateValue.includes('UNACK')) {
         if (!isFlashing) {
-          alarmEffectInterval = setInterval(function() {
-            if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color','orange');
-            else $('#alarmTitle').css('color','');
-          },1000);
+          alarmEffectInterval = setInterval(function () {
+            if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color', 'orange');
+            else $('#alarmTitle').css('color', '');
+          }, 1000);
           isFlashing = true;
         }
       } else {
         isFlashing = false;
         clearInterval(alarmEffectInterval);
-        $('#alarmTitle').css('color','');
+        $('#alarmTitle').css('color', '');
       }
-      
+
     });
 
     //Scada function
@@ -144,62 +145,62 @@ $(document).ready(function () {
       if (arrVarObjects) {
         arrVarObjects.variables.forEach(function (varObject) {
           eval(varObject.tagName + '=' + varObject.value);
-          SCADA(elementHTML, varObject.tagName);
+          SCADA(elementHTML, varObject.tagName, varObject.timestamp);
         });
       }
     });
 
-    
-  $('#btnAck').click(function () {
-    if ($('.alarm-selected').length > 0) {
-      var _resAlarm = {
-        deviceID: $deviceID,
-        resAlarm: []
-      }
-      $('.alarm-selected').each(function () {
-        var _selectedItem = $(this).find('td');
-        if (_selectedItem[7].innerText != 'ACKED') {
-          _resAlarm.resAlarm.push({
-            deviceID : $deviceID,
-            source: _selectedItem[3].innerText,
-            value: _selectedItem[4].innerText,
-            message: _selectedItem[5].innerText,
-            type: _selectedItem[6].innerText,
-            state: 'ACKED',
-            timestamp: new Date().toLocaleString(),
-          })
-        }
-      });
-      console.log('ACK button');
-      console.log(_resAlarm);
-      if (_resAlarm.resAlarm.length > 0) socket.emit('/resAlarm', _resAlarm);
-    }
-  });
 
-  $('#btnAckAll').click(function () {
-    var rows = $('#alarmTable tbody tr');
-    if (rows.length > 0) {
-      var _resAlarm = {
-        deviceID: $deviceID,
-        resAlarm: []
+    $('#btnAck').click(function () {
+      if ($('.alarm-selected').length > 0) {
+        var _resAlarm = {
+          deviceID: $deviceID,
+          resAlarm: []
+        }
+        $('.alarm-selected').each(function () {
+          var _selectedItem = $(this).find('td');
+          if (_selectedItem[7].innerText != 'ACKED') {
+            _resAlarm.resAlarm.push({
+              deviceID: $deviceID,
+              source: _selectedItem[3].innerText,
+              value: _selectedItem[4].innerText,
+              message: _selectedItem[5].innerText,
+              type: _selectedItem[6].innerText,
+              state: 'ACKED',
+              timestamp: new Date().toLocaleString(),
+            })
+          }
+        });
+        console.log('ACK button');
+        console.log(_resAlarm);
+        if (_resAlarm.resAlarm.length > 0) socket.emit('/resAlarm', _resAlarm);
       }
-      rows.each(function () {
-        if ($(this).find('td')[7].innerText == 'UNACK')
-          _resAlarm.resAlarm.push({
-            deviceID : $deviceID,
-            source: $(this).find('td')[3].innerText,
-            value: $(this).find('td')[4].innerText,
-            message: $(this).find('td')[5].innerText,
-            type: $(this).find('td')[6].innerText,
-            state: 'ACKED',
-            timestamp: new Date().toLocaleString(),
-          })
-      });
-      socket.emit('/resAlarm', _resAlarm);
-      console.log('ACK all');
-      console.log(_resAlarm);
-    }
-  });
+    });
+
+    $('#btnAckAll').click(function () {
+      var rows = $('#alarmTable tbody tr');
+      if (rows.length > 0) {
+        var _resAlarm = {
+          deviceID: $deviceID,
+          resAlarm: []
+        }
+        rows.each(function () {
+          if ($(this).find('td')[7].innerText == 'UNACK')
+            _resAlarm.resAlarm.push({
+              deviceID: $deviceID,
+              source: $(this).find('td')[3].innerText,
+              value: $(this).find('td')[4].innerText,
+              message: $(this).find('td')[5].innerText,
+              type: $(this).find('td')[6].innerText,
+              state: 'ACKED',
+              timestamp: new Date().toLocaleString(),
+            })
+        });
+        socket.emit('/resAlarm', _resAlarm);
+        console.log('ACK all');
+        console.log(_resAlarm);
+      }
+    });
   });
 
 
@@ -444,12 +445,85 @@ function initSCADA(elementHTML, socket) {
         }
         break;
       }
+      //Chart
+      case 'chart': {
+        //Create chart
+        var canvas = document.getElementById(elementHTML[i].id);
+        var ctx1 = canvas.getContext('2d');
+        var newChart = new Chart(ctx1, {
+          // The type of chart we want to create
+          type: 'line',
+          // The data for our dataset
+          data: {
+            labels: [],
+            datasets: [{
+              steppedLine: false,
+              backgroundColor: 'rgba(57,172,180 , 0.8)',
+              hoverBackgroundColor: 'rgba(57,172,180 , 0.3)',
+              data: [],
+              label: 'Value',
+              // backgroundColor: 'rgb(255, 255, 255, 0.2)',
+              borderColor: 'rgb(0,102,10)',
+              borderWidth: 2,
+              pointRadius: 0,
+            }]
+          },
 
+          // Configuration options go here
+          options: {
+            legend: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            title: {
+              display: false,
+              // text: option.title,
+              // fontColor: 'white',
+              // fontSize: 20
+            },
+            tooltips: {
+              mode: 'index',
+              intersect: false,
+              titleFontSize: 16,
+              bodyFontSize: 16
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true
+            },
+            scales: {
+              xAxes: [{
+                display: true,
+                // type : 'realtime',
+                scaleLabel: {
+                  display: true,
+                  labelString: canvas.xLabel,
+                },
+              }],
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                },
+                display: true,
+                gridLines: {
+                  color: '#282525'
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: canvas.yLabel,
+                }
+              }]
+            },
+
+          }
+        });
+        arrChartJS.push({id : elementHTML[i].id, node : newChart});
+        break;
+      }
     }
   }
 }
 
-function SCADA(elementHTML, variableName) {
+function SCADA(elementHTML, variableName, variableTimestamp) {
   for (i = 0; i < elementHTML.length; i++) {
     var _id = elementHTML[i].id;
     var _type = elementHTML[i].type.toLowerCase();
@@ -517,6 +591,11 @@ function SCADA(elementHTML, variableName) {
       //SVG
       case 'svg': {
         scadaSvg(_id, variableName);
+        break;
+      }
+      //Chart
+      case 'chart' : {
+        scadaChart(_id, variableName, variableTimestamp);
         break;
       }
     }
@@ -804,6 +883,30 @@ function scadaCheckbox(id, variableName) {
   }
 }
 
+//Chart scada
+function scadaChart(id, variableName, variableTimestamp) {
+  var canvas = document.getElementById(id);
+  if (canvas) {
+    var foundChartIndex = findChartById(canvas.id);
+    if (foundChartIndex != -1) {  //Found chart JS object
+      if (canvas.tag) {
+        if (canvas.tag.includes(variableName)) {
+          var label = moment(variableTimestamp).format('MM:mm:ss');
+          var data = eval(canvas.tag);
+          addChartData(arrChartJS[foundChartIndex].node, label, data);
+        }
+      };
+      if (canvas.hiddenWhen) {
+        if (canvas.hiddenWhen.includes(variableName)) {
+          if (eval(canvas.hiddenWhen)) $(canvas.parentNode).hide();
+          else $(canvas.parentNode).show();
+        }
+      }
+      
+    }
+  }
+}
+
 //Fix tooltip for vertical slider
 function fixTooltip() {
 
@@ -860,4 +963,19 @@ function reInitVerticalSlider() {
       console.log($('#' + elementHTML[i].id));
     }
   }
+}
+
+//Find chart object by Id in arrChartJS array
+function findChartById(_id) {
+  for (var i = 0; i < arrChartJS.length; i++) {
+    if (arrChartJS[i].id == _id) return i;
+  }
+  return -1;
+}
+
+//Update data for chart
+function addChartData(chart, label, data) {
+  chart.data.labels.push(label);
+  chart.data.datasets[0].data.push(data);
+  chart.update();
 }

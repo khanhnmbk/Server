@@ -1,1 +1,54 @@
-[]
+[
+    {
+        "type": "chart",
+        "id": "chart0",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": "S7_1500_M0_0"
+            },
+            {
+                "name": "xLabel",
+                "value": "Time 1"
+            },
+            {
+                "name": "yLabel",
+                "value": "Value 1"
+            },
+            {
+                "name": "timeRange",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "chart",
+        "id": "chart1",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": "S7_1500_M0_0"
+            },
+            {
+                "name": "xLabel",
+                "value": "Time 2"
+            },
+            {
+                "name": "yLabel",
+                "value": "Value 2"
+            },
+            {
+                "name": "timeRange",
+                "value": ""
+            }
+        ]
+    }
+]

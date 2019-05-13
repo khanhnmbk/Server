@@ -41,7 +41,7 @@ $(document).ready(function () {
         if (arrVarObjects) {
           arrVarObjects.variables.forEach(function (varObject) {
             eval(varObject.tagName + '=' + varObject.value);
-            SCADA(shapes, varObject.tagName);
+            SCADA(shapes, varObject.tagName, varObject.timeStamp);
           });
         }
       });
@@ -58,7 +58,7 @@ $(document).ready(function () {
         var _timeStamp = new Date(alarmObject.timestamp)
 
         for (var i = 0; i < arrAlarmSource.length; i++) { //_item => arrAlarmSource[i]
-          if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) { 
+          if ((arrAlarmSource[i].innerText == alarmObject.source) && (arrAlarmType[i].innerText == alarmObject.type) && (arrAlarmState[i].innerText == 'UNACK')) {
             if (alarmObject.state == 'UNACK') {
               var _expression = '#alarmTable tr:nth(' + (i + 1) + ') td';
               var tableRow = $(_expression);
@@ -75,7 +75,7 @@ $(document).ready(function () {
               tableRow[1].innerText = _timeStamp.toLocaleDateString();
               tableRow[2].innerText = _timeStamp.toLocaleTimeString();
               tableRow[7].innerText = alarmObject.state;
-              $(arrAlarmSource[i].closest('tr')).css('color' , 'black');
+              $(arrAlarmSource[i].closest('tr')).css('color', 'black');
             }
             _isExist = true;
             break;
@@ -116,16 +116,16 @@ $(document).ready(function () {
 
         if (arrAlarmStateValue.includes('UNACK')) {
           if (!isFlashing) {
-            alarmEffectInterval = setInterval(function() {
-              if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color','orange');
-              else $('#alarmTitle').css('color','');
-            },1000);
+            alarmEffectInterval = setInterval(function () {
+              if ($('#alarmTitle').css('color') == 'rgb(255, 255, 255)') $('#alarmTitle').css('color', 'orange');
+              else $('#alarmTitle').css('color', '');
+            }, 1000);
             isFlashing = true;
           }
         } else {
           isFlashing = false;
           clearInterval(alarmEffectInterval);
-          $('#alarmTitle').css('color','');
+          $('#alarmTitle').css('color', '');
         }
 
       });
@@ -168,6 +168,9 @@ $(document).ready(function () {
       $('.saveChangeButton').prop('disabled', false);
       //Disable vertical slider
       $('.slider-vertical').siblings('input').bootstrapSlider('disable');
+      //Clear chart data
+      clearChartData();
+
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
       socket.off('/' + deviceID + '/resHistory');
@@ -200,7 +203,7 @@ $(document).ready(function () {
         var _selectedItem = $(this).find('td');
         if (_selectedItem[7].innerText != 'ACKED') {
           _resAlarm.resAlarm.push({
-            deviceID : deviceID,
+            deviceID: deviceID,
             source: _selectedItem[3].innerText,
             value: _selectedItem[4].innerText,
             message: _selectedItem[5].innerText,
@@ -210,7 +213,7 @@ $(document).ready(function () {
           })
         }
       });
-      
+
       if (_resAlarm.resAlarm.length > 0) socket.emit('/resAlarm', _resAlarm);
     }
   });
@@ -346,7 +349,7 @@ $(document).ready(function () {
     var _confirm = confirm('Do you want to publish your design? This cannot be back!');
     if (_confirm) {
       //Enable vertical slider first
-      for (i = 0 ; i < shapes.length ; i++) {
+      for (i = 0; i < shapes.length; i++) {
         if (shapes[i].id) {
           if (shapes[i].id.includes('verticalSlider')) {
             console.log(shapes[i]);
@@ -364,23 +367,23 @@ $(document).ready(function () {
       }
 
       var mainPageColor = $('#mainPage1')[0].style.background;
-    if (mainPageColor) mainPageColor = rgb2hex(mainPageColor);
+      if (mainPageColor) mainPageColor = rgb2hex(mainPageColor);
 
-    var alarmPageColor = $('#alarm')[0].style.background;
-    if (alarmPageColor) alarmPageColor = rgb2hex(alarmPageColor);
+      var alarmPageColor = $('#alarm')[0].style.background;
+      if (alarmPageColor) alarmPageColor = rgb2hex(alarmPageColor);
 
-    var historyPageColor = $('#history')[0].style.background;
-    if (historyPageColor) historyPageColor = rgb2hex(historyPageColor);
+      var historyPageColor = $('#history')[0].style.background;
+      if (historyPageColor) historyPageColor = rgb2hex(historyPageColor);
 
-    var dashboardPageColor = $('#dashboard')[0].style.background;
-    if (dashboardPageColor) dashboardPageColor = rgb2hex(dashboardPageColor);
+      var dashboardPageColor = $('#dashboard')[0].style.background;
+      if (dashboardPageColor) dashboardPageColor = rgb2hex(dashboardPageColor);
 
-    var backgroundObject = {
-      mainPage : mainPageColor,
-      alarmPage : alarmPageColor,
-      historyPage : historyPageColor,
-      dashboardPage : dashboardPageColor
-    }
+      var backgroundObject = {
+        mainPage: mainPageColor,
+        alarmPage: alarmPageColor,
+        historyPage: historyPageColor,
+        dashboardPage: dashboardPageColor
+      }
 
 
       socket.emit('/publish', _sendObject, backgroundObject);
@@ -403,25 +406,25 @@ $(document).ready(function () {
   //Settings: Change background color
   $('#settingModal').on('show.bs.modal', function () {
     var mainPageColor = $('#mainPage1')[0].style.background;
-    if (mainPageColor) $('#mainPageColor').prop({'value' : rgb2hex(mainPageColor)});
+    if (mainPageColor) $('#mainPageColor').prop({ 'value': rgb2hex(mainPageColor) });
 
     var alarmPageColor = $('#alarm')[0].style.background;
-    if (alarmPageColor) $('#alarmPageColor').prop({'value' : rgb2hex(alarmPageColor)});
+    if (alarmPageColor) $('#alarmPageColor').prop({ 'value': rgb2hex(alarmPageColor) });
 
     var historyPageColor = $('#history')[0].style.background;
-    if (historyPageColor) $('#historyPageColor').prop({'value' : rgb2hex(historyPageColor)});
+    if (historyPageColor) $('#historyPageColor').prop({ 'value': rgb2hex(historyPageColor) });
 
     var dashboardPageColor = $('#dashboard')[0].style.background;
-    if (dashboardPageColor) $('#dashboardPageColor').prop({'value' : rgb2hex(dashboardPageColor) });
+    if (dashboardPageColor) $('#dashboardPageColor').prop({ 'value': rgb2hex(dashboardPageColor) });
   });
 
-  $('#btnSaveColors').click(function(){
+  $('#btnSaveColors').click(function () {
     console.log($('#mainPageColor').prop('value') + ' !important');
     //$('#mainPage1')[0].style.cssText = '#ff0000';
-    $('#mainPage1')[0].style.setProperty('background' , $('#mainPageColor').prop('value'), 'important');
-    $('#alarm')[0].style.setProperty('background' , $('#alarmPageColor').prop('value'), 'important');
-    $('#history')[0].style.setProperty('background' , $('#historyPageColor').prop('value'), 'important');
-    $('#dashboard')[0].style.setProperty('background' , $('#dashboardPageColor').prop('value'), 'important');
+    $('#mainPage1')[0].style.setProperty('background', $('#mainPageColor').prop('value'), 'important');
+    $('#alarm')[0].style.setProperty('background', $('#alarmPageColor').prop('value'), 'important');
+    $('#history')[0].style.setProperty('background', $('#historyPageColor').prop('value'), 'important');
+    $('#dashboard')[0].style.setProperty('background', $('#dashboardPageColor').prop('value'), 'important');
   });
 
 });
@@ -437,6 +440,7 @@ $(document).ready(function () {
 const draw = SVG('mainPage1');
 const shapes = [];
 const draggableObjects = [];
+const arrChartJS = [];
 let index = 0;
 let shape;
 let selectedItemId;
@@ -462,7 +466,7 @@ const defaultLineOption = {
 //Add context menu
 function addContextMenu() {
   $('.contextMenu').on('contextmenu', function (e) {
-   
+
     selectedItemId = e.target.id;
     if (!selectedItemId) {
       selectedItemId = e.target.parentNode.id;
@@ -498,7 +502,7 @@ function addContextMenu() {
 function removeItem() {
   if (selectedItemId) {
     var item = document.getElementById(selectedItemId);
-    if (selectedItemId.includes('verticalSlider')) {
+    if (selectedItemId.includes('verticalSlider') || selectedItemId.includes('chart')) {
       $(item.parentNode).remove();
     }
     else item.parentNode.removeChild(item);
@@ -528,12 +532,18 @@ function removeItem() {
       }
     }
 
+    for (var chartItem of arrChartJS) {
+      if (chartItem.id == selectedItemId) {
+        arrChartJS.splice(arrChartJS.indexOf(chartItem), 1);
+        break;
+      }
+    }
+
     var _foundIndex = findElementHTMLById(selectedItemId);
     if (_foundIndex != -1) elementHTML.splice(_foundIndex, 1);
   };
 
   selectedItemId = '';
-
 }
 
 var hexDigits = new Array
@@ -680,7 +690,7 @@ function initSCADA(_shapes, _socket) {
   })
 }
 
-function SCADA(arrHtmlElems, variableName) {
+function SCADA(arrHtmlElems, variableName, variableTimestamp) {
   shapes.forEach(function (_shape) {
     var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
     console.log(_id);
@@ -713,15 +723,15 @@ function SCADA(arrHtmlElems, variableName) {
         scadaSliderObject(_shape, variableName);
         break;
       }
-      case 'verticalslider' : {
-        scadaVerticalSliderObject(_shape , variableName);
+      case 'verticalslider': {
+        scadaVerticalSliderObject(_shape, variableName);
         break;
       }
       case 'progressbar': {
         scadaProgressBarObject(_shape, variableName);
         break;
       }
-      case 'verticalprogressbar' : {
+      case 'verticalprogressbar': {
         scadaVerticalProgressBarObject(_shape, variableName);
         break;
       }
@@ -733,6 +743,10 @@ function SCADA(arrHtmlElems, variableName) {
         scadaSymbolSetObject(_shape, variableName);
         break;
       }
+      case 'chartdiv' : {
+        scadaChartObject(_shape, variableName, variableTimestamp);
+        break;
+      }
       default: {
         if ($(_shape).find('span')[0]) {
           scadaSwitchObject(_shape, variableName);
@@ -741,7 +755,7 @@ function SCADA(arrHtmlElems, variableName) {
         } else {
           scadaSvgObject(_shape, variableName);
         }
-        
+
       }
     }
   })
@@ -879,10 +893,10 @@ function scadaVerticalProgressBarObject(item, variableName) {
         var _height = (eval(item.tag) - item.min) / _range * 100 + '%';
         var _top = (100 - (eval(item.tag) - item.min) / _range * 100) + '%';
       }
-      
+
       $(item).children('div').css({
         'height': _height,
-        'top' : _top,
+        'top': _top,
       });
       if (item.isHideLabel) $(item).children('div').text('');
       else {
@@ -989,7 +1003,7 @@ function scadaVerticalSliderObject(item, variableName) {
 
   if (item.tag) {
     if (item.tag.includes(variableName)) {
-     $(item).bootstrapSlider('setValue' , eval(item.tag))
+      $(item).bootstrapSlider('setValue', eval(item.tag))
     }
   }
 
@@ -1015,21 +1029,58 @@ function findElementHTMLById(_id) {
   return -1;
 }
 
+//Chart scada
+function scadaChartObject(item, variableName, variableTimestamp) {
+  var canvas = $(item).find('canvas')[0];
+  if (canvas) {
+    var foundChartIndex = findChartById(canvas.id);
+    if (foundChartIndex != -1) {  //Found chart JS object
+      if (canvas.tag) {
+        if (canvas.tag.includes(variableName)) {
+          var label = moment(variableTimestamp).format('MM:mm:ss');
+          var data = eval(canvas.tag);
+          addChartData(arrChartJS[foundChartIndex].node, label, data);
+        }
+      };
+      if (canvas.hiddenWhen) {
+        if (canvas.hiddenWhen.includes(variableName)) {
+          if (eval(canvas.hiddenWhen)) $(item).hide();
+          else $(item).show();
+        }
+      }
+      
+    }
+  }
+}
+
+function findChartById(_id) {
+  for (var i = 0; i < arrChartJS.length; i++) {
+    if (arrChartJS[i].id == _id) return i;
+  }
+  return -1;
+}
+
 //Fix tooltip for vertical slider
 function fixTooltip(sliderID) {
-  
-  $('.slider-vertical').each(function() {
+
+  $('.slider-vertical').each(function () {
     $(this).children('.tooltip')[0].classList.add('bs-tooltip-left');
-    $(this).children('.tooltip')[0].childNodes[0].classList.add('arrow' , 'my-2');
+    $(this).children('.tooltip')[0].childNodes[0].classList.add('arrow', 'my-2');
   })
-  
-  
+
+
   //Fix background color
-  $('.slider-vertical').find('.slider-handle').each(function(){
-    $(this).css({background : '#007bff'})
+  $('.slider-vertical').find('.slider-handle').each(function () {
+    $(this).css({ background: '#007bff' })
   });
 }
 
+//Update data for chart
+function addChartData(chart, label, data) {
+  chart.data.labels.push(label);
+  chart.data.datasets[0].data.push(data);
+  chart.update();
+}
 /*
 ***********************************************************************************************
                                 Create object functions 
@@ -1550,7 +1601,7 @@ var drawPolygon = function () {
           catch {
 
           }
-          
+
         }
 
         if (element) {
@@ -1678,7 +1729,7 @@ var drawPolyline = function () {
           } catch {
 
           }
-          
+
         }
 
         if (element) {
@@ -1835,6 +1886,14 @@ function addNewSymbolSet() {
   $('#mainPage1').on('mousedown', symbolsetMouseDownEventHandler);
 }
 
+//Add new chart
+function addNewChart() {
+  stopDraw(false);
+  $('#mainPage1').on('mousedown', chartMouseDownEventHandler);
+}
+
+
+
 /*
 ***********************************************************************************************
                                 Stop drawing function 
@@ -1856,6 +1915,7 @@ var stopDraw = function (addContext) {
   $('#mainPage1').off('mousedown', processbarMouseDownEventHandler);
   $('#mainPage1').off('mousedown', verticalProcessbarMouseDownEventHandler);
   $('#mainPage1').off('mousedown', symbolsetMouseDownEventHandler);
+  $('#mainPage1').off('mousedown', chartMouseDownEventHandler);
 
   if (addContext) addContextMenu();
 }
@@ -2457,7 +2517,7 @@ function buttonMouseDownEventHandler(event) {
   $('.draggable').draggable({
     refreshPositions: true,
     containment: $('#mainPage1'),
-    cancel : false,
+    cancel: false,
   });
 
 
@@ -2745,7 +2805,7 @@ function inputMouseDownEventHandler(event) {
   $('.draggable').draggable({
     refreshPositions: true,
     containment: $('#mainPage1'),
-    cancel : false,
+    cancel: false,
   });
 
 
@@ -3134,7 +3194,7 @@ function sliderMouseDownEventHandler(event) {
   $('.draggable').draggable({
     refreshPositions: true,
     containment: $('#mainPage1'),
-    cancel : false
+    cancel: false
   });
 
 }
@@ -3152,7 +3212,7 @@ function verticalSliderMouseDownEventHandler(event) {
   //verticalSlider.type = 'text';
   verticalSliderDiv.className = ' contextMenu ';
   verticalSliderDiv.style.background = 'transparent';
-  
+
   var verticalSlider = document.createElement('input');
   verticalSlider.type = 'range';
   verticalSlider.id = 'verticalSlider' + index;
@@ -3166,8 +3226,8 @@ function verticalSliderMouseDownEventHandler(event) {
   verticalSliderDiv.style.position = 'absolute';
   verticalSliderDiv.style.top = top;
   verticalSliderDiv.style.left = left;
-  
-  
+
+
 
   verticalSliderDiv.append(verticalSlider);
   $('#mainPage1').append(verticalSliderDiv);
@@ -3178,9 +3238,9 @@ function verticalSliderMouseDownEventHandler(event) {
     max: verticalSlider.max,
     value: 50,
     orientation: 'vertical',
-    tooltip_position:'left',
-    reversed : true,
-    enabled : false,
+    tooltip_position: 'left',
+    reversed: true,
+    enabled: false,
   });
 
   fixTooltip(); //Fix tooltip for vertical slider
@@ -3242,7 +3302,7 @@ function verticalSliderMouseDownEventHandler(event) {
     var elem = $(mouseEvent.target).closest('.slider')[0];
     $('#verticalSliderModal').one('show.bs.modal', function (showEvent) {
 
-      var elemHeight = elem.style.height ;
+      var elemHeight = elem.style.height;
       if (elemHeight) elemHeight = parseInt(elemHeight, 10);
 
       var _input = $(elem).siblings('input')[0];
@@ -3307,7 +3367,7 @@ function verticalSliderMouseDownEventHandler(event) {
         else _input.isMinTag = false;
 
         if (itemModal.querySelector('.inputMaxTag').value)
-        _input.isMaxTag = true;
+          _input.isMaxTag = true;
         else _input.isMaxTag = false;
 
         var _foundIndex = findElementHTMLById(_input.id);
@@ -3382,7 +3442,7 @@ function verticalSliderMouseDownEventHandler(event) {
   $('.draggable').draggable({
     refreshPositions: true,
     containment: $('#mainPage1'),
-    cancel : false
+    cancel: false
   });
 
 }
@@ -3573,7 +3633,7 @@ function processbarMouseDownEventHandler(event) {
         progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
         progressElement.isRawValue = itemModal.querySelector('#rawValueCheckbox').checked;
-        
+
 
         if (itemModal.querySelector('.inputMinTag').value)
           progressElement.isMinTag = true;
@@ -3773,7 +3833,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
       var progressElement;
       var isHideLabel = false;
       var isRawValue = false;
-      
+
       if (selectedItem.id) { //Progress is chosen
         progressElement = selectedItem;
         elemWidth = parseInt(selectedItem.style.width, 10);
@@ -3856,7 +3916,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
         progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
         progressElement.isHideLabel = itemModal.querySelector('#hideVerticalLabelCheckbox').checked;
         progressElement.isRawValue = itemModal.querySelector('#rawVerticalValueCheckbox').checked;
-        
+
 
         if (itemModal.querySelector('.inputMinTag').value)
           progressElement.isMinTag = true;
@@ -4126,4 +4186,276 @@ function symbolsetMouseDownEventHandler(event) {
     containment: $('#mainPage1'),
   });
 
+}
+
+//Chart mouse down event handler: To create new chart
+function chartMouseDownEventHandler(event) {
+  var leftOffset = document.getElementById('mainPage1').getBoundingClientRect().left;
+  var topOffset = document.getElementById('mainPage1').getBoundingClientRect().top;
+
+  var left = event.pageX - leftOffset + 'px';
+  var top = event.pageY - topOffset + 'px';
+
+  //Add a new div
+  var canvas = document.createElement('canvas');
+  canvas.className = 'chart contextMenu';
+  canvas.id = 'chart' + index;
+  canvas.xLabel = 'Time';
+  canvas.yLabel = 'Value';
+  canvas.timeRange = 60000;
+
+  var chartDiv = document.createElement('div');
+  chartDiv.id = 'chartDiv' + index;
+  chartDiv.appendChild(canvas);
+
+  //Chart css style
+  chartDiv.style.position = 'absolute';
+  chartDiv.style.top = top;
+  chartDiv.style.left = left;
+
+  canvas.style.height = '200px';
+  canvas.style.width = '500px';
+
+  //canvas.style.background = 'green';
+
+  //Create elementHTML object
+  var _chartObj = {
+    type: 'chart',
+    id: canvas.id,
+    properties: [
+      {
+        name: 'tag',
+        value: ''
+      },
+      {
+        name: 'hiddenWhen',
+        value: ''
+      },
+      {
+        name: 'xLabel',
+        value: ''
+      },
+      {
+        name: 'yLabel',
+        value: ''
+      },
+    ]
+  }
+
+  elementHTML.push(_chartObj);
+
+  //Create chart
+  var ctx1 = canvas.getContext('2d');
+  var newChart = new Chart(ctx1, {
+    // The type of chart we want to create
+    type: 'line',
+    // The data for our dataset
+    data: {
+      labels: [],
+      datasets: [{
+        steppedLine: false,
+        backgroundColor: 'rgba(57,172,180 , 0.8)',
+        hoverBackgroundColor: 'rgba(57,172,180 , 0.3)',
+        data: [],
+        label: 'Value',
+        // backgroundColor: 'rgb(255, 255, 255, 0.2)',
+        borderColor: 'rgb(0,102,10)',
+        borderWidth: 2,
+        pointRadius: 0,
+      }]
+    },
+
+    // Configuration options go here
+    options: {
+      legend: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      title: {
+        display: false,
+        // text: option.title,
+        // fontColor: 'white',
+        // fontSize: 20
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false,
+        titleFontSize: 16,
+        bodyFontSize: 16
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: true
+      },
+      scales: {
+        xAxes: [{
+          display: true,
+          // type : 'realtime',
+          scaleLabel: {
+            display: true,
+            labelString: canvas.xLabel,
+          },
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          },
+          display: true,
+          gridLines: {
+            color: '#282525'
+          },
+          scaleLabel: {
+            display: true,
+            labelString: canvas.yLabel,
+          }
+        }]
+      },
+       
+      }
+  });
+  arrChartJS.push({id : canvas.id, node : newChart});
+  console.log(arrChartJS)
+
+
+  //Image mouse events
+  $(canvas).on('mouseover', function (event) {
+    //event.target.style.opacity = 0.4;
+    event.target.style.cursor = 'pointer';
+  });
+  //Subscribe mouseout event for each polygon
+  // $(canvas).on('mouseout', function (event) {
+  //   event.target.style.opacity = 1;
+  // });
+  //Subscribe mouse double click event
+  $(canvas).on('dblclick', function (mouseEvent) {
+    $('#chartModal').one('show.bs.modal', function (showEvent) {
+
+      var selectedItem = mouseEvent.target; //Canvas selected
+      var elemWidth, elemHeight;
+
+      elemWidth = parseInt(selectedItem.style.width, 10);
+      elemHeight = parseInt(selectedItem.style.height, 10);
+
+      var itemModal = $('#chartModal')[0];
+      itemModal.querySelector('.inputWidth').value = elemWidth;
+      itemModal.querySelector('.inputHeight').value = elemHeight;
+
+      if (selectedItem.tag) {
+        itemModal.querySelector('.inputValue').value = selectedItem.tag;
+      }
+      else {
+        itemModal.querySelector('.inputValue').value = '';
+      }
+
+      if (selectedItem.xLabel) {
+        itemModal.querySelector('.inputXLabel').value = selectedItem.xLabel;
+      }
+      else {
+        itemModal.querySelector('.inputXLabel').value = '';
+      }
+
+      if (selectedItem.yLabel) {
+        itemModal.querySelector('.inputYLabel').value = selectedItem.yLabel;
+      }
+      else {
+        itemModal.querySelector('.inputYLabel').value = '';
+      }
+
+      // if (selectedItem.timeRange) {
+      //   itemModal.querySelector('.inputTimeRange').value = selectedItem.timeRange;
+      // }
+      // else {
+      //   itemModal.querySelector('.inputTimeRange').value = '';
+      // }
+
+      if (selectedItem.hiddenWhen) {
+        itemModal.querySelector('.inputHiddenWhen').value = selectedItem.hiddenWhen;
+      }
+      else {
+        itemModal.querySelector('.inputHiddenWhen').value = '';
+      }
+
+
+      //Button save 
+      $('.saveChangeButton').on('click', function (event) {
+
+        selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+        selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+        selectedItem.tag = itemModal.querySelector('.inputValue').value;
+        selectedItem.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+        selectedItem.xLabel = itemModal.querySelector('.inputXLabel').value;
+        selectedItem.yLabel = itemModal.querySelector('.inputYLabel').value;
+        //selectedItem.timeRange = itemModal.querySelector('.inputTimeRange').value;
+
+        var _foundIndex = findElementHTMLById(selectedItem.id);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = selectedItem.tag;
+          elementHTML[_foundIndex].properties[1].value = selectedItem.hiddenWhen;
+          elementHTML[_foundIndex].properties[2].value = selectedItem.xLabel;
+          elementHTML[_foundIndex].properties[3].value = selectedItem.yLabel;
+          // elementHTML[_foundIndex].properties[4].value = selectedItem.timeRange;
+        }
+
+        var foundChartIndex = findChartById(selectedItem.id);
+        if (foundChartIndex != -1) {
+          arrChartJS[foundChartIndex].node.options.scales.xAxes[0].scaleLabel.labelString = selectedItem.xLabel;
+          arrChartJS[foundChartIndex].node.options.scales.yAxes[0].scaleLabel.labelString = selectedItem.yLabel;
+          arrChartJS[foundChartIndex].node.update();
+        }
+      });
+
+      //Button Value browse tag
+      $('.btnValueTag').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnHiddenWhen').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+    });
+
+    $('#chartModal').one('hide.bs.modal', function (hideEvent) {
+      $('.saveChangeButton').off('click');
+      $('.btnValueTag').off('click');
+      $('.btnHiddenWhen').off('click');
+    });
+
+    $('#chartModal').modal();
+  });
+
+  $('#mainPage1').append(chartDiv);
+  shapes[index] = chartDiv;
+  index++;
+  console.log(chartDiv);
+
+  //Add draggable feature
+  // draggable = new PlainDraggable(progressbar, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+  chartDiv.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+  });
+
+
+}
+
+//Clear all chart data when press STOP
+function clearChartData() {
+  for (var i = 0; i < arrChartJS.length; i++) {
+    arrChartJS[i].node.data.labels = [];
+    arrChartJS[i].node.data.datasets[0].data = [];
+    arrChartJS[i].node.update();
+  }
 }

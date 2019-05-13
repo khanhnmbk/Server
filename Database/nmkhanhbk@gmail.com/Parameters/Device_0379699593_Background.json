@@ -1,6 +1,6 @@
 {
-    "mainPage": "#ff0000",
-    "alarmPage": "#008000",
-    "historyPage": "#ffffff",
-    "dashboardPage": "#ffffff"
+    "mainPage": "",
+    "alarmPage": "",
+    "historyPage": "",
+    "dashboardPage": ""
 }

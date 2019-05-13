@@ -21,17 +21,17 @@ var databasePath = '../Server/Database';
 var certificatePath = '../Server/public/certificate/mqtt_ca.crt';
 
 //MQTT VARIABLES
-// let mqttHost = '127.0.0.1';
-// let mqttPort = 1883;
-let mqttHost = '45.124.94.180';
-let mqttPort = 8883;
+let mqttHost = '127.0.0.1';
+let mqttPort = 1883;
+// let mqttHost = '45.124.94.180';
+// let mqttPort = 8883;
 let trustedCA = fs.readFileSync(certificatePath);
 let mqttOptions = {
   host: mqttHost,
   port: mqttPort,
   rejectUnauthorized: false,
   ca: trustedCA,
-  protocol: 'mqtts'
+  //protocol: 'mqtts'
 }
 
 

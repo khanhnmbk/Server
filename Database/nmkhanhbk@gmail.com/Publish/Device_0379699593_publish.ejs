@@ -69,7 +69,7 @@
                             <i
                                 class="fas fa-exclamation-triangle mr-1"></i><strong>Warning!</strong> New alarm
                         </div> -->
-                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg></div>
+                    <svg id="SvgjsSvg1001" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs"><defs id="SvgjsDefs1002"></defs></svg><div id="chartDiv0" class="draggable ui-draggable ui-draggable-handle" style="position: absolute; top: 242px; left: 160.5px;"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div><canvas class="chart contextMenu chartjs-render-monitor" id="chart0" width="500" height="200" style="height: 200px; width: 500px; display: block; cursor: pointer;"></canvas></div><div id="chartDiv1" style="position: absolute; top: 574px; left: 161.5px;" class="draggable ui-draggable ui-draggable-handle"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div><canvas class="chart contextMenu chartjs-render-monitor" id="chart1" width="500" height="200" style="height: 200px; width: 500px; display: block; cursor: pointer;"></canvas></div></div>
                     <div id="alarm" class="container-fluid tab-pane fade bg-white full-height px-2">
                         <div class="row pt-3 px-2">
                             <button class="btn btn-primary ml-auto mr-5" id="btnAck">Acknowledge</button>
@@ -194,6 +194,10 @@
     
     
     <script src="/javascripts/socket.io.js"></script>
+         
+  <script src="/javascripts/moment.js"></script>
+  <script src="/javascripts/Chart.min.js"></script>
+  <script src="/javascripts/hammer.js"></script>
     
     <script src="/javascripts/Myscripts/publish.js"></script>
 

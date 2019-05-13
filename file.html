@@ -6,62 +6,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <!-- Font Awesome CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Bootstrap form helpers -->
-    <link rel="stylesheet" href="public/stylesheets/bootstrap-slider.min.css">
-    <!-- Own style -->
-    <link rel="stylesheet" href="/public/stylesheets/publish-style.css">
+
+
 
     <title>Published Page</title>
 
-    <style>
-
-  
-
-    .slider.slider-horizontal:hover .tooltip.tooltip-main.top .tooltip-arrow:after,
-.slider.slider-vertical:hover .tooltip.tooltip-main.top .tooltip-arrow:after {
-  content: '';
-  width: 0;
-  height: 0;
-  position: absolute;
-  left: 40%;
-  bottom: -10px;
-  border: transparent 5px solid;
-  border-top: #000 5px solid;
-}
-
-    </style>
 </head>
 
 <body >
     <!------------------------ MAIN PAGE ------------------------->
-<div class="container p-5 mt-5">
-    <button id="button">Rotate</button>
-    <button id="btnHide">Hide</button>
-    <button id="btnEnable">Enable</button>
-    <button id="btnSet">Set value</button>
-    <div id="wrapper">
-      <input type="range" id="verticalSlider">
+    <div >
+      <canvas style="width : 500px; height: 200px;" id="chart"></canvas>
     </div>
-   
-
-</div>
- 
-<div style="height:500px; width : 100px">
-  <canvas style="height : 100%; width : 100%">Helo</canvas>
-</div>    
+    <button id="pause">Pause</button>
 
 
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="public/javascripts/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="public/javascripts/bootstrap-slider.min.js"></script>
+    <script src="public/javascripts/jquery-3.3.1.min.js"></script>
+     <!-- Chart -->
+  <script src="public/javascripts/moment.js"></script>
+  <script src="public/javascripts/Chart.min.js"></script>
+  <script src="public/javascripts/hammer.js"></script>
+  <script src="public/javascripts/chartjs-plugin-zoom.js"></script>
+  <script src="public/javascripts/chartjs-plugin-streaming.min.js"></script>
     <!-- Bootstrap form helper script -->
    
     <!-- Context menu script -->
@@ -72,51 +40,75 @@
     <!-- My script -->
     <script src="public/javascripts/Myscripts/publish.js"></script>
     <script>
-        $('#button').click(function(){
-            $('#verticalSlider').bootstrapSlider({
-              min: 0,
-	max: 100,
-	value: 0,
-  orientation: 'vertical',
-  tooltip : 'show',
-  tooltip_position:'left',
-  reversed : true,
-   enabled : false
-            });
-
-            fixTooltip();
-
-          //  $('#wrapper').addClass('draggable');
-            $('.draggable').draggable({
-          cancel : false
-        })
-        });
-
-      var search = $('#wrapper').find('*');
-      console.log(search);
-        function fixTooltip() {
-          $('.tooltip.tooltip-main').css({
-            'opacity' : 0.7
-          })
-          $('.slider-vertical').children('.tooltip')[0].classList.add('bs-tooltip-left');
-            $('.slider-vertical').children('.tooltip')[0].childNodes[0].classList.add('arrow' , 'my-2');
+      var i = 0;
+      $('#pause').click(function() {
+        console.log('Click')
+        if (i == 0) {
+          myChart.options.plugins.streaming.pause = true;
+          i = 1;
+        } else {
+          myChart.options.plugins.streaming.pause = false;
+          i = 0;
         }
         
-      $('#btnHide').click(function() {
-        $('#verticalSlider').hide();
       })
+        var ctx2 = document.getElementById('chart').getContext('2d');
+    var myChart = new Chart(ctx2, {
+        // The type of chart we want to create
+        type: 'line',
+        // The data for our dataset
+        data: {
+            datasets: [{
+                label: 'Speed',
+                // backgroundColor: 'rgb(255, 255, 255, 0.2)',
+                borderColor: 'rgb(0,102,10)',
+                borderWidth: 2,
+            }]
+        },
 
-      $('#btnEnable').click(function() {
-        $('#verticalSlider').bootstrapSlider('enable');
-        $('#verticalSlider').on('input', function() {
-          console.log('Change');
-        })
-      })
-
-      $('#btnSet').click(function() {
-         $('#wrapper').remove()
-        
-      })
+        // Configuration options go here
+        options: {
+            legend: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            title: {
+                display: true,
+                text: 'Motor 2: Speed now',
+                fontColor: 'white',
+                fontSize: 20
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+                titleFontSize: 16,
+                bodyFontSize: 16
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Timestamp'
+                    },
+                   
+                }],
+                yAxes: [{
+                    display: true,
+                    gridLines: {
+                        color: '#282525'
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'RPM'
+                    }
+                }]
+            }
+        }
+    });
     </script>
 </body>
 
