@@ -82,13 +82,13 @@ mqttClient.on('message', function (topic, message) {
     if (statusObject) {
       console.log(statusObject.deviceID);
       recursive(databasePath, function (err, files) {
-        if (err) throw err;
+        if (err) console.log(err);
         console.log(files);
         for (var file of files) {
           if (file.includes(statusObject.deviceID + '.json')) {
             var filePath = file;
             fs.readFile(filePath, function (err, data) {
-              if (err) throw err;
+              if (err) console.log(err);
               var object = JSON.parse(data);
               object.status = statusObject.status;
               object.lastActive = statusObject.timestamp;

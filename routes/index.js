@@ -30,7 +30,7 @@ router.get('/register', checkLogin, function(req, res, next) {
 router.post('/register', function(req, res, next) {
   userModel.getUserByEmail(req.body.email, function (err,userFound) { 
     var errors = [];
-    if (err) throw err;
+    if (err) console.log(err);
     if (userFound){
      var err = {};
       err.msg = "Existing email address";
@@ -66,11 +66,11 @@ passport.use(new LocalStrategy({
   },
   function(username, password, done) {
   userModel.getUserByEmail(username,function (err,userFound) { 
-    if (err) throw err;
+    if (err) console.log(err);
     if (!userFound) 
       return done(null,false,{message : 'This email does not exist. Please register before'});
     userModel.checkPassword(password,userFound.password,function (err, isMatch) { 
-      if (err) throw err;
+      if (err) console.log(err);
       if (isMatch) 
         return done(null,userFound);
       else return done(null,false,{message : 'Wrong password'});
@@ -157,7 +157,7 @@ router.get('/design/:user/:filename', checkAuthtication, function(req, res, next
       callback();
     }
   ] , function (err) { 
-    if (err) throw err;
+    if (err) console.log(err);
     console.log(arrSymbols);
     res.render('designPage', {user : req.user.email , variableList : variableList , deviceID : deviceID , arrSymbols : arrSymbols});
     
