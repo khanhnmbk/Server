@@ -443,6 +443,7 @@ const draggableObjects = [];
 const arrChartJS = [];
 const arrGauge = [];
 let index = 0;
+let nameIndex = 0;
 let shape;
 let selectedItemId;
 const deviceID = $('#deviceID').text();
@@ -2013,7 +2014,7 @@ function imageMouseDownEventHandler(event) {
   //Declare new image
   var defaultImageSrc = '../../images/png/default-image.png';
   shapes[index] = document.createElement('img');
-  shapes[index].id = 'img' + index;
+  shapes[index].id = 'img' + nameIndex;
   shapes[index].className += ' contextMenu '
 
 
@@ -2141,9 +2142,7 @@ function imageMouseDownEventHandler(event) {
   });
 
   index++;
-
-
-
+  nameIndex++;
 }
 
 //Text mouse down event handler: To create new text
@@ -2158,7 +2157,7 @@ function textMouseDownEventHandler(event) {
   var para = document.createElement('p');
   var text = document.createTextNode('Textblock');
   para.appendChild(text);
-  para.id = 'text' + index;
+  para.id = 'text' + nameIndex;
   para.className += ' contextMenu ';
 
 
@@ -2253,6 +2252,7 @@ function textMouseDownEventHandler(event) {
   $('#mainPage1').append(para);
   shapes[index] = para;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   draggable = new PlainDraggable(para, { leftTop: true });
@@ -2273,7 +2273,7 @@ function displayValueMouseDownEventHandler(event) {
   var para = document.createElement('p');
   var text = document.createTextNode('##.##');
   para.appendChild(text);
-  para.id = 'displayValue' + index;
+  para.id = 'displayValue' + nameIndex;
   para.className += ' contextMenu '
 
   //Image css style
@@ -2401,14 +2401,13 @@ function displayValueMouseDownEventHandler(event) {
   $('#mainPage1').append(para);
   shapes[index] = para;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   draggable = new PlainDraggable(para, { leftTop: true });
   draggable.autoScroll = true;
   draggable.containment = document.getElementById('mainPage1');
   draggableObjects.push(draggable);
-
-
 }
 
 //Button mouse down event handler: To create new button
@@ -2423,7 +2422,7 @@ function buttonMouseDownEventHandler(event) {
   var btn = document.createElement('button');
   var text = document.createTextNode('Button');
   btn.appendChild(text);
-  btn.id = 'button' + index;
+  btn.id = 'button' + nameIndex;
 
   //Image css style
   btn.className = 'btn btn-primary contextMenu ';
@@ -2573,6 +2572,7 @@ function buttonMouseDownEventHandler(event) {
   $('#mainPage1').append(btn);
   shapes[index] = btn;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(btn, { leftTop: true });
@@ -2607,7 +2607,7 @@ function switchMouseDownEventHandler(event) {
 
   var spansw = document.createElement('span');
   spansw.className = 'slider-sw round';
-  spansw.id = 'switch' + index;
+  spansw.id = 'switch' + nameIndex;
 
   sw.appendChild(inputsw);
   sw.appendChild(spansw);
@@ -2729,6 +2729,7 @@ function switchMouseDownEventHandler(event) {
   $('#mainPage1').append(sw);
   shapes[index] = sw;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   draggable = new PlainDraggable(sw, { leftTop: true });
@@ -2750,7 +2751,7 @@ function inputMouseDownEventHandler(event) {
   //Declare new paragrap
   var input = document.createElement('input');
   input.type = 'number';
-  input.id = 'input' + index;
+  input.id = 'input' + nameIndex;
   input.placeholder = 'Add value ...';
 
   //Image css style
@@ -2861,6 +2862,7 @@ function inputMouseDownEventHandler(event) {
   $('#mainPage1').append(input);
   shapes[index] = input;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(input, { leftTop: true });
@@ -2893,13 +2895,13 @@ function checkboxMouseDownEventHandler(event) {
   var cbInput = document.createElement('input');
   cbInput.type = 'checkbox';
   cbInput.className = 'custom-control-input';
-  cbInput.id = 'cbInput' + index;
+  cbInput.id = 'cbInput' + nameIndex;
 
   var cbLabel = document.createElement('label');
   cbLabel.className = 'custom-control-label';
-  cbLabel.htmlFor = 'cbInput' + index;
+  cbLabel.htmlFor = 'cbInput' + nameIndex;
   cbLabel.innerText = 'Checkbox';
-  cbLabel.id = 'checkbox' + index;
+  cbLabel.id = 'checkbox' + nameIndex;
 
   checkbox.appendChild(cbInput);
   checkbox.appendChild(cbLabel);
@@ -3023,14 +3025,13 @@ function checkboxMouseDownEventHandler(event) {
   $('#mainPage1').append(checkbox);
   shapes[index] = checkbox;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   draggable = new PlainDraggable(checkbox, { leftTop: true });
   draggable.autoScroll = true;
   draggable.containment = document.getElementById('mainPage1');
   draggableObjects.push(draggable);
-
-
 }
 
 //Slider mouse down event handler: To create new Checkbox
@@ -3045,7 +3046,7 @@ function sliderMouseDownEventHandler(event) {
   var slider = document.createElement('input');
   slider.type = 'range';
   slider.className = 'custom-range contextMenu ';
-  slider.id = 'slider' + index;
+  slider.id = 'slider' + nameIndex;
   slider.min = 0;
   slider.max = 100;
   slider.minValue = slider.min;
@@ -3250,6 +3251,7 @@ function sliderMouseDownEventHandler(event) {
   $('#mainPage1').append(slider);
   shapes[index] = slider;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(slider, { leftTop: true });
@@ -3281,7 +3283,7 @@ function verticalSliderMouseDownEventHandler(event) {
 
   var verticalSlider = document.createElement('input');
   verticalSlider.type = 'range';
-  verticalSlider.id = 'verticalSlider' + index;
+  verticalSlider.id = 'verticalSlider' + nameIndex;
   verticalSlider.min = 0;
   verticalSlider.max = 100;
   verticalSlider.minValue = verticalSlider.min;
@@ -3498,6 +3500,7 @@ function verticalSliderMouseDownEventHandler(event) {
 
   shapes[index] = verticalSlider;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(slider, { leftTop: true });
@@ -3525,7 +3528,7 @@ function processbarMouseDownEventHandler(event) {
   //Declare new paragrap
   var progressbar = document.createElement('div');
   progressbar.className = 'progress contextMenu';
-  progressbar.id = 'progressbar' + index;
+  progressbar.id = 'progressbar' + nameIndex;
   progressbar.isHideLabel = false;
   progressbar.min = 0;
   progressbar.max = 100;
@@ -3776,6 +3779,7 @@ function processbarMouseDownEventHandler(event) {
   $('#mainPage1').append(progressbar);
   shapes[index] = progressbar;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(progressbar, { leftTop: true });
@@ -3803,7 +3807,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
   //Declare new paragrap
   var verticalProgressbar = document.createElement('div');
   verticalProgressbar.className = 'progress contextMenu vertical-progress ';
-  verticalProgressbar.id = 'verticalProgressbar' + index;
+  verticalProgressbar.id = 'verticalProgressbar' + nameIndex;
   verticalProgressbar.isHideLabel = false;
   verticalProgressbar.min = 0;
   verticalProgressbar.max = 100;
@@ -4059,6 +4063,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
   $('#mainPage1').append(verticalProgressbar);
   shapes[index] = verticalProgressbar;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(progressbar, { leftTop: true });
@@ -4086,7 +4091,7 @@ function symbolsetMouseDownEventHandler(event) {
   //Declare new image
   var defaultSymbolSet = '../../images/symbol-set/light-off.png';
   var symbolSet = document.createElement('img');
-  symbolSet.id = 'symbolSet' + index;
+  symbolSet.id = 'symbolSet' + nameIndex;
   symbolSet.className += ' contextMenu ';
   symbolSet.offSymbol = '';
   symbolSet.onSymbol = '';
@@ -4240,6 +4245,7 @@ function symbolsetMouseDownEventHandler(event) {
   $('#mainPage1').append(symbolSet);
   shapes[index] = symbolSet;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(symbolSet, { leftTop: true });
@@ -4265,13 +4271,13 @@ function chartMouseDownEventHandler(event) {
   //Add a new div
   var canvas = document.createElement('canvas');
   canvas.className = 'chart contextMenu';
-  canvas.id = 'chart' + index;
+  canvas.id = 'chart' + nameIndex;
   canvas.xLabel = 'Time';
   canvas.yLabel = 'Value';
   canvas.timeRange = 60000;
 
   var chartDiv = document.createElement('div');
-  chartDiv.id = 'chartDiv' + index;
+  chartDiv.id = 'chartDiv' + nameIndex;
   chartDiv.appendChild(canvas);
 
   //Chart css style
@@ -4500,6 +4506,7 @@ function chartMouseDownEventHandler(event) {
   $('#mainPage1').append(chartDiv);
   shapes[index] = chartDiv;
   index++;
+  nameIndex++;
   console.log(chartDiv);
 
   //Add draggable feature
@@ -4527,7 +4534,7 @@ function gaugeMouseDownEventHandler(event) {
 
   //Add a new div
   var gaugeDiv = document.createElement('div');
-  gaugeDiv.id = 'gauge' + index;
+  gaugeDiv.id = 'gauge' + nameIndex;
   gaugeDiv.className = 'gauge contextMenu';
 
   //Chart css style
@@ -4838,6 +4845,7 @@ function gaugeMouseDownEventHandler(event) {
 
   shapes[index] = gaugeDiv;
   index++;
+  nameIndex++;
 
   //Add draggable feature
   // draggable = new PlainDraggable(progressbar, { leftTop: true });
