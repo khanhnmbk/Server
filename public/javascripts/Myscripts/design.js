@@ -441,6 +441,7 @@ const draw = SVG('mainPage1');
 const shapes = [];
 const draggableObjects = [];
 const arrChartJS = [];
+const arrGauge = [];
 let index = 0;
 let shape;
 let selectedItemId;
@@ -466,10 +467,18 @@ const defaultLineOption = {
 //Add context menu
 function addContextMenu() {
   $('.contextMenu').on('contextmenu', function (e) {
-
     selectedItemId = e.target.id;
     if (!selectedItemId) {
       selectedItemId = e.target.parentNode.id;
+    };
+
+    //For gauge
+    if (!selectedItemId) {  
+      if(e.target.parentNode.tagName == 'svg') {  //This is gauge object
+        selectedItemId = e.target.parentNode.parentNode.id;
+      } else if(e.target.parentNode.tagName == 'text') {  //This is gauge object
+        selectedItemId = e.target.parentNode.parentNode.parentNode.id;
+      }
     }
 
     //For vertical slider
@@ -500,6 +509,7 @@ function addContextMenu() {
 
 //Delete element
 function removeItem() {
+  console.log("Selected Item: ", selectedItemId);
   if (selectedItemId) {
     var item = document.getElementById(selectedItemId);
     if (selectedItemId.includes('verticalSlider') || selectedItemId.includes('chart')) {
@@ -508,6 +518,7 @@ function removeItem() {
     else item.parentNode.removeChild(item);
 
     for (var elem of shapes) {
+      console.log(elem);
       try {
         if (elem.node.id == selectedItemId) {
           shapes.splice(shapes.indexOf(elem), 1);
@@ -535,6 +546,13 @@ function removeItem() {
     for (var chartItem of arrChartJS) {
       if (chartItem.id == selectedItemId) {
         arrChartJS.splice(arrChartJS.indexOf(chartItem), 1);
+        break;
+      }
+    }
+
+    for (var gaugeItem of arrGauge) {
+      if (gaugeItem.id == selectedItemId) {
+        arrGauge.splice(arrGauge.indexOf(gaugeItem), 1);
         break;
       }
     }
@@ -743,8 +761,12 @@ function SCADA(arrHtmlElems, variableName, variableTimestamp) {
         scadaSymbolSetObject(_shape, variableName);
         break;
       }
-      case 'chartdiv' : {
+      case 'chartdiv': {
         scadaChartObject(_shape, variableName, variableTimestamp);
+        break;
+      }
+      case 'gauge' : {
+        scadaGaugeObject(_shape, variableName);
         break;
       }
       default: {
@@ -1022,13 +1044,6 @@ function scadaVerticalSliderObject(item, variableName) {
   }
 }
 
-function findElementHTMLById(_id) {
-  for (i = 0; i < elementHTML.length; i++) {
-    if (elementHTML[i].id == _id) return elementHTML.indexOf(elementHTML[i]);
-  }
-  return -1;
-}
-
 //Chart scada
 function scadaChartObject(item, variableName, variableTimestamp) {
   var canvas = $(item).find('canvas')[0];
@@ -1048,14 +1063,49 @@ function scadaChartObject(item, variableName, variableTimestamp) {
           else $(item).show();
         }
       }
-      
+
     }
   }
+}
+
+//Gauge scada
+function scadaGaugeObject(item, variableName) {
+  if (item) {
+    var foundGaugeIndex = findGaugeById(item.id);
+    if (foundGaugeIndex != -1) {  //Found chart JS object
+      if (item.tag) {
+        if (item.tag.includes(variableName)) {
+          arrGauge[foundGaugeIndex].node.refresh(eval(item.tag));
+        }
+      };
+      if (item.hiddenWhen) {
+        if (item.hiddenWhen.includes(variableName)) {
+          if (eval(item.hiddenWhen)) $(item).hide();
+          else $(item).show();
+        }
+      }
+
+    }
+  }
+}
+
+function findElementHTMLById(_id) {
+  for (i = 0; i < elementHTML.length; i++) {
+    if (elementHTML[i].id == _id) return elementHTML.indexOf(elementHTML[i]);
+  }
+  return -1;
 }
 
 function findChartById(_id) {
   for (var i = 0; i < arrChartJS.length; i++) {
     if (arrChartJS[i].id == _id) return i;
+  }
+  return -1;
+}
+
+function findGaugeById(_id) {
+  for (var i = 0; i < arrGauge.length; i++) {
+    if (arrGauge[i].id == _id) return i;
   }
   return -1;
 }
@@ -1080,6 +1130,15 @@ function addChartData(chart, label, data) {
   chart.data.labels.push(label);
   chart.data.datasets[0].data.push(data);
   chart.update();
+}
+
+//Clear all chart data when press STOP
+function clearChartData() {
+  for (var i = 0; i < arrChartJS.length; i++) {
+    arrChartJS[i].node.data.labels = [];
+    arrChartJS[i].node.data.datasets[0].data = [];
+    arrChartJS[i].node.update();
+  }
 }
 /*
 ***********************************************************************************************
@@ -1892,6 +1951,12 @@ function addNewChart() {
   $('#mainPage1').on('mousedown', chartMouseDownEventHandler);
 }
 
+//Add new gauge
+function addNewGauge() {
+  stopDraw(false);
+  $('#mainPage1').on('mousedown', gaugeMouseDownEventHandler);
+}
+
 
 
 /*
@@ -1916,6 +1981,7 @@ var stopDraw = function (addContext) {
   $('#mainPage1').off('mousedown', verticalProcessbarMouseDownEventHandler);
   $('#mainPage1').off('mousedown', symbolsetMouseDownEventHandler);
   $('#mainPage1').off('mousedown', chartMouseDownEventHandler);
+  $('#mainPage1').off('mousedown', gaugeMouseDownEventHandler);
 
   if (addContext) addContextMenu();
 }
@@ -4309,10 +4375,10 @@ function chartMouseDownEventHandler(event) {
           }
         }]
       },
-       
-      }
+
+    }
   });
-  arrChartJS.push({id : canvas.id, node : newChart});
+  arrChartJS.push({ id: canvas.id, node: newChart });
   console.log(arrChartJS)
 
 
@@ -4451,11 +4517,340 @@ function chartMouseDownEventHandler(event) {
 
 }
 
-//Clear all chart data when press STOP
-function clearChartData() {
-  for (var i = 0; i < arrChartJS.length; i++) {
-    arrChartJS[i].node.data.labels = [];
-    arrChartJS[i].node.data.datasets[0].data = [];
-    arrChartJS[i].node.update();
+//Chart mouse down event handler: To create new chart
+function gaugeMouseDownEventHandler(event) {
+  var leftOffset = document.getElementById('mainPage1').getBoundingClientRect().left;
+  var topOffset = document.getElementById('mainPage1').getBoundingClientRect().top;
+
+  var left = event.pageX - leftOffset + 'px';
+  var top = event.pageY - topOffset + 'px';
+
+  //Add a new div
+  var gaugeDiv = document.createElement('div');
+  gaugeDiv.id = 'gauge' + index;
+  gaugeDiv.className = 'gauge contextMenu';
+
+  //Chart css style
+  gaugeDiv.style.position = 'absolute';
+  gaugeDiv.style.top = top;
+  gaugeDiv.style.left = left;
+  gaugeDiv.style.height = '400px';
+  gaugeDiv.style.width = '400px';
+  //gaugeDiv.style.background = 'green';
+
+  //Init gauge properties
+  gaugeDiv.type = false;
+  gaugeDiv.format = 2;
+  gaugeDiv.usePointer = true;
+  gaugeDiv.gaugeWidth = 0.2;
+  gaugeDiv.gaugeColor = 'rgba(255,255,255,0.5)';
+  gaugeDiv.levelColor = ['#00660a'];
+  gaugeDiv.pointerColor = '#00800d';
+  gaugeDiv.fontColor = '#000000';
+  gaugeDiv.label = 'value';
+  gaugeDiv.min = 0;
+  gaugeDiv.max = 100;
+
+  //Create elementHTML object
+  var _gaugeObj = {
+    type: 'gauge',
+    id: gaugeDiv.id,
+    properties: [
+      {
+        name: 'tag',
+        value: ''
+      },
+      {
+        name: 'hiddenWhen',
+        value: ''
+      },
+      {
+        name: 'type',
+        value: ''
+      },
+      {
+        name: 'gaugeColor',
+        value: ''
+      },
+      {
+        name: 'levelColor',
+        value: ''
+      },
+      {
+        name: 'fontColor',
+        value: ''
+      },
+      {
+        name: 'gaugeWidth',
+        value: ''
+      },
+      {
+        name: 'usePointer',
+        value: ''
+      },
+      {
+        name: 'pointerColor',
+        value: ''
+      },
+      {
+        name: 'format',
+        value: ''
+      },
+      {
+        name: 'label',
+        value: ''
+      },
+      {
+        name: 'min',
+        value: ''
+      },
+      {
+        name: 'max',
+        value: ''
+      },
+    ]
   }
+
+  elementHTML.push(_gaugeObj);
+
+  $('#mainPage1').append(gaugeDiv);
+
+  var gauge = new JustGage({
+    id: gaugeDiv.id,
+    value: 50,
+    decimals: gaugeDiv.format,
+    min: gaugeDiv.min,
+    max: gaugeDiv.max,
+    label: gaugeDiv.label,
+    labelFontColor: gaugeDiv.fontColor,
+    donut: gaugeDiv.type,
+    relativeGaugeSize: true,
+    valueFontColor: gaugeDiv.fontColor,
+    valueFontSize: '10px',
+    gaugeColor: gaugeDiv.gaugeColor,
+    levelColors: gaugeDiv.levelColor,
+    pointer: gaugeDiv.usePointer,
+    pointerOptions: {
+      toplength: 8,
+      bottomlength: -20,
+      bottomwidth: 6,
+      color: gaugeDiv.pointerColor
+    },
+    gaugeWidthScale: gaugeDiv.gaugeWidth,
+    counter: true,
+  });
+  arrGauge.push({ id: gaugeDiv.id, node: gauge });
+
+  //Image mouse events
+  $(gaugeDiv).on('mouseover', function (event) {
+    //event.target.style.opacity = 0.4;
+    event.target.style.cursor = 'pointer';
+  });
+  //Subscribe mouseout event for each polygon
+  // $(canvas).on('mouseout', function (event) {
+  //   event.target.style.opacity = 1;
+  // });
+  //Subscribe mouse double click event
+  $(gaugeDiv).on('dblclick', function (mouseEvent) {
+    $('#gaugeModal').one('show.bs.modal', function (showEvent) {
+
+      var selectedItem = mouseEvent.target; //Canvas selected
+      switch(selectedItem.tagName) {
+        case 'svg' : {
+          selectedItem = selectedItem.parentNode;  
+          break;
+        }
+        case 'path' : {
+          selectedItem = selectedItem.parentNode.parentNode;
+          break;
+        }
+        case 'tspan' : {
+          selectedItem = selectedItem.parentNode.parentNode.parentNode;
+          break;
+        }
+      }
+
+      var elemWidth, elemHeight;
+
+      elemWidth = parseInt(selectedItem.style.width, 10);
+      elemHeight = parseInt(selectedItem.style.height, 10);
+
+      var itemModal = $('#gaugeModal')[0];
+      itemModal.querySelector('.inputWidth').value = elemWidth;
+      itemModal.querySelector('.inputHeight').value = elemHeight;
+
+      if (selectedItem.type) {
+        itemModal.querySelector('[name = gaugeType]').value = "true";
+      } else {
+        itemModal.querySelector('[name = gaugeType]').value = "false";
+      }
+
+      if (selectedItem.format) {
+        itemModal.querySelector('[name = gaugeFormat]').value = selectedItem.format;
+      }
+
+      if (selectedItem.gaugeWidth) {
+        itemModal.querySelector('.inputGaugeWidth').value = selectedItem.gaugeWidth;
+      }
+
+      if (selectedItem.usePointer) {
+        itemModal.querySelector('#gaugeUsePointerCheckbox').checked = true;
+      } else {
+        itemModal.querySelector('#gaugeUsePointerCheckbox').checked = false;
+      }
+     
+      if (selectedItem.gaugeColor) {
+        itemModal.querySelector('.inputGaugeColor').value = selectedItem.gaugeColor;
+      }
+
+      if (selectedItem.levelColor) {
+        itemModal.querySelector('.inputLevelColor').value = selectedItem.levelColor[0];
+      }
+
+      if (selectedItem.fontColor) {
+        itemModal.querySelector('.inputFontColor').value = selectedItem.fontColor;
+      }
+
+      if (selectedItem.pointerColor) {
+        itemModal.querySelector('.inputPointerColor').value = selectedItem.pointerColor;
+      }
+
+      if (selectedItem.tag) {
+        itemModal.querySelector('.inputValue').value = selectedItem.tag;
+      } else {
+        itemModal.querySelector('.inputValue').value = '';
+      }
+
+      if (selectedItem.label) {
+        itemModal.querySelector('.inputGaugeLabel').value = selectedItem.label;
+      } else {
+        itemModal.querySelector('.inputGaugeLabel').value = '';
+      }
+
+      if (selectedItem.min != null) {
+        itemModal.querySelector('.inputMin').value = selectedItem.min;
+      }
+
+      if (selectedItem.max != null) {
+        itemModal.querySelector('.inputMax').value = selectedItem.max;
+      }
+
+      if (selectedItem.hiddenWhen) {
+        itemModal.querySelector('.inputHiddenWhen').value = selectedItem.hiddenWhen;
+      } else {
+        itemModal.querySelector('.inputHiddenWhen').value = '';
+      }
+
+      //Button save 
+      $('.saveChangeButton').on('click', function (event) {
+
+        selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+        selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+        selectedItem.type = (itemModal.querySelector('[name = gaugeType]').value == 'true');
+        selectedItem.format = Number(itemModal.querySelector('[name=gaugeFormat]').value);
+        selectedItem.gaugeWidth = itemModal.querySelector('.inputGaugeWidth').value;
+        selectedItem.usePointer = itemModal.querySelector('#gaugeUsePointerCheckbox').checked;
+        selectedItem.gaugeColor = itemModal.querySelector('.inputGaugeColor').value;
+        selectedItem.levelColor = [itemModal.querySelector('.inputLevelColor').value];
+        selectedItem.fontColor = itemModal.querySelector('.inputFontColor').value;
+        selectedItem.pointerColor = itemModal.querySelector('.inputPointerColor').value;
+        selectedItem.tag = itemModal.querySelector('.inputValue').value;
+        selectedItem.label = itemModal.querySelector('.inputGaugeLabel').value;
+        selectedItem.min = Number(itemModal.querySelector('.inputMin').value);
+        selectedItem.max = Number(itemModal.querySelector('.inputMax').value);
+        selectedItem.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+        var _foundIndex = findElementHTMLById(selectedItem.id);
+        if (_foundIndex != -1) {
+          elementHTML[_foundIndex].properties[0].value = selectedItem.tag;
+          elementHTML[_foundIndex].properties[1].value = selectedItem.hiddenWhen;
+          elementHTML[_foundIndex].properties[2].value = selectedItem.type;
+          elementHTML[_foundIndex].properties[3].value = selectedItem.gaugeColor;
+          elementHTML[_foundIndex].properties[4].value = [selectedItem.levelColor];
+          elementHTML[_foundIndex].properties[5].value = selectedItem.fontColor;
+          elementHTML[_foundIndex].properties[6].value = selectedItem.gaugeWidth;
+          elementHTML[_foundIndex].properties[7].value = selectedItem.usePointer;
+          elementHTML[_foundIndex].properties[8].value = selectedItem.pointerColor;
+          elementHTML[_foundIndex].properties[9].value = selectedItem.format;
+          elementHTML[_foundIndex].properties[10].value = selectedItem.label;
+          elementHTML[_foundIndex].properties[11].value = selectedItem.min;
+          elementHTML[_foundIndex].properties[12].value = selectedItem.max;
+        }
+
+        var foundGaugeIndex = findGaugeById(selectedItem.id);
+        if (foundGaugeIndex != -1) {
+          var gaugeItem = arrGauge[foundGaugeIndex].node;
+          var gaugeConfig = JSON.parse(JSON.stringify(gaugeItem.config));
+          var gaugeId = arrGauge[foundGaugeIndex].id;
+
+          //Update config 
+          gaugeConfig.donut = selectedItem.type;
+          gaugeConfig.gaugeColor = selectedItem.gaugeColor;
+          gaugeConfig.levelColors = [selectedItem.levelColor];
+          gaugeConfig.labelFontColor = selectedItem.fontColor;
+          gaugeConfig.valueFontColor = selectedItem.fontColor;
+          gaugeConfig.gaugeWidthScale = selectedItem.gaugeWidth;
+          gaugeConfig.pointer = selectedItem.usePointer;
+          gaugeConfig.pointerOptions.color = selectedItem.pointerColor;
+          gaugeConfig.decimals = selectedItem.format;
+          gaugeConfig.label = selectedItem.label;
+
+          //Remove current svg object
+          $('#' + gaugeId).find('svg').remove();
+
+          //Create new gauge
+          var newGauge = new JustGage(gaugeConfig);
+
+          //Update arrGauge
+          arrGauge[foundGaugeIndex].node = newGauge;
+          console.log(arrGauge);
+        }
+      });
+
+      //Button Value browse tag
+      $('.btnValueTag').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+      $('.btnHiddenWhen').on('click', function (valueEvent) {
+        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+            itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+          }
+        });
+      });
+
+    });
+
+    $('#gaugeModal').one('hide.bs.modal', function (hideEvent) {
+      $('.saveChangeButton').off('click');
+      $('.btnValueTag').off('click');
+      $('.btnHiddenWhen').off('click');
+    });
+
+    $('#gaugeModal').modal();
+  });
+
+
+  shapes[index] = gaugeDiv;
+  index++;
+
+  //Add draggable feature
+  // draggable = new PlainDraggable(progressbar, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+  gaugeDiv.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+  });
+
+
 }
+

@@ -2,6 +2,7 @@
 let elementHTML = [];
 let variableList = [];
 let arrChartJS = [];
+let arrGauge = [];
 let $user = $('#user').text();
 let $deviceID = $('#deviceID').text();
 let alarmEffectInterval; //For flashing the alarm title when getting unacked alarm
@@ -519,6 +520,38 @@ function initSCADA(elementHTML, socket) {
         arrChartJS.push({id : elementHTML[i].id, node : newChart});
         break;
       }
+      //Gauge
+      case 'gauge' : {
+        var gaugeDiv = document.getElementById(elementHTML[i].id);
+        //Remove old svg
+        $(gaugeDiv).find('svg').remove();
+        var newGauge = new JustGage({
+          id: gaugeDiv.id,
+          value: 50,
+          decimals: gaugeDiv.format,
+          min: gaugeDiv.min,
+          max: gaugeDiv.max,
+          label: gaugeDiv.label,
+          labelFontColor: gaugeDiv.fontColor,
+          donut: gaugeDiv.type,
+          relativeGaugeSize: true,
+          valueFontColor: gaugeDiv.fontColor,
+          valueFontSize: '10px',
+          gaugeColor: gaugeDiv.gaugeColor,
+          levelColors: gaugeDiv.levelColor,
+          pointer: gaugeDiv.usePointer,
+          pointerOptions: {
+            toplength: 8,
+            bottomlength: -20,
+            bottomwidth: 6,
+            color: gaugeDiv.pointerColor
+          },
+          gaugeWidthScale: gaugeDiv.gaugeWidth,
+          counter: true,
+        });
+        arrGauge.push({id : gaugeDiv.id, node : newGauge});
+        break;
+      }
     }
   }
 }
@@ -596,6 +629,11 @@ function SCADA(elementHTML, variableName, variableTimestamp) {
       //Chart
       case 'chart' : {
         scadaChart(_id, variableName, variableTimestamp);
+        break;
+      }
+      //Gauge
+      case 'gauge' : {
+        scadaGauge(_id, variableName);
         break;
       }
     }
@@ -907,6 +945,28 @@ function scadaChart(id, variableName, variableTimestamp) {
   }
 }
 
+//Gauge scada
+function scadaGauge(id, variableName) {
+  var gaugeDiv = document.getElementById(id);
+  if (gaugeDiv) {
+    var foundGaugeIndex = findGaugeById(gaugeDiv.id);
+    if (foundGaugeIndex != -1) {  //Found chart JS object
+      if (gaugeDiv.tag) {
+        if (gaugeDiv.tag.includes(variableName)) {
+          arrGauge[foundGaugeIndex].node.refresh(eval(gaugeDiv.tag));
+        }
+      };
+      if (gaugeDiv.hiddenWhen) {
+        if (gaugeDiv.hiddenWhen.includes(variableName)) {
+          if (eval(gaugeDiv.hiddenWhen)) $(gaugeDiv).hide();
+          else $(gaugeDiv).show();
+        }
+      }
+      
+    }
+  }
+}
+
 //Fix tooltip for vertical slider
 function fixTooltip() {
 
@@ -973,6 +1033,13 @@ function findChartById(_id) {
   return -1;
 }
 
+//Find gauge object by Id in arrGauge array
+function findGaugeById(_id) {
+  for (var i = 0; i < arrGauge.length; i++) {
+    if (arrGauge[i].id == _id) return i;
+  }
+  return -1;
+}
 //Update data for chart
 function addChartData(chart, label, data) {
   chart.data.labels.push(label);

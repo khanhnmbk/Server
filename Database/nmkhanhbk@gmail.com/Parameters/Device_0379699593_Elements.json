@@ -1,7 +1,7 @@
 [
     {
-        "type": "chart",
-        "id": "chart0",
+        "type": "gauge",
+        "id": "gauge0",
         "properties": [
             {
                 "name": "tag",
@@ -12,22 +12,58 @@
                 "value": "S7_1500_M0_0"
             },
             {
-                "name": "xLabel",
-                "value": "Time 1"
+                "name": "type",
+                "value": false
             },
             {
-                "name": "yLabel",
-                "value": "Value 1"
+                "name": "gaugeColor",
+                "value": "rgba(255,255,255,0.5)"
             },
             {
-                "name": "timeRange",
-                "value": ""
+                "name": "levelColor",
+                "value": [
+                    [
+                        "#00660a"
+                    ]
+                ]
+            },
+            {
+                "name": "fontColor",
+                "value": "#000000"
+            },
+            {
+                "name": "gaugeWidth",
+                "value": "0.2"
+            },
+            {
+                "name": "usePointer",
+                "value": true
+            },
+            {
+                "name": "pointerColor",
+                "value": "#00800d"
+            },
+            {
+                "name": "format",
+                "value": 2
+            },
+            {
+                "name": "label",
+                "value": "value"
+            },
+            {
+                "name": "min",
+                "value": 0
+            },
+            {
+                "name": "max",
+                "value": 100
             }
         ]
     },
     {
-        "type": "chart",
-        "id": "chart1",
+        "type": "gauge",
+        "id": "gauge1",
         "properties": [
             {
                 "name": "tag",
@@ -38,16 +74,52 @@
                 "value": "S7_1500_M0_0"
             },
             {
-                "name": "xLabel",
-                "value": "Time 2"
+                "name": "type",
+                "value": true
             },
             {
-                "name": "yLabel",
-                "value": "Value 2"
+                "name": "gaugeColor",
+                "value": "rgba(255,255,255,0.5)"
             },
             {
-                "name": "timeRange",
-                "value": ""
+                "name": "levelColor",
+                "value": [
+                    [
+                        "#00660a"
+                    ]
+                ]
+            },
+            {
+                "name": "fontColor",
+                "value": "#000000"
+            },
+            {
+                "name": "gaugeWidth",
+                "value": "0.2"
+            },
+            {
+                "name": "usePointer",
+                "value": true
+            },
+            {
+                "name": "pointerColor",
+                "value": "#00800d"
+            },
+            {
+                "name": "format",
+                "value": 2
+            },
+            {
+                "name": "label",
+                "value": "value"
+            },
+            {
+                "name": "min",
+                "value": 0
+            },
+            {
+                "name": "max",
+                "value": 100
             }
         ]
     }

@@ -339,4 +339,3 @@ label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
     max-height: 700px;
     overflow-y:auto;
 }
-

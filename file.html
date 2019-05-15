@@ -15,11 +15,11 @@
 
 <body >
     <!------------------------ MAIN PAGE ------------------------->
-    <div >
-      <canvas style="width : 500px; height: 200px;" id="chart"></canvas>
+    <div id="gauge" style="width:400px; height:300px">
+      
     </div>
-    <button id="pause">Pause</button>
-
+    <button id="btnUpdate">Update</button>
+    
 
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
@@ -30,6 +30,9 @@
   <script src="public/javascripts/hammer.js"></script>
   <script src="public/javascripts/chartjs-plugin-zoom.js"></script>
   <script src="public/javascripts/chartjs-plugin-streaming.min.js"></script>
+    <!-- Just Gauge -->
+    <script src="public/javascripts/raphael-2.1.4.min.js"></script>
+    <script src="public/javascripts/justgage.js"></script>
     <!-- Bootstrap form helper script -->
    
     <!-- Context menu script -->
@@ -40,75 +43,42 @@
     <!-- My script -->
     <script src="public/javascripts/Myscripts/publish.js"></script>
     <script>
-      var i = 0;
-      $('#pause').click(function() {
-        console.log('Click')
-        if (i == 0) {
-          myChart.options.plugins.streaming.pause = true;
-          i = 1;
-        } else {
-          myChart.options.plugins.streaming.pause = false;
-          i = 0;
-        }
-        
-      })
-        var ctx2 = document.getElementById('chart').getContext('2d');
-    var myChart = new Chart(ctx2, {
-        // The type of chart we want to create
-        type: 'line',
-        // The data for our dataset
-        data: {
-            datasets: [{
-                label: 'Speed',
-                // backgroundColor: 'rgb(255, 255, 255, 0.2)',
-                borderColor: 'rgb(0,102,10)',
-                borderWidth: 2,
-            }]
+       var gauge = new JustGage({
+        id: 'gauge',
+        value: 1200,
+        decimals: 2,
+        min: 0,
+        max: 3000,
+        // symbol: ' RPM',
+        label: 'RPM',
+        labelFontColor : 'red',
+        donut: true,
+        relativeGaugeSize: true,
+        valueFontColor: '#ff0000',
+        valueFontSize: '10px',
+        gaugeColor: 'rgba(255,255,255,0.15)',
+        levelColors: ['#00660a'],
+        pointer: true,
+        pointerOptions: {
+            toplength: 8,
+            bottomlength: -20,
+            bottomwidth: 6,
+            color: '#00800d'
         },
-
-        // Configuration options go here
-        options: {
-            legend: false,
-            responsive: true,
-            maintainAspectRatio: false,
-            title: {
-                display: true,
-                text: 'Motor 2: Speed now',
-                fontColor: 'white',
-                fontSize: 20
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false,
-                titleFontSize: 16,
-                bodyFontSize: 16
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: true
-            },
-            scales: {
-                xAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Timestamp'
-                    },
-                   
-                }],
-                yAxes: [{
-                    display: true,
-                    gridLines: {
-                        color: '#282525'
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'RPM'
-                    }
-                }]
-            }
-        }
+        gaugeWidthScale: 0.2,
+        counter: true,
     });
+
+    $('#btnUpdate').click(function() {
+        console.log(gauge);
+        var oldConfig = JSON.parse(JSON.stringify(gauge.config));
+        oldConfig.label = 'Hello';
+        oldConfig.labelFontColor = 'black';
+        oldConfig.donut = false;
+        //var gauge = new JustGage(oldConfig);
+        $('#gauge').find('svg').remove();
+        var newGauge = new JustGage(oldConfig);
+    })
     </script>
 </body>
 
