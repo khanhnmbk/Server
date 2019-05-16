@@ -78,71 +78,87 @@ mqttClient.on('connect', function () {
 
 mqttClient.on('message', function (topic, message) {
   if (topic.endsWith('status')) {
-    var statusObject = JSON.parse(message.toString());
-    if (statusObject) {
-      console.log(statusObject.deviceID);
-      recursive(databasePath, function (err, files) {
-        if (err) console.log(err);
-        console.log(files);
-        for (var file of files) {
-          if (file.includes(statusObject.deviceID + '.json')) {
-            var filePath = file;
-            fs.readFile(filePath, function (err, data) {
-              if (err) console.log(err);
-              var object = JSON.parse(data);
-              object.status = statusObject.status;
-              object.lastActive = statusObject.timestamp;
-              //console.log(object);
-              fs.writeFile(filePath, JSON.stringify(object, null, 4), function (err) {
+    try {
+      var statusObject = JSON.parse(message.toString());
+      if (statusObject) {
+        console.log(statusObject.deviceID);
+        recursive(databasePath, function (err, files) {
+          if (err) console.log(err);
+          console.log(files);
+          for (var file of files) {
+            if (file.includes(statusObject.deviceID + '.json')) {
+              var filePath = file;
+              fs.readFile(filePath, function (err, data) {
                 if (err) console.log(err);
-                else console.log('Write success in ' + filePath);
+                var object = JSON.parse(data);
+                object.status = statusObject.status;
+                object.lastActive = statusObject.timestamp;
+                //console.log(object);
+                fs.writeFile(filePath, JSON.stringify(object, null, 4), function (err) {
+                  if (err) console.log(err);
+                  else console.log('Write success in ' + filePath);
+                });
               });
-            });
-            break;
+              break;
+            }
           }
-        }
-      });
-      io.emit('/' + statusObject.deviceID + '/status', message.toString());
+        });
+        io.emit('/' + statusObject.deviceID + '/status', message.toString());
+      }
+    } catch (error) {
+      console.log(error);
     }
+
   }
 
   if (topic.endsWith('tags')) {
-    var variableObj = JSON.parse(message.toString());
-    io.emit('/' + variableObj.deviceID + '/tag', message.toString());
-
-    if (variableObj.variables) {
-      variableObj.variables.forEach(function (_var) {
-        if (_var.isHistory) {
-          var historyModel = historyMongoose.createModel('Device_' + variableObj.deviceID + '_history');
-          var _newHistory = new historyModel({
-            tag: _var.tagName,
-            type: _var.dataType,
-            address: _var.address,
-            value: _var.value,
-            timestamp: _var.timestamp
-          });
-          historyMongoose.createNewHistory(_newHistory);
-        }
-      });
+    try {
+      var variableObj = JSON.parse(message.toString());
+      io.emit('/' + variableObj.deviceID + '/tag', message.toString());
+      if (variableObj.variables) {
+        variableObj.variables.forEach(function (_var) {
+          if (_var.isHistory) {
+            var historyModel = historyMongoose.createModel('Device_' + variableObj.deviceID + '_history');
+            var _newHistory = new historyModel({
+              tag: _var.tagName,
+              type: _var.dataType,
+              address: _var.address,
+              value: _var.value,
+              timestamp: _var.timestamp
+            });
+            historyMongoose.createNewHistory(_newHistory);
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
+
+
+
   }
 
   if (topic.endsWith('alarm')) {
-    var alarmObject = JSON.parse(message.toString());
-    console.log('Receive alarm object MQTT');
-    console.log(alarmObject);
-    io.emit('/' + alarmObject.deviceID + '/alarm', alarmObject);
-    //Save to mongo
-    var alarmModel = alarmMongoose.createModel('Device_' + alarmObject.deviceID + '_alarm');
-    var _newAlarm = new alarmModel({
-      source: alarmObject.source,
-      value: alarmObject.value,
-      message: alarmObject.message,
-      type: alarmObject.type,
-      state: alarmObject.state,
-      timestamp: alarmObject.timestamp,
-    });
-    alarmMongoose.createNewAlarm(_newAlarm);
+    try {
+      var alarmObject = JSON.parse(message.toString());
+      console.log('Receive alarm object MQTT');
+      console.log(alarmObject);
+      io.emit('/' + alarmObject.deviceID + '/alarm', alarmObject);
+      //Save to mongo
+      var alarmModel = alarmMongoose.createModel('Device_' + alarmObject.deviceID + '_alarm');
+      var _newAlarm = new alarmModel({
+        source: alarmObject.source,
+        value: alarmObject.value,
+        message: alarmObject.message,
+        type: alarmObject.type,
+        state: alarmObject.state,
+        timestamp: alarmObject.timestamp,
+      });
+      alarmMongoose.createNewAlarm(_newAlarm);
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 });
 
@@ -177,19 +193,23 @@ io.on('connection', function (socket) {
   socket.on('deviceConfig', function (data) {
     console.log(data);
     if (data) {
-      var receivedObject = JSON.parse(data);
-      if (receivedObject) {
-        receivedObject.fileName = 'deviceConfig_' + receivedObject.deviceID + '.json';
-        receivedObjectJSON = JSON.stringify(receivedObject, null, 4);
-        var filePath = path.resolve(databasePath, receivedObject.user, 'Config', 'deviceConfig_' + receivedObject.deviceID + '.json');
+      try {
+        var receivedObject = JSON.parse(data);
+        if (receivedObject) {
+          receivedObject.fileName = 'deviceConfig_' + receivedObject.deviceID + '.json';
+          receivedObjectJSON = JSON.stringify(receivedObject, null, 4);
+          var filePath = path.resolve(databasePath, receivedObject.user, 'Config', 'deviceConfig_' + receivedObject.deviceID + '.json');
 
-        fs.writeFile(filePath, receivedObjectJSON, function (err) {
-          if (err) console.log(err);
-          else console.log('Succeed');
-        });
+          fs.writeFile(filePath, receivedObjectJSON, function (err) {
+            if (err) console.log(err);
+            else console.log('Succeed');
+          });
 
-        //Send configuration to gateway via MQTT
-        mqttClient.publish('/' + receivedObject.deviceID + '/config', receivedObjectJSON);
+          //Send configuration to gateway via MQTT
+          mqttClient.publish('/' + receivedObject.deviceID + '/config', receivedObjectJSON);
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   });
@@ -260,7 +280,7 @@ io.on('connection', function (socket) {
     var elementObj = JSON.parse(fs.readFileSync(elementFile));
     var variableObj = JSON.parse(fs.readFileSync(variableFile));
     var backgroundObj = JSON.parse(fs.readFileSync(backgroundFile));
-    socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj, background : backgroundObj });
+    socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj, background: backgroundObj });
   });
 
 });

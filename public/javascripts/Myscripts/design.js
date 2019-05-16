@@ -506,6 +506,11 @@ function addContextMenu() {
     selectedItemId = '';
   });
 
+  $('#dashboard').on("click", function () {
+    $("#context-menu").removeClass("show").hide();
+    selectedItemId = '';
+  });
+
   $("#context-menu a").on("click", function () {
     $(this).parent().removeClass("show").hide();
   });
