@@ -450,6 +450,8 @@ function initSCADA(elementHTML, socket) {
       case 'chart': {
         //Create chart
         var canvas = document.getElementById(elementHTML[i].id);
+        var width = canvas.width;
+        var height = canvas.height;
         var ctx1 = canvas.getContext('2d');
         var newChart = new Chart(ctx1, {
           // The type of chart we want to create
@@ -517,6 +519,10 @@ function initSCADA(elementHTML, socket) {
 
           }
         });
+        if ($.contains(document.getElementById('dashboard'), document.getElementById(elementHTML[i].id))) {
+          canvas.style.width = width;
+          canvas.style.height = height;
+        } 
         arrChartJS.push({id : elementHTML[i].id, node : newChart});
         break;
       }
@@ -529,6 +535,7 @@ function initSCADA(elementHTML, socket) {
           id: gaugeDiv.id,
           value: 50,
           decimals: gaugeDiv.format,
+          title : gaugeDiv.title,
           min: gaugeDiv.min,
           max: gaugeDiv.max,
           label: gaugeDiv.label,

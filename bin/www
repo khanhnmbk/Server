@@ -228,6 +228,7 @@ io.on('connection', function (socket) {
     var template = fs.readFileSync('../Server/views/publish-template.ejs').toString();
     var htlmObject = HTMLParser.parse(template);
     htlmObject.querySelector('#mainPage1').appendChild(dataObj.html);
+    htlmObject.querySelector('#dashboard').appendChild(dataObj.dashboard);
     var fileName = 'Device_' + dataObj.deviceID + '_publish.ejs';
     fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Publish', fileName), htlmObject);
     fs.writeFileSync(path.resolve(databasePath, dataObj.user, 'Parameters', 'Device_' + dataObj.deviceID + '_Elements.json'), JSON.stringify(dataObj.elements, null, 4));

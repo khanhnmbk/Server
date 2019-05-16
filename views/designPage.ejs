@@ -258,6 +258,38 @@
                                 </div> <!-- /Card-body div -->
                             </div> <!-- /collapseTwo div -->
                         </div> <!-- /Card Elements div -->
+
+                        <!-- Dashboard only -->
+                        <div class="card">
+                            <div class="card-header">
+                                <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
+                                    <i class="fa" aria-hidden="true"></i>
+                                    Dashboard only
+                                </a>
+                            </div>
+                            <div id="collapseThree" class="collapse">
+                                <div class="card-body">
+                                    <div class="justify-content-sm-end justify-content-center">
+                                         <!-- Chart -->
+                                        <button type="button" class="btn button-icon" data-toggle="tooltip"
+                                        title="Chart dashboard" onclick="addNewChartDashboard()">
+                                        <img src="/images/toolboxIcon/trend.png" class="img-icon"
+                                            alt="Trend">
+                                        </button>
+                                        <!-- /Chart -->
+
+                                         <!-- Gauge -->
+                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
+                                         title="Gauge dashboard" onclick="addNewGaugeDashboard()">
+                                         <img src="/images/toolboxIcon/gauge.png" class="img-icon"
+                                             alt="Gauge">
+                                         </button>
+                                         <!-- /Gauge -->
+
+                                    </div> <!-- /Wrapper div -->
+                                </div> <!-- /Card-body div -->
+                            </div> <!-- /collapseTwo div -->
+                        </div> <!-- /Card Elements div -->
                     </div> <!-- /collapseGroup -->
                     <!-- /Collapse group -->
                 </div>
@@ -384,9 +416,6 @@
                         </div>
                     </div>
                     <div id="dashboard" class="container-fluid tab-pane fade bg-white full-height"><br>
-                        <h3>Dashboard</h3>
-                        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-                            laudantium, totam rem aperiam.</p>
                     </div>
                 </div>
             </div>
@@ -2781,14 +2810,23 @@
                                 </div>
                             </div>
 
-                          
+                            <div class="form-group row my-2">
+                                <label class="col-sm-2 col-form-label">Title</label>
+                                <div class="input-group col-sm">
+                                    <input type="text" class="form-control inputGaugeTitle inputModal"
+                                        placeholder="Insert gauge title">
+                                </div>
+                            </div>
+
                             <div class="form-group row my-2">
                                 <label class="col-sm-2 col-form-label">Label</label>
                                 <div class="input-group col-sm">
                                     <input type="text" class="form-control inputGaugeLabel inputModal"
-                                        placeholder="Insert gauge title">
+                                        placeholder="Insert gauge label">
                                 </div>
                             </div>
+
+                            
 
                             <div class="form-group row my-2">
                                 <label class="col-sm-2 col-form-label">Min</label>

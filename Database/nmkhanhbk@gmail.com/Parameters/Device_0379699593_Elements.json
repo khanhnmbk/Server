@@ -9,7 +9,7 @@
             },
             {
                 "name": "hiddenWhen",
-                "value": "S7_1500_M0_0"
+                "value": ""
             },
             {
                 "name": "type",
@@ -58,12 +58,16 @@
             {
                 "name": "max",
                 "value": 100
+            },
+            {
+                "name": "title",
+                "value": "Main"
             }
         ]
     },
     {
-        "type": "gauge",
-        "id": "gauge1",
+        "type": "chart",
+        "id": "chart1",
         "properties": [
             {
                 "name": "tag",
@@ -71,7 +75,51 @@
             },
             {
                 "name": "hiddenWhen",
-                "value": "S7_1500_M0_0"
+                "value": ""
+            },
+            {
+                "name": "xLabel",
+                "value": "Time"
+            },
+            {
+                "name": "yLabel",
+                "value": "Value"
+            }
+        ]
+    },
+    {
+        "type": "chart",
+        "id": "chart2",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            },
+            {
+                "name": "xLabel",
+                "value": "Time"
+            },
+            {
+                "name": "yLabel",
+                "value": "Value"
+            }
+        ]
+    },
+    {
+        "type": "gauge",
+        "id": "gauge3",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
             },
             {
                 "name": "type",
@@ -120,6 +168,32 @@
             {
                 "name": "max",
                 "value": 100
+            },
+            {
+                "name": "title",
+                "value": "Gauge"
+            }
+        ]
+    },
+    {
+        "type": "chart",
+        "id": "chart4",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "hiddenWhen",
+                "value": ""
+            },
+            {
+                "name": "xLabel",
+                "value": "Time"
+            },
+            {
+                "name": "yLabel",
+                "value": "Value"
             }
         ]
     }
