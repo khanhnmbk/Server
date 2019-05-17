@@ -133,7 +133,7 @@ $(document).ready(function () {
 
       //Clear history table body first
       $('#historyTable tbody').empty();
-      socket.emit('/reqHistory', deviceID);
+      //socket.emit('/reqHistory', deviceID);
       socket.on('/' + deviceID + '/resHistory', function (data) {
         if (data.length > 0) {
           $('#historyTable tbody').empty();
@@ -147,6 +147,8 @@ $(document).ready(function () {
               <td>` + dataItem.timestamp + `</td>
             </tr>`
             $('#historyTable tbody').append(_htmlMarkup);
+            $('#historyTable tbody').css({'height' : '800px', 'overflow-y' : 'auto'});
+            console.log(dataItem);
           });
         }
       });
@@ -172,12 +174,15 @@ $(document).ready(function () {
       $('.slider-vertical').siblings('input').bootstrapSlider('disable');
       //Clear chart data
       clearChartData();
+      //Show all hidden items
+      showHiddenItems();
 
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
       socket.off('/' + deviceID + '/resHistory');
-      //Reset alarm color
+      //Reset alarm color, clear Interval
       $('#alarmTitle').css('color', '');
+      clearInterval(alarmEffectInterval);
     });
   });
 
@@ -2663,14 +2668,14 @@ function switchMouseDownEventHandler(event) {
 
   elementHTML.push(_swObj);
   //Image mouse events
-  $(sw).on('mouseover', function (event) {
-    event.target.style.opacity = 0.65;
-    //event.target.style.cursor = 'move';
-  });
+  // $(sw).on('mouseover', function (event) {
+  //   event.target.style.opacity = 0.65;
+  //   //event.target.style.cursor = 'move';
+  // });
   //Subscribe mouseout event for each polygon
-  $(sw).on('mouseout', function (vent) {
-    event.target.style.opacity = 1;
-  });
+  // $(sw).on('mouseout', function (vent) {
+  //   event.target.style.opacity = 1;
+  // });
   //Subscribe mouse double click event
   $(sw).on('dblclick', function (mouseEvent) {
     $('#switchModal').one('show.bs.modal', function (showEvent) {
@@ -5516,3 +5521,9 @@ function gaugeDashboardMouseDownEventHandler(event) {
 
 }
 
+//Show all hidden element 
+function showHiddenItems() {
+  for (var i = 0; i < elementHTML.length; i++) {
+    $('#' + elementHTML[i].id).show();
+  }
+}

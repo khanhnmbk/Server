@@ -16,9 +16,12 @@
 <body >
     <!------------------------ MAIN PAGE ------------------------->
     <div id="gauge" style="width:400px; height:300px">
-      
     </div>
+
+    <div id="item" style="width:300px; height:300px; background: green"></div>
     <button id="btnUpdate">Update</button>
+    <button id="btnHide">Hide</button>
+    <button id="btnShow">Show</button>
     
 
     <!------------------------ SCRIPT ------------------------->
@@ -80,6 +83,17 @@
         $('#gauge').find('svg').remove();
         var newGauge = new JustGage(oldConfig);
     })
+
+    $('#btnHide').click(function() {
+        $('#item').hide();
+        var hiddens = $(':hidden');
+        console.log(hiddens);
+    });
+
+    $('#btnShow').click(function() {
+        $('#item').show();
+    })
+
     </script>
 </body>
 

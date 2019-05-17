@@ -4,22 +4,6 @@ var path = require('path');
 var rootDir = '../Server';
 //var databaseDir = path.resolve(rootDir,'Database');
 
-fs.readdir(path.resolve(rootDir,'Database'), function (err , dirs) { 
-    var result ='';
-    for (var dir of dirs) {
-        if (dir == 'Khanh') {
-            result = dir;
-            break;
-        }
-    }
-    if (result) {
-        fs.mkdir(path.resolve(rootDir,'Database','Truc'),function (err) { 
-            if (err) throw err;
-         });
-    }
-});
-
-
 module.exports.createUserDir = function (user) {
     fs.readdir(path.resolve(rootDir,'Database'), function (err , dirs) { 
         var result ='';
@@ -31,8 +15,23 @@ module.exports.createUserDir = function (user) {
         }
         if (!result) {
             fs.mkdir(path.resolve(rootDir,'Database',user),function (err) { 
-                if (err) throw err;
-             });
+                if (err) console.log(err);
+                else {
+                    fs.mkdir(path.resolve(rootDir,'Database',user, 'Parameters'),function (err) { 
+                        if (err) console.log(err);
+                        else console.log('Create folder successfully: Parameters');
+                    });
+                    fs.mkdir(path.resolve(rootDir,'Database',user, 'Publish'),function (err) { 
+                        if (err) console.log(err);
+                        else console.log('Create folder successfully: Publish');
+                    });
+                    fs.mkdir(path.resolve(rootDir,'Database',user, 'Config'),function (err) { 
+                        if (err) console.log(err);
+                        else console.log('Create folder successfully: Config');
+                    });
+                }
+            });
+            
         }
     });
 }

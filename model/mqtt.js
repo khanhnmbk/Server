@@ -13,8 +13,8 @@ module.exports = {
     },
     subscribeDevice: function (deviceID) {
         client.subscribe('/' + deviceID + '/' + 'status', function (err) { 
-            if (err) throw err;
-            console.log('Subscribed topic: ' + deviceID + '/' + 'status');    
+            if (err) console.log(err);
+            else console.log('Subscribed topic: ' + deviceID + '/' + 'status');    
         });     
     
     }

@@ -29,7 +29,7 @@ module.exports.getUserByEmail = function (email , callback) {
 
 module.exports.checkPassword = function (pass, hash, callback) {
     bcrypt.compare (pass, hash, function (err, isMatch) { 
-        if (err) throw err;
+        if (err) console.log(err);
         callback(null, isMatch);
     });
 };
