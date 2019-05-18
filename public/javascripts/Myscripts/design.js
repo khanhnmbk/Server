@@ -176,6 +176,8 @@ $(document).ready(function () {
       clearChartData();
       //Show all hidden items
       showHiddenItems();
+      //Enable all items
+      enableAllItems();
 
       socket.off('/' + deviceID + '/tag');
       socket.off('/' + deviceID + '/alarm');
@@ -358,9 +360,11 @@ $(document).ready(function () {
       //Enable vertical slider first
       for (i = 0; i < shapes.length; i++) {
         if (shapes[i].id) {
-          if (shapes[i].id.includes('verticalSlider')) {
-            console.log(shapes[i]);
-            $(shapes[i]).bootstrapSlider('enable');
+          if(typeof(shapes[i].id) == 'string') {
+            if (shapes[i].id.includes('verticalSlider')) {
+              console.log(shapes[i]);
+              $(shapes[i]).bootstrapSlider('enable');
+            }
           }
         }
       }
@@ -524,13 +528,16 @@ function addContextMenu() {
 
 //Delete element
 function removeItem() {
-  console.log("Selected Item: ", selectedItemId);
+  // console.log("Selected Item: ", selectedItemId);
+  // console.log('Selected Item: ');
+  // console.log(document.getElementById(selectedItemId));
+
   if (selectedItemId) {
     var item = document.getElementById(selectedItemId);
-    if (selectedItemId.includes('verticalSlider') || selectedItemId.includes('chart')) {
+    if (selectedItemId.includes('verticalSlider') || selectedItemId.includes('chart') || selectedItemId.includes('switch')) {
       $(item.parentNode).remove();
     }
-    else item.parentNode.removeChild(item);
+    else item.parentNode.removeChild(item); 
 
     for (var elem of shapes) {
       console.log(elem);
@@ -927,7 +934,7 @@ function scadaVerticalProgressBarObject(item, variableName) {
         var _height = '100%';
         var _top = '0%'
       } else {
-        var _height = (eval(item.tag) - item.min) / _range * 100 + '%';
+        var _height = Number((eval(item.tag) - item.min) / _range * 100).toFixed(3) + '%';
         var _top = (100 - (eval(item.tag) - item.min) / _range * 100) + '%';
       }
 
@@ -938,7 +945,7 @@ function scadaVerticalProgressBarObject(item, variableName) {
       if (item.isHideLabel) $(item).children('div').text('');
       else {
         if (!item.isRawValue) $(item).children('div').text(_height);
-        else $(item).children('div').text(eval(item.tag));
+        else $(item).children('div').text(Number(eval(item.tag)).toFixed(3));
       }
     }
   }
@@ -3838,6 +3845,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
   verticalProgressbar.isHideLabel = false;
   verticalProgressbar.min = 0;
   verticalProgressbar.max = 100;
+  //verticalProgressbar.isRawValue = false;
 
   verticalProgressbar.minValue = verticalProgressbar.min;
   verticalProgressbar.maxValue = verticalProgressbar.max;
@@ -4038,6 +4046,7 @@ function verticalProcessbarMouseDownEventHandler(event) {
           elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
           elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
           elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
+          elementHTML[_foundIndex].properties[9].value = progressElement.isRawValue;
         }
       });
 
@@ -5524,6 +5533,17 @@ function gaugeDashboardMouseDownEventHandler(event) {
 //Show all hidden element 
 function showHiddenItems() {
   for (var i = 0; i < elementHTML.length; i++) {
+    if (elementHTML[i].type != 'verticalslider')
     $('#' + elementHTML[i].id).show();
+  }
+}
+
+//Enable all element
+function enableAllItems() {
+  for (var i = 0; i < elementHTML.length; i++) {
+    if (elementHTML[i].type == 'switch' || elementHTML[i].type == 'checkbox') {
+     // console.log( $(document.getElementById(elementHTML[i].id).parentNode).find('input'))
+      $(document.getElementById(elementHTML[i].id).parentNode).find('input').prop('disabled', false);
+    } else $('#' + elementHTML[i].id).prop('disabled', false);
   }
 }

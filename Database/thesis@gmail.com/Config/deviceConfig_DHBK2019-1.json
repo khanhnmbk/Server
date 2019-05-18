@@ -47,28 +47,10 @@
                     "isHistory": false
                 },
                 {
-                    "name": "Auto_1",
+                    "name": "SetMode_1",
                     "dataType": "Bool",
                     "plc": "TankController",
                     "address": "M100.2",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Manual_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.3",
                     "access": "read/write",
                     "unit": "",
                     "isAlarm": false,
@@ -155,150 +137,6 @@
                     "isHistory": false
                 },
                 {
-                    "name": "Start_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.4",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Stop_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.5",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Auto_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.6",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Manual_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.7",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Man_FillValve_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB4.DBX8.0",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Man_DischargeValve_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB4.DBX8.1",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "FillValve_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB4.DBX8.3",
-                    "access": "read",
-                    "unit": "",
-                    "isAlarm": true,
-                    "alarmType": "0",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
-                    "name": "DischargeValve_2",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB4.DBX8.4",
-                    "access": "read",
-                    "unit": "",
-                    "isAlarm": true,
-                    "alarmType": "0",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
                     "name": "FillValve_1",
                     "dataType": "Bool",
                     "plc": "TankController",
@@ -335,42 +173,6 @@
                     "isHistory": true
                 },
                 {
-                    "name": "Level_2",
-                    "dataType": "Double",
-                    "plc": "TankController",
-                    "address": "DB4.DBD0",
-                    "access": "read",
-                    "unit": "m",
-                    "isAlarm": true,
-                    "alarmType": "1",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
-                    "name": "DischargeFlow_2",
-                    "dataType": "Double",
-                    "plc": "TankController",
-                    "address": "DB4.DBD4",
-                    "access": "read",
-                    "unit": "m3/s",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
                     "name": "Mode_1",
                     "dataType": "Bool",
                     "plc": "TankController",
@@ -389,10 +191,28 @@
                     "isHistory": false
                 },
                 {
-                    "name": "Mode_2",
+                    "name": "StartLight_1",
                     "dataType": "Bool",
                     "plc": "TankController",
-                    "address": "DB4.DBX8.2",
+                    "address": "Q0.0",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "StopLight_1",
+                    "dataType": "Bool",
+                    "plc": "TankController",
+                    "address": "Q0.1",
                     "access": "read",
                     "unit": "",
                     "isAlarm": false,
@@ -411,8 +231,9 @@
     ],
     "user": "thesis@gmail.com",
     "creationTime": "5/17/2019, 11:18:12 AM",
-    "lastActive": "2019-05-17 23:54:52",
-    "published": false,
-    "status": false,
-    "fileName": "deviceConfig_DHBK2019-1.json"
+    "lastActive": "2019-05-18 23:28:06",
+    "published": true,
+    "status": true,
+    "fileName": "deviceConfig_DHBK2019-1.json",
+    "link": "/published/thesis@gmail.com/Device_DHBK2019-1_publish.ejs"
 }

@@ -53,7 +53,7 @@ $(document).ready(function () {
     });
 
     //History function
-    socket.emit('/reqHistory', $deviceID);
+    //socket.emit('/reqHistory', $deviceID);
     socket.on('/' + $deviceID + '/resHistory', function (arrHistory) {
       loadHistoryTable(arrHistory);
     });
@@ -789,7 +789,7 @@ function scadaVerticalProgressbar(id, variableName) {
         var _height = '100%';
         var _top = '0%'
       } else {
-        var _height = (eval(verticalbar.tag) - verticalbar.min) / _range * 100 + '%';
+        var _height = Number((eval(verticalbar.tag) - verticalbar.min) / _range * 100).toFixed(3) + '%';
         var _top = (100 - (eval(verticalbar.tag) - verticalbar.min) / _range * 100) + '%';
       }
       $(verticalbar).children('div').css({
@@ -800,7 +800,7 @@ function scadaVerticalProgressbar(id, variableName) {
       if (verticalbar.isHideLabel) $(verticalbar).children('div').text('');
       else {
         if (!verticalbar.isRawValue) $(verticalbar).children('div').text(_height);
-        else $(verticalbar).children('div').text(eval(verticalbar.tag));
+        else $(verticalbar).children('div').text(Number(eval(verticalbar.tag)).toFixed(3));
       }
     }
   }
