@@ -368,6 +368,8 @@ $(document).ready(function () {
           }
         }
       }
+      //Move each element 100px to the right to make it more "center" 
+      addPixel();
       var mainPage1 = document.getElementById('mainPage1').innerHTML;
       var dashboard = document.getElementById('dashboard').innerHTML;
       var _sendObject = {
@@ -463,6 +465,7 @@ const deviceID = $('#deviceID').text();
 const user = $('#user').text();
 let variableList = [];
 let elementHTML = []; //Array contains extra-HTML properties, which is sent to server via socket.io
+const $leftOffset = 165;
 
 //Default option for basic objects except LINE
 const defaultOption = {
@@ -5545,5 +5548,55 @@ function enableAllItems() {
      // console.log( $(document.getElementById(elementHTML[i].id).parentNode).find('input'))
       $(document.getElementById(elementHTML[i].id).parentNode).find('input').prop('disabled', false);
     } else $('#' + elementHTML[i].id).prop('disabled', false);
+  }
+}
+
+
+
+
+//Add 100px to the left of all elements
+function addPixel() {
+  for (var i = 0; i < elementHTML.length; i++) {
+    var element = document.getElementById(elementHTML[i].id);
+    console.log(element);
+    switch(elementHTML[i].type) {
+      case 'svg' : {
+        $(element).attr({
+          transform: 'translate(' + $leftOffset +',0)'
+        });
+        break;
+      };
+      case 'switch' : {
+        var label = $(element).closest('label')[0];
+        if (label) {
+          var labelLeft = label.style.left;
+          if (labelLeft) {
+            labelLeft = labelLeft.replace('px', '');
+            var newLeft = (Number(labelLeft) + $leftOffset) + 'px';
+            label.style.left = newLeft;
+          }
+        }
+        break;
+      }
+      case 'checkbox' : 
+      case 'chart' : 
+      case 'verticalslider' : {
+        var divNode = element.parentNode;
+        var divLeft = divNode.style.left;
+        if (divLeft) {
+          divLeft = divLeft.replace('px','');
+          divNode.style.left = (Number(divLeft) + $leftOffset) + 'px';
+        }
+        break;
+      }
+      default : {
+        var currentLeft = element.style.left;
+        if (currentLeft) {
+          currentLeft = currentLeft.replace('px','');
+          element.style.left = (Number(currentLeft) + $leftOffset) + 'px';
+        }
+        break;
+      }
+    }
   }
 }

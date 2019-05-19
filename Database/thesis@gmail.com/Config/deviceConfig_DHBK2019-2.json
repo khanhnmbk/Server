@@ -6,14 +6,14 @@
     "period": "5000",
     "PLCs": [
         {
-            "name": "SortingController",
+            "name": "Controller",
             "protocol": "S7-connection",
             "ipAddress": "192.168.100.161",
             "variables": [
                 {
                     "name": "Start",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "M11.4",
                     "access": "read/write",
                     "unit": "",
@@ -31,7 +31,7 @@
                 {
                     "name": "Stop",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "M11.5",
                     "access": "read/write",
                     "unit": "",
@@ -49,7 +49,7 @@
                 {
                     "name": "StartLight",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "Q0.0",
                     "access": "read",
                     "unit": "",
@@ -67,7 +67,7 @@
                 {
                     "name": "StopLight",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "Q0.1",
                     "access": "read",
                     "unit": "",
@@ -84,11 +84,11 @@
                 },
                 {
                     "name": "BlueProduct",
-                    "dataType": "uDInt",
-                    "plc": "SortingController",
+                    "dataType": "uInt",
+                    "plc": "Controller",
                     "address": "QW2",
                     "access": "read",
-                    "unit": "",
+                    "unit": "product",
                     "isAlarm": false,
                     "alarmType": null,
                     "parameters": {
@@ -102,11 +102,11 @@
                 },
                 {
                     "name": "GreenProduct",
-                    "dataType": "uDInt",
-                    "plc": "SortingController",
+                    "dataType": "uInt",
+                    "plc": "Controller",
                     "address": "QW4",
                     "access": "read",
-                    "unit": "",
+                    "unit": "product",
                     "isAlarm": false,
                     "alarmType": null,
                     "parameters": {
@@ -120,11 +120,11 @@
                 },
                 {
                     "name": "OtherProduct",
-                    "dataType": "uDInt",
-                    "plc": "SortingController",
+                    "dataType": "uInt",
+                    "plc": "Controller",
                     "address": "QW6",
                     "access": "read",
-                    "unit": "",
+                    "unit": "product",
                     "isAlarm": false,
                     "alarmType": null,
                     "parameters": {
@@ -139,10 +139,10 @@
                 {
                     "name": "TotalRunningTime",
                     "dataType": "uDInt",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "MD12",
                     "access": "read",
-                    "unit": "",
+                    "unit": "min",
                     "isAlarm": false,
                     "alarmType": null,
                     "parameters": {
@@ -157,7 +157,7 @@
                 {
                     "name": "EntryConveyor",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "Q0.3",
                     "access": "read",
                     "unit": "",
@@ -175,7 +175,7 @@
                 {
                     "name": "ExitConveyor",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "Q0.4",
                     "access": "read",
                     "unit": "",
@@ -191,29 +191,11 @@
                     "isHistory": false
                 },
                 {
-                    "name": "MaintenanceAlarm",
+                    "name": "MaintAlarm",
                     "dataType": "Bool",
-                    "plc": "SortingController",
+                    "plc": "Controller",
                     "address": "M11.2",
                     "access": "read",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "ResetMaintenance",
-                    "dataType": "Bool",
-                    "plc": "SortingController",
-                    "address": "M11.3",
-                    "access": "read/write",
                     "unit": "",
                     "isAlarm": true,
                     "alarmType": "0",
@@ -225,14 +207,33 @@
                         "deadband": ""
                     },
                     "isHistory": false
+                },
+                {
+                    "name": "ResetMaint",
+                    "dataType": "Bool",
+                    "plc": "Controller",
+                    "address": "M11.3",
+                    "access": "read/write",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
                 }
             ]
         }
     ],
     "user": "thesis@gmail.com",
-    "creationTime": "5/19/2019, 11:37:22 AM",
-    "lastActive": "",
-    "published": false,
-    "status": false,
-    "fileName": "deviceConfig_DHBK2019-2.json"
+    "creationTime": "5/19/2019, 11:35:29 PM",
+    "lastActive": "2019-05-20 00:43:02",
+    "published": true,
+    "status": true,
+    "fileName": "deviceConfig_DHBK2019-2.json",
+    "link": "/published/thesis@gmail.com/Device_DHBK2019-2_publish.ejs"
 }

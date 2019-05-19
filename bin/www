@@ -33,7 +33,7 @@ let mqttOptions = {
   ca: trustedCA,
   //protocol: 'mqtts'
 }
-
+let retainOption = {retain : true};
 
 /**
  * Get port from environment and store in Express.
@@ -206,7 +206,7 @@ io.on('connection', function (socket) {
           });
 
           //Send configuration to gateway via MQTT
-          mqttClient.publish('/' + receivedObject.deviceID + '/config', receivedObjectJSON);
+          mqttClient.publish('/' + receivedObject.deviceID + '/config', receivedObjectJSON, retainOption);
         }
       } catch (error) {
         console.log(error);
@@ -219,7 +219,7 @@ io.on('connection', function (socket) {
     var deviceID = fileBase.replace('deviceConfig_', '').replace('.json', '');
     var mqttResetTopic = '/' + deviceID + '/reset';
     console.log(mqttResetTopic);
-    mqttClient.publish(mqttResetTopic, JSON.stringify({ CMD: true }, null, 4));
+    mqttClient.publish(mqttResetTopic, JSON.stringify({ CMD: true }, null, 4), retainOption);
 
 
     fs.unlink(path.resolve(databasePath, filePath), function (err) {
