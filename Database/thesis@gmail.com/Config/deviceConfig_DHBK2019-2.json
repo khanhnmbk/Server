@@ -1,20 +1,20 @@
 {
-    "deviceName": "Water Processing",
-    "deviceID": "DHBK2019-1",
-    "longitude": "106.676470",
-    "latitude": "10.767530",
-    "period": "1000",
+    "deviceName": "Sorting Station",
+    "deviceID": "DHBK2019-2",
+    "longitude": "106.677597",
+    "latitude": "11.073170",
+    "period": "5000",
     "PLCs": [
         {
-            "name": "TankController",
+            "name": "SortingController",
             "protocol": "S7-connection",
-            "ipAddress": "192.168.100.160",
+            "ipAddress": "192.168.100.161",
             "variables": [
                 {
-                    "name": "Start_1",
+                    "name": "Start",
                     "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.0",
+                    "plc": "SortingController",
+                    "address": "M11.4",
                     "access": "read/write",
                     "unit": "",
                     "isAlarm": false,
@@ -29,10 +29,10 @@
                     "isHistory": false
                 },
                 {
-                    "name": "Stop_1",
+                    "name": "Stop",
                     "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.1",
+                    "plc": "SortingController",
+                    "address": "M11.5",
                     "access": "read/write",
                     "unit": "",
                     "isAlarm": false,
@@ -47,153 +47,9 @@
                     "isHistory": false
                 },
                 {
-                    "name": "SetMode_1",
+                    "name": "StartLight",
                     "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "M100.2",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Man_FillValve_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB1.DBX8.0",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Man_DIschargeValve_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB1.DBX8.1",
-                    "access": "read/write",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "Level_1",
-                    "dataType": "Double",
-                    "plc": "TankController",
-                    "address": "DB1.DBD0",
-                    "access": "read",
-                    "unit": "m",
-                    "isAlarm": true,
-                    "alarmType": "1",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
-                    "name": "DischargeFlow_1",
-                    "dataType": "Double",
-                    "plc": "TankController",
-                    "address": "DB1.DBD4",
-                    "access": "read",
-                    "unit": "m3/s",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "FillValve_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB1.DBX8.3",
-                    "access": "read",
-                    "unit": "",
-                    "isAlarm": true,
-                    "alarmType": "0",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
-                    "name": "DischargeValve_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB1.DBX8.4",
-                    "access": "read",
-                    "unit": "",
-                    "isAlarm": true,
-                    "alarmType": "0",
-                    "parameters": {
-                        "lolo": "0.3",
-                        "lo": "0.7",
-                        "hi": "2.5",
-                        "hihi": "2.8",
-                        "deadband": "0.1"
-                    },
-                    "isHistory": true
-                },
-                {
-                    "name": "Mode_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
-                    "address": "DB1.DBX8.2",
-                    "access": "read",
-                    "unit": "",
-                    "isAlarm": false,
-                    "alarmType": null,
-                    "parameters": {
-                        "lolo": null,
-                        "lo": null,
-                        "hi": null,
-                        "hihi": null,
-                        "deadband": null
-                    },
-                    "isHistory": false
-                },
-                {
-                    "name": "StartLight_1",
-                    "dataType": "Bool",
-                    "plc": "TankController",
+                    "plc": "SortingController",
                     "address": "Q0.0",
                     "access": "read",
                     "unit": "",
@@ -209,9 +65,9 @@
                     "isHistory": false
                 },
                 {
-                    "name": "StopLight_1",
+                    "name": "StopLight",
                     "dataType": "Bool",
-                    "plc": "TankController",
+                    "plc": "SortingController",
                     "address": "Q0.1",
                     "access": "read",
                     "unit": "",
@@ -225,15 +81,158 @@
                         "deadband": null
                     },
                     "isHistory": false
+                },
+                {
+                    "name": "BlueProduct",
+                    "dataType": "uDInt",
+                    "plc": "SortingController",
+                    "address": "QW2",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "GreenProduct",
+                    "dataType": "uDInt",
+                    "plc": "SortingController",
+                    "address": "QW4",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "OtherProduct",
+                    "dataType": "uDInt",
+                    "plc": "SortingController",
+                    "address": "QW6",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "TotalRunningTime",
+                    "dataType": "uDInt",
+                    "plc": "SortingController",
+                    "address": "MD12",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "EntryConveyor",
+                    "dataType": "Bool",
+                    "plc": "SortingController",
+                    "address": "Q0.3",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "ExitConveyor",
+                    "dataType": "Bool",
+                    "plc": "SortingController",
+                    "address": "Q0.4",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "MaintenanceAlarm",
+                    "dataType": "Bool",
+                    "plc": "SortingController",
+                    "address": "M11.2",
+                    "access": "read",
+                    "unit": "",
+                    "isAlarm": false,
+                    "alarmType": null,
+                    "parameters": {
+                        "lolo": null,
+                        "lo": null,
+                        "hi": null,
+                        "hihi": null,
+                        "deadband": null
+                    },
+                    "isHistory": false
+                },
+                {
+                    "name": "ResetMaintenance",
+                    "dataType": "Bool",
+                    "plc": "SortingController",
+                    "address": "M11.3",
+                    "access": "read/write",
+                    "unit": "",
+                    "isAlarm": true,
+                    "alarmType": "0",
+                    "parameters": {
+                        "lolo": "",
+                        "lo": "",
+                        "hi": "",
+                        "hihi": "",
+                        "deadband": ""
+                    },
+                    "isHistory": false
                 }
             ]
         }
     ],
     "user": "thesis@gmail.com",
-    "creationTime": "5/17/2019, 11:18:12 AM",
-    "lastActive": "2019-05-18 23:28:06",
-    "published": true,
+    "creationTime": "5/19/2019, 11:37:22 AM",
+    "lastActive": "",
+    "published": false,
     "status": false,
-    "fileName": "deviceConfig_DHBK2019-1.json",
-    "link": "/published/thesis@gmail.com/Device_DHBK2019-1_publish.ejs"
+    "fileName": "deviceConfig_DHBK2019-2.json"
 }
