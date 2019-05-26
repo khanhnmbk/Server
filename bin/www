@@ -72,8 +72,7 @@ mqttClient.on('connect', function () {
     if (err) console.log(err);
     else console.log('Subscribed topic : ' + '/*/alarm');
   });
-
-
+  
 });
 
 mqttClient.on('message', function (topic, message) {

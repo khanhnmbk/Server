@@ -99,7 +99,7 @@ $(document).ready(function () {
                         <td class = "text-center">
                             <i class="fas fa-cog variable-icon" data-toggle="modal" data-target="#gatewayChildrenModal">
                         </td>
-                        <td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + _user + '/deviceConfig_' + deviceObject.deviceID + '.json' + `">Design page</a></td>
+                        <td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + _user + '/deviceConfig_' + deviceObject.deviceID + '.json' + `">Designable</a></td>
                     </tr>
                     `
                     $('#deviceTable tbody').append(htmlMarkup);
@@ -354,8 +354,8 @@ function loadDeviceTable(arrDeviceObject) {
                     </td>` ;
 
             if (!device.published)
-                htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Design page</a></td> </tr>`;
-            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "` + device.link + `">Published page</a></td> </tr>`;
+                htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Designable</a></td> </tr>`;
+            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "` + device.link + `">Published</a></td> </tr>`;
             $('#deviceTable > tbody').append(htmlMarkup);
 
         });

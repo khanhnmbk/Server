@@ -128,7 +128,6 @@ $(document).ready(function () {
           clearInterval(alarmEffectInterval);
           $('#alarmTitle').css('color', '');
         }
-
       });
 
       //Clear history table body first
@@ -372,6 +371,7 @@ $(document).ready(function () {
       addPixel();
       var mainPage1 = document.getElementById('mainPage1').innerHTML;
       var dashboard = document.getElementById('dashboard').innerHTML;
+      
       var _sendObject = {
         user: user,
         deviceID: deviceID,
@@ -1811,7 +1811,7 @@ var drawPolyline = function () {
               break;
             }
           } catch {
-
+            console.log('Item not found');
           }
 
         }
@@ -2054,7 +2054,6 @@ function imageMouseDownEventHandler(event) {
   shapes[index].id = 'img' + nameIndex;
   shapes[index].className += ' contextMenu '
 
-
   //Image css style
   shapes[index].src = defaultImageSrc;
   shapes[index].style.height = '100px';
@@ -2288,14 +2287,25 @@ function textMouseDownEventHandler(event) {
 
   $('#mainPage1').append(para);
   shapes[index] = para;
+  //Change draggable from Plain Draggable -> Jquery UI
+  $(shapes[index]).addClass('draggable');
+  $('.draggable').draggable({
+      refreshPositions: true,
+      containment: $('#mainPage1'),
+  });
+  
+  
   index++;
   nameIndex++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(para, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(para, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+
+
 }
 
 //Display Value mouse down event handler: To create new DisplayValue
