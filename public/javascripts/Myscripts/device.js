@@ -80,7 +80,7 @@ $(document).ready(function () {
                     else deviceObject.period = 5000;
                     deviceObject.PLCs = [];
                     deviceObject.user = _user;
-                    deviceObject.creationTime = new Date().toLocaleString();
+                    deviceObject.creationTime = moment().format('YYYY-MM-DD HH:mm:ss');
                     deviceObject.lastActive = '';
                     deviceObject.published = false;
 
@@ -409,7 +409,7 @@ function loadPLCModal($modal, deviceObj) {
             <td>` + plc.name + `</td>
             <td>` + plc.protocol + `</td>
             <td>` + plc.ipAddress + `</td>
-            <td>
+            <td class = "text-center">
                 <i class="fas fa-cog variable-icon" data-index=`+ plcList.indexOf(plc) + ` data-toggle="modal" data-target="#variableModal">
             </td>
         </tr>`

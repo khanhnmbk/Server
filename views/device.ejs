@@ -164,7 +164,7 @@
                         <div>
                             <table class="table table-hover">
                                 <thead>
-                                    <tr>
+                                    <tr class = "text-center">
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Protocol</th>
@@ -172,7 +172,7 @@
                                         <th>Variables</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class = "text-center">
                                     <tr>
                                         <td>1</td>
                                         <td>PLC S7-1500</td>
@@ -216,7 +216,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body ">
                     <fieldset class="form-group border px-4 pb-2 pt-1">
                         <legend class="col-form-label w-auto px-2">Information</legend>
                         <div>
@@ -237,8 +237,8 @@
 
                     <fieldset class="form-group border px-4 pb-2 pt-1">
                         <legend class="col-form-label w-auto px-2">Variables</legend>
-                        <div>
-                            <table class="table table-hover">
+                        <div class="modal-scrollable">
+                            <table class="table table-hover ">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -628,6 +628,7 @@
     <script src="/javascripts/bootstrap.min.js"></script>
     <script src="/javascripts/socket.io.js"></script>
     <script src='http://www.bing.com/api/maps/mapcontrol'></script>
+    <script src="/javascripts/moment.js"></script>
 
     <!-- My script -->
     <script src="/javascripts/Myscripts/device.js"></script>

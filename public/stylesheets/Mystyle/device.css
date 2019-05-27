@@ -322,3 +322,9 @@ select option[disabled]:first-child {
 .btnAdd , .btnNext , .btnCancel , .btnSave, .btnClose{
     min-width: 120px;
 }
+
+
+.modal-scrollable {
+    max-height: 500px;
+    overflow-y: auto;
+}
