@@ -8,7 +8,7 @@
         {
             "name": "TankController",
             "protocol": "S7-connection",
-            "ipAddress": "192.168.100.160",
+            "ipAddress": "192.168.1.160",
             "variables": [
                 {
                     "name": "Start_1",
@@ -231,7 +231,7 @@
     ],
     "user": "thesis@gmail.com",
     "creationTime": "2019-05-17 11:18:12",
-    "lastActive": "2019-05-18 23:28:06",
+    "lastActive": "2019-05-28 21:06:54",
     "published": true,
     "status": false,
     "fileName": "deviceConfig_DHBK2019-1.json",

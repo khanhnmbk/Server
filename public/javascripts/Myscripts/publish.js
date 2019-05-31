@@ -17,6 +17,7 @@ $(document).ready(function () {
 
   //Empty alarm table first
   $('#alarmTable tbody').empty();
+  $('#historyTable tbody').empty();
 
 
   //Button style when click
@@ -51,6 +52,9 @@ $(document).ready(function () {
       }
       socket.off('/' + $deviceID + '/resPublishParameters');
     });
+
+    //Get all variable first, server will return to socket TAG
+    socket.emit('/reqAllVariables', {deviceID : $deviceID, topic : '/' + $deviceID + '/reqAllVariables'});
 
     //History function
     //socket.emit('/reqHistory', $deviceID);
@@ -320,8 +324,9 @@ $(document).ready(function () {
 /* **************** FUNCTIONS ****************** */
 function loadHistoryTable(arrHistory) {
   $('#historyTable tbody').empty();
+  var _htmlMarkup;
   for (i = 0; i < arrHistory.length; i++) {
-    var _htmlMarkup =
+    _htmlMarkup +=
       `<tr>
             <td>` + arrHistory[i].tag + `</td>
             <td>` + arrHistory[i].type + `</td>
@@ -329,8 +334,8 @@ function loadHistoryTable(arrHistory) {
             <td>` + arrHistory[i].value + `</td>
             <td>` + arrHistory[i].timestamp + `</td>
           </tr>`;
-    $('#historyTable tbody').append(_htmlMarkup);
   }
+  $('#historyTable tbody').append(_htmlMarkup);
 }
 
 function initVariable(variableList) {
@@ -369,12 +374,13 @@ function initSCADA(elementHTML, socket) {
         var _span = $(_id)[0];
         if (_checkbox) {
           $(_checkbox).on('change', function () {
+            var _newSpan = $(this.parentNode).find('span')[0];
             if ($(this).is(':checked')) {
-              var _sendObj = { deviceID: $deviceID, command: _span.onCommand }
+              var _sendObj = { deviceID: $deviceID, command: _newSpan.onCommand }
               socket.emit('/write', _sendObj);
             }
             else {
-              var _sendObj = { deviceID: $deviceID, command: _span.offCommand }
+              var _sendObj = { deviceID: $deviceID, command: _newSpan.offCommand }
               socket.emit('/write', _sendObj);
             }
           });
@@ -520,8 +526,8 @@ function initSCADA(elementHTML, socket) {
           }
         });
         if ($.contains(document.getElementById('dashboard'), document.getElementById(elementHTML[i].id))) {
-          canvas.style.width = width;
-          canvas.style.height = height;
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
         } 
         arrChartJS.push({id : elementHTML[i].id, node : newChart});
         break;

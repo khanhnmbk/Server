@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="/stylesheets/bootstrap-slider.min.css">
     <!-- RGBA color picker -->
     <link type="text/css" rel="stylesheet" href="/stylesheets/rgbaColorPicker.css" />
+    <!-- Data table -->
+    <link type="text/css" rel="stylesheet" href="/stylesheets/dataTables.bootstrap4.min.css" />
     <!-- Own style -->
     <link rel="stylesheet" href="/stylesheets/Mystyle/style.css">
 
@@ -34,14 +36,14 @@
                 <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#gaugeModal"><i
                         class="far fa-file mr-2"></i>Demo</button>
             </div> -->
-            <!-- <div class="btn-group" role="group" aria-label="Clipboard group">
-                <button type="button" class="btn btn-dark" id="btnOpen"><i
+            <div class="btn-group" role="group" aria-label="Clipboard group">
+                <button type="button" class="btn btn-dark" id="btnOpen" data-toggle="modal" data-target="#openModal"><i
                         class="far fa-folder-open mr-2"></i>Open</button>
-            </div> -->
-            <!-- <div class="btn-group" role="group" aria-label="Clipboard group">
-                <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#textModal"><i
+            </div>
+            <div class="btn-group" role="group" aria-label="Clipboard group">
+                <button type="button" class="btn btn-dark" data-toggle="modal" id="btnSave" data-target="#saveModal"><i
                         class="far fa-save mr-2"></i>Save</button>
-            </div> -->
+            </div>
             <div class="btn-group" role="group" aria-label="Clipboard group">
                 <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#settingModal"><i
                         class="fas fa-cog mr-2"></i>Settings</button>
@@ -249,21 +251,19 @@
                                         </button>
                                         <!-- /Symbol -->
 
-                                         <!-- Chart -->
+                                        <!-- Chart -->
                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
-                                        title="Chart" onclick="addNewChart()">
-                                        <img src="/images/toolboxIcon/trend.png" class="img-icon"
-                                            alt="Trend">
+                                            title="Chart" onclick="addNewChart()">
+                                            <img src="/images/toolboxIcon/trend.png" class="img-icon" alt="Trend">
                                         </button>
                                         <!-- /Chart -->
 
-                                         <!-- Gauge -->
-                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
-                                         title="Gauge" onclick="addNewGauge()">
-                                         <img src="/images/toolboxIcon/gauge.png" class="img-icon"
-                                             alt="Gauge">
-                                         </button>
-                                         <!-- /Gauge -->
+                                        <!-- Gauge -->
+                                        <button type="button" class="btn button-icon" data-toggle="tooltip"
+                                            title="Gauge" onclick="addNewGauge()">
+                                            <img src="/images/toolboxIcon/gauge.png" class="img-icon" alt="Gauge">
+                                        </button>
+                                        <!-- /Gauge -->
 
                                     </div> <!-- /Wrapper div -->
                                 </div> <!-- /Card-body div -->
@@ -281,21 +281,19 @@
                             <div id="collapseThree" class="collapse">
                                 <div class="card-body">
                                     <div class="justify-content-sm-end justify-content-center">
-                                         <!-- Chart -->
+                                        <!-- Chart -->
                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
-                                        title="Chart dashboard" onclick="addNewChartDashboard()">
-                                        <img src="/images/toolboxIcon/trend.png" class="img-icon"
-                                            alt="Trend">
+                                            title="Chart dashboard" onclick="addNewChartDashboard()">
+                                            <img src="/images/toolboxIcon/trend.png" class="img-icon" alt="Trend">
                                         </button>
                                         <!-- /Chart -->
 
-                                         <!-- Gauge -->
-                                         <button type="button" class="btn button-icon" data-toggle="tooltip"
-                                         title="Gauge dashboard" onclick="addNewGaugeDashboard()">
-                                         <img src="/images/toolboxIcon/gauge.png" class="img-icon"
-                                             alt="Gauge">
-                                         </button>
-                                         <!-- /Gauge -->
+                                        <!-- Gauge -->
+                                        <button type="button" class="btn button-icon" data-toggle="tooltip"
+                                            title="Gauge dashboard" onclick="addNewGaugeDashboard()">
+                                            <img src="/images/toolboxIcon/gauge.png" class="img-icon" alt="Gauge">
+                                        </button>
+                                        <!-- /Gauge -->
 
                                     </div> <!-- /Wrapper div -->
                                 </div> <!-- /Card-body div -->
@@ -344,7 +342,7 @@
                             <!-- <button class="btn btn-primary mx-3" id="btnAckAll">Acknowledge All</button> -->
                         </div>
 
-                        <div class="row mt-3"  style="max-height: 90%; overflow-y:auto">
+                        <div class="row mt-3" style="max-height: 90%; overflow-y:auto">
                             <table class="table table-hover" id="alarmTable">
                                 <thead class="bg-secondary text-white">
                                     <tr>
@@ -2534,7 +2532,19 @@
         </div>
     </div>
 
-    <!-- Success modal -->
+    <!-- Spinner save modal -->
+    <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        id="spinnerSaveModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content" style="width: 48px">
+                <span class="fa fa-spinner fa-spin fa-3x"></span>
+                <br>
+                Saving...
+            </div>
+        </div>
+    </div>
+
+    <!-- Success publish modal -->
     <div class="modal fade" id="successModal" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -2545,6 +2555,29 @@
                         <p>Your design has been published</p>
                         <h3 class="cupon-pop"><a id="publishedLink">Go to your page</a></h3>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success save modal -->
+    <div class="modal fade" id="successSaveModal" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="thank-you-pop">
+                        <img src="/images/png/success.png" alt="">
+                        <h3 class="text-success">Saved!</h1>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" style="width:100px" data-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>
@@ -2566,37 +2599,42 @@
                             Main page
                         </div>
                         <div class="col-sm-8">
-                            <input type="color" class="form-control ml-auto inputModal" id="mainPageColor" value="#ffffff">
+                            <input type="color" class="form-control ml-auto inputModal" id="mainPageColor"
+                                value="#ffffff">
                         </div>
                     </div>
                     <div class="row mt-4">
-                            <div class="col-sm-4">
-                                Alarm page
-                            </div>
-                            <div class="col-sm-8">
-                                <input type="color" class="form-control ml-auto inputModal" id="alarmPageColor" value="#ffffff">
-                            </div>
+                        <div class="col-sm-4">
+                            Alarm page
                         </div>
-                        <div class="row mt-4">
-                                <div class="col-sm-4">
-                                    History page
-                                </div>
-                                <div class="col-sm-8">
-                                    <input type="color" class="form-control ml-auto inputModal" id="historyPageColor"  value="#ffffff">
-                                </div>
-                            </div>
-                            <div class="row mt-4">
-                                    <div class="col-sm-4">
-                                        Dashboard page
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <input type="color" class="form-control ml-auto inputModal" id="dashboardPageColor" value="#ffffff">
-                                    </div>
-                                </div>
+                        <div class="col-sm-8">
+                            <input type="color" class="form-control ml-auto inputModal" id="alarmPageColor"
+                                value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-sm-4">
+                            History page
+                        </div>
+                        <div class="col-sm-8">
+                            <input type="color" class="form-control ml-auto inputModal" id="historyPageColor"
+                                value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-sm-4">
+                            Dashboard page
+                        </div>
+                        <div class="col-sm-8">
+                            <input type="color" class="form-control ml-auto inputModal" id="dashboardPageColor"
+                                value="#ffffff">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary saveChangeButton" id="btnSaveColors">Save changes</button>
+                    <button type="button" class="btn btn-primary saveChangeButton" id="btnSaveColors">Save
+                        changes</button>
                 </div>
             </div>
         </div>
@@ -2739,7 +2777,7 @@
                                         <select name="gaugeType" class="custom-select">
                                             <option value="true" selected>Donut</option>
                                             <option value="false">Half circle</option>
-                                          </select>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -2750,7 +2788,7 @@
                                             <option value="0" selected>####</option>
                                             <option value="1">####.#</option>
                                             <option value="2">####.##</option>
-                                          </select>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -2758,15 +2796,17 @@
                                     <label class="col-sm-2 col-form-label">Gauge width</label>
                                     <div class="col-sm">
                                         <input type="number" class="form-control ml-auto inputGaugeWidth inputModal"
-                                            value="1" min="0.0"  max="1.0">
+                                            value="1" min="0.0" max="1.0">
                                     </div>
                                 </div>
 
                                 <div class="form-group row my-2 mx-1">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="gaugeUsePointerCheckbox">
-                                        <label class="custom-control-label" for="gaugeUsePointerCheckbox">Use pointer</label>
-                                      </div>    
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="gaugeUsePointerCheckbox">
+                                        <label class="custom-control-label" for="gaugeUsePointerCheckbox">Use
+                                            pointer</label>
+                                    </div>
                                 </div>
 
 
@@ -2777,31 +2817,35 @@
                                 <div class="form-group row my-2">
                                     <label class="col-sm-2 col-form-label">Gauge color</label>
                                     <div class="col-sm">
-                                        <input class="color form-control ml-auto inputGaugeColor inputModal" value="rgba(100,100,100,0.5)" style="width:75%; display: inline-block">
+                                        <input class="color form-control ml-auto inputGaugeColor inputModal"
+                                            value="rgba(100,100,100,0.5)" style="width:75%; display: inline-block">
                                     </div>
                                 </div>
 
                                 <div class="form-group row my-2">
                                     <label class="col-sm-2 col-form-label">Level color</label>
                                     <div class="col-sm">
-                                        <input type="color" class="form-control ml-auto inputLevelColor inputModal" value="#ffffff">
+                                        <input type="color" class="form-control ml-auto inputLevelColor inputModal"
+                                            value="#ffffff">
                                     </div>
                                 </div>
 
                                 <div class="form-group row my-2">
                                     <label class="col-sm-2 col-form-label">Font color</label>
                                     <div class="col-sm">
-                                        <input type="color" class="form-control ml-auto inputFontColor inputModal" value="#ffffff">
+                                        <input type="color" class="form-control ml-auto inputFontColor inputModal"
+                                            value="#ffffff">
                                     </div>
                                 </div>
 
                                 <div class="form-group row my-2">
                                     <label class="col-sm-2 col-form-label">Pointer color</label>
                                     <div class="col-sm">
-                                        <input type="color" class="form-control ml-auto inputPointerColor inputModal" value="#ffffff">
+                                        <input type="color" class="form-control ml-auto inputPointerColor inputModal"
+                                            value="#ffffff">
                                     </div>
                                 </div>
-                                
+
                             </div>
                         </div>
                     </fieldset>
@@ -2837,7 +2881,7 @@
                                 </div>
                             </div>
 
-                            
+
 
                             <div class="form-group row my-2">
                                 <label class="col-sm-2 col-form-label">Min</label>
@@ -2882,6 +2926,94 @@
         </div>
     </div>
 
+    <!--Save modal-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="saveModal" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Save design</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <table class="table table-borderless table-hover file-table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Date modified</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (var i = 0; i < designFiles.length; i++) { %>
+                                <tr>
+                                    <td><%= designFiles[i].name %></td>
+                                    <td><%= designFiles[i].time %></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="input-group mt-2">
+                        <input type="text" class="form-control" placeholder="Filename" id="inputSaveFilename">
+                        <div class="input-group-append">
+                            <span class="input-group-text px-5">.json</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary saveChangeButton" id="btnSaveDesign">Save</button>
+                    <button type="button" class="btn btn-secondary closeButton" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!--Open modal-->
+        <div class="modal fade" tabindex="-1" role="dialog" id="openModal" data-backdrop="static">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Open design</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <table class="table table-borderless table-hover file-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Filename</th>
+                                            <th>Date modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for (var i = 0; i < designFiles.length; i++) { %>
+                                        <tr>
+                                            <td><%= designFiles[i].name %></td>
+                                            <td><%= designFiles[i].time %></td>
+                                        </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- <div class="input-group mt-2">
+                                <input type="text" class="form-control" placeholder="Filename" id="inputSaveFilename">
+                                <div class="input-group-append">
+                                    <span class="input-group-text px-5">.ejs</span>
+                                </div>
+                            </div> -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary saveChangeButton" id="btnOpenDesign">Open</button>
+                            <button type="button" class="btn btn-secondary closeButton" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
     <script src="/javascripts/jquery-3.3.1.min.js"></script>
@@ -2907,15 +3039,18 @@
     <script src="/javascripts/plain-draggable.min.js"></script>
     <!-- Socket.io -->
     <script src="/javascripts/socket.io.js"></script>
-     <!-- Chart -->
-  <script src="/javascripts/moment.js"></script>
-  <script src="/javascripts/Chart.min.js"></script>
-  <script src="/javascripts/hammer.js"></script>
-  <!-- Just Gauge -->
-  <script src="/javascripts/raphael-2.1.4.min.js"></script>
-  <script src="/javascripts/justgage.js"></script>
-  <!-- RGBA color picker -->
-  <script type="text/javascript" src="/javascripts/rgbaColorPicker.js"></script>
+    <!-- Chart -->
+    <script src="/javascripts/moment.js"></script>
+    <script src="/javascripts/Chart.min.js"></script>
+    <script src="/javascripts/hammer.js"></script>
+    <!-- Just Gauge -->
+    <script src="/javascripts/raphael-2.1.4.min.js"></script>
+    <script src="/javascripts/justgage.js"></script>
+    <!-- RGBA color picker -->
+    <script type="text/javascript" src="/javascripts/rgbaColorPicker.js"></script>
+    <!-- Data table -->
+    <script type="text/javascript" src="/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/dataTables.bootstrap4.min.js"></script>
 
     <!-- My script -->
     <script src="/javascripts/Myscripts/design.js"></script>

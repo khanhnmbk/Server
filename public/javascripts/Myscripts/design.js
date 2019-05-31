@@ -5,9 +5,51 @@
 */
 let alarmEffectInterval;
 let isFlashing = false;
+let isRunning = false;
 
+let saveTable, openTable;
 
 $(document).ready(function () {
+  //Load table file
+  saveTable = $('#saveModal .file-table').DataTable({
+    scrollY: 500,
+    // scrollX : 'auto'
+    paging: false,
+  });
+  openTable = $('#openModal .file-table').DataTable({
+    scrollY: 500,
+    // scrollX : 'auto'
+    paging: false,
+  });
+
+  $('#saveModal').on('shown.bs.modal', function (e) {
+    $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+  });
+
+  $('#openModal').on('shown.bs.modal', function (e) {
+    openTable.$('tr.table-selected').removeClass('table-selected');
+    $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+  });
+
+  $('#openModal').on('show.bs.modal', function (e) {
+    openTable.$('tr.table-selected').removeClass('table-selected');
+  });
+
+
+  //Open table: select row
+  $('#openModal table tbody').on('click', 'tr', function () {
+    if ($(this).hasClass('table-selected')) {
+      $(this).removeClass('table-selected');
+    }
+    else {
+      openTable.$('tr.table-selected').removeClass('table-selected');
+      $(this).addClass('table-selected');
+    }
+  });
+
+
+
+
   //Disable all elements in alarm and history when not RUN
   $('#alarm *').prop('disabled', true);
   $('#history *').prop('disabled', true);
@@ -18,6 +60,7 @@ $(document).ready(function () {
   socket.on('connect', function () {
 
     $('#btnRun').on('click', function (clickEvent) {
+      isRunning = true;
       $(this).prop('disabled', true);
       $('#btnStop').prop('disabled', false);
       $('.button-icon').prop('disabled', true);
@@ -146,7 +189,7 @@ $(document).ready(function () {
               <td>` + dataItem.timestamp + `</td>
             </tr>`
             $('#historyTable tbody').append(_htmlMarkup);
-            $('#historyTable tbody').css({'height' : '800px', 'overflow-y' : 'auto'});
+            $('#historyTable tbody').css({ 'height': '800px', 'overflow-y': 'auto' });
             console.log(dataItem);
           });
         }
@@ -154,6 +197,7 @@ $(document).ready(function () {
     });
 
     $('#btnStop').on('click', function (clickEvent) {
+      isRunning = false;
       $(this).prop('disabled', true);
       $('#btnRun').prop('disabled', false);
       $('.button-icon').prop('disabled', false);
@@ -359,7 +403,7 @@ $(document).ready(function () {
       //Enable vertical slider first
       for (i = 0; i < shapes.length; i++) {
         if (shapes[i].id) {
-          if(typeof(shapes[i].id) == 'string') {
+          if (typeof (shapes[i].id) == 'string') {
             if (shapes[i].id.includes('verticalSlider')) {
               console.log(shapes[i]);
               $(shapes[i]).bootstrapSlider('enable');
@@ -371,12 +415,12 @@ $(document).ready(function () {
       addPixel();
       var mainPage1 = document.getElementById('mainPage1').innerHTML;
       var dashboard = document.getElementById('dashboard').innerHTML;
-      
+
       var _sendObject = {
         user: user,
         deviceID: deviceID,
         html: mainPage1,
-        dashboard : dashboard,
+        dashboard: dashboard,
         elements: elementHTML,
         variableList: variableList
       }
@@ -442,6 +486,31 @@ $(document).ready(function () {
     $('#dashboard')[0].style.setProperty('background', $('#dashboardPageColor').prop('value'), 'important');
   });
 
+  //Save current design
+  $('#btnSaveDesign').click(function () {
+    if ($('#inputSaveFilename').val() != '') {
+      var filename = $('#inputSaveFilename').val() + '.json';
+      var result = saveTable.search(filename).$('tr', { "filter": "applied" }).length;
+      if (result > 0) alert('Existing filename');
+      else saveDesign(socket);
+    } else {
+      alert('Filename is empty');
+    }
+
+  });
+
+  //Open designs
+  $('#btnOpenDesign').click(function () {
+    if (openTable.$('tr.table-selected').length > 0) { //Detect selected row
+      openDesign(socket);
+      $('#openModal').modal('hide');
+    } else { //None selected
+      alert('Select a file first');
+    }
+
+  });
+
+
 });
 
 
@@ -490,10 +559,10 @@ function addContextMenu() {
     };
 
     //For gauge
-    if (!selectedItemId) {  
-      if(e.target.parentNode.tagName == 'svg') {  //This is gauge object
+    if (!selectedItemId) {
+      if (e.target.parentNode.tagName == 'svg') {  //This is gauge object
         selectedItemId = e.target.parentNode.parentNode.id;
-      } else if(e.target.parentNode.tagName == 'text') {  //This is gauge object
+      } else if (e.target.parentNode.tagName == 'text') {  //This is gauge object
         selectedItemId = e.target.parentNode.parentNode.parentNode.id;
       }
     }
@@ -540,7 +609,7 @@ function removeItem() {
     if (selectedItemId.includes('verticalSlider') || selectedItemId.includes('chart') || selectedItemId.includes('switch')) {
       $(item.parentNode).remove();
     }
-    else item.parentNode.removeChild(item); 
+    else item.parentNode.removeChild(item);
 
     for (var elem of shapes) {
       console.log(elem);
@@ -627,7 +696,7 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.command,
           }
-          _socket.emit('/write', _sendObj);
+          if (isRunning) _socket.emit('/write', _sendObj);
         })
         break;
       }
@@ -647,7 +716,7 @@ function initSCADA(_shapes, _socket) {
                   command: this.tag + ' = ' + this.value
                 }
               }
-              _socket.emit('/write', _sendObj);
+              if (isRunning) _socket.emit('/write', _sendObj);
             }
           }
         });
@@ -668,7 +737,7 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.tag + ' = ' + this.value
           }
-          if (this.tag) _socket.emit('/write', _sendObj);
+          if (this.tag && isRunning) _socket.emit('/write', _sendObj);
         });
         break;
       }
@@ -680,7 +749,7 @@ function initSCADA(_shapes, _socket) {
             command: this.tag + ' = ' + this.value
           }
           console.log(_sendObj)
-          if (this.tag) _socket.emit('/write', _sendObj);
+          if (this.tag && isRunning) _socket.emit('/write', _sendObj);
         });
         break;
       }
@@ -695,14 +764,14 @@ function initSCADA(_shapes, _socket) {
                   deviceID: deviceID,
                   command: _span.onCommand,
                 }
-                _socket.emit('/write', _sendObj);
+                if (isRunning) _socket.emit('/write', _sendObj);
               }
               else {
                 var _sendObj = {
                   deviceID: deviceID,
                   command: _span.offCommand,
                 }
-                _socket.emit('/write', _sendObj);
+                if (isRunning) _socket.emit('/write', _sendObj);
               }
             });
           }
@@ -716,14 +785,14 @@ function initSCADA(_shapes, _socket) {
                   deviceID: deviceID,
                   command: _label.checkedCommand,
                 }
-                _socket.emit('/write', _sendObj);
+                if (isRunning) _socket.emit('/write', _sendObj);
               }
               else {
                 var _sendObj = {
                   deviceID: deviceID,
                   command: _label.unCheckedCommand,
                 }
-                _socket.emit('/write', _sendObj);
+                if (isRunning) _socket.emit('/write', _sendObj);
               }
             });
           }
@@ -790,7 +859,7 @@ function SCADA(arrHtmlElems, variableName, variableTimestamp) {
         scadaChartObject(_shape, variableName, variableTimestamp);
         break;
       }
-      case 'gauge' : {
+      case 'gauge': {
         scadaGaugeObject(_shape, variableName);
         break;
       }
@@ -2290,11 +2359,11 @@ function textMouseDownEventHandler(event) {
   //Change draggable from Plain Draggable -> Jquery UI
   $(shapes[index]).addClass('draggable');
   $('.draggable').draggable({
-      refreshPositions: true,
-      containment: $('#mainPage1'),
+    refreshPositions: true,
+    containment: $('#mainPage1'),
   });
-  
-  
+
+
   index++;
   nameIndex++;
 
@@ -2447,14 +2516,21 @@ function displayValueMouseDownEventHandler(event) {
 
   $('#mainPage1').append(para);
   shapes[index] = para;
+
+  $(shapes[index]).addClass('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+  });
+
   index++;
   nameIndex++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(para, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(para, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
 }
 
 //Button mouse down event handler: To create new button
@@ -2779,11 +2855,17 @@ function switchMouseDownEventHandler(event) {
   nameIndex++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(sw, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(sw, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
 
+  sw.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel: false,
+  });
 
 }
 
@@ -3075,10 +3157,17 @@ function checkboxMouseDownEventHandler(event) {
   nameIndex++;
 
   //Add draggable feature
-  draggable = new PlainDraggable(checkbox, { leftTop: true });
-  draggable.autoScroll = true;
-  draggable.containment = document.getElementById('mainPage1');
-  draggableObjects.push(draggable);
+  // draggable = new PlainDraggable(checkbox, { leftTop: true });
+  // draggable.autoScroll = true;
+  // draggable.containment = document.getElementById('mainPage1');
+  // draggableObjects.push(draggable);
+
+  checkbox.classList.add('draggable');
+  $('.draggable').draggable({
+    refreshPositions: true,
+    containment: $('#mainPage1'),
+    cancel: false,
+  });
 }
 
 //Slider mouse down event handler: To create new Checkbox
@@ -4680,7 +4769,7 @@ function gaugeMouseDownEventHandler(event) {
     id: gaugeDiv.id,
     value: 50,
     decimals: gaugeDiv.format,
-    title : gaugeDiv.title,
+    title: gaugeDiv.title,
     min: gaugeDiv.min,
     max: gaugeDiv.max,
     label: gaugeDiv.label,
@@ -4717,16 +4806,16 @@ function gaugeMouseDownEventHandler(event) {
     $('#gaugeModal').one('show.bs.modal', function (showEvent) {
 
       var selectedItem = mouseEvent.target; //Canvas selected
-      switch(selectedItem.tagName) {
-        case 'svg' : {
-          selectedItem = selectedItem.parentNode;  
+      switch (selectedItem.tagName) {
+        case 'svg': {
+          selectedItem = selectedItem.parentNode;
           break;
         }
-        case 'path' : {
+        case 'path': {
           selectedItem = selectedItem.parentNode.parentNode;
           break;
         }
-        case 'tspan' : {
+        case 'tspan': {
           selectedItem = selectedItem.parentNode.parentNode.parentNode;
           break;
         }
@@ -4760,7 +4849,7 @@ function gaugeMouseDownEventHandler(event) {
       } else {
         itemModal.querySelector('#gaugeUsePointerCheckbox').checked = false;
       }
-     
+
       if (selectedItem.gaugeColor) {
         itemModal.querySelector('.inputGaugeColor').value = selectedItem.gaugeColor;
       }
@@ -5297,7 +5386,7 @@ function gaugeDashboardMouseDownEventHandler(event) {
     id: gaugeDiv.id,
     value: 50,
     decimals: gaugeDiv.format,
-    title : gaugeDiv.title,
+    title: gaugeDiv.title,
     min: gaugeDiv.min,
     max: gaugeDiv.max,
     label: gaugeDiv.label,
@@ -5334,16 +5423,16 @@ function gaugeDashboardMouseDownEventHandler(event) {
     $('#gaugeModal').one('show.bs.modal', function (showEvent) {
 
       var selectedItem = mouseEvent.target; //Canvas selected
-      switch(selectedItem.tagName) {
-        case 'svg' : {
-          selectedItem = selectedItem.parentNode;  
+      switch (selectedItem.tagName) {
+        case 'svg': {
+          selectedItem = selectedItem.parentNode;
           break;
         }
-        case 'path' : {
+        case 'path': {
           selectedItem = selectedItem.parentNode.parentNode;
           break;
         }
-        case 'tspan' : {
+        case 'tspan': {
           selectedItem = selectedItem.parentNode.parentNode.parentNode;
           break;
         }
@@ -5377,7 +5466,7 @@ function gaugeDashboardMouseDownEventHandler(event) {
       } else {
         itemModal.querySelector('#gaugeUsePointerCheckbox').checked = false;
       }
-     
+
       if (selectedItem.gaugeColor) {
         itemModal.querySelector('.inputGaugeColor').value = selectedItem.gaugeColor;
       }
@@ -5547,7 +5636,7 @@ function gaugeDashboardMouseDownEventHandler(event) {
 function showHiddenItems() {
   for (var i = 0; i < elementHTML.length; i++) {
     if (elementHTML[i].type != 'verticalslider')
-    $('#' + elementHTML[i].id).show();
+      $('#' + elementHTML[i].id).show();
   }
 }
 
@@ -5555,7 +5644,7 @@ function showHiddenItems() {
 function enableAllItems() {
   for (var i = 0; i < elementHTML.length; i++) {
     if (elementHTML[i].type == 'switch' || elementHTML[i].type == 'checkbox') {
-     // console.log( $(document.getElementById(elementHTML[i].id).parentNode).find('input'))
+      // console.log( $(document.getElementById(elementHTML[i].id).parentNode).find('input'))
       $(document.getElementById(elementHTML[i].id).parentNode).find('input').prop('disabled', false);
     } else $('#' + elementHTML[i].id).prop('disabled', false);
   }
@@ -5569,14 +5658,14 @@ function addPixel() {
   for (var i = 0; i < elementHTML.length; i++) {
     var element = document.getElementById(elementHTML[i].id);
     console.log(element);
-    switch(elementHTML[i].type) {
-      case 'svg' : {
+    switch (elementHTML[i].type) {
+      case 'svg': {
         $(element).attr({
-          transform: 'translate(' + $leftOffset +',0)'
+          transform: 'translate(' + $leftOffset + ',0)'
         });
         break;
       };
-      case 'switch' : {
+      case 'switch': {
         var label = $(element).closest('label')[0];
         if (label) {
           var labelLeft = label.style.left;
@@ -5588,25 +5677,378 @@ function addPixel() {
         }
         break;
       }
-      case 'checkbox' : 
-      case 'chart' : 
-      case 'verticalslider' : {
+      case 'checkbox':
+      case 'chart':
+      case 'verticalslider': {
         var divNode = element.parentNode;
         var divLeft = divNode.style.left;
         if (divLeft) {
-          divLeft = divLeft.replace('px','');
+          divLeft = divLeft.replace('px', '');
           divNode.style.left = (Number(divLeft) + $leftOffset) + 'px';
         }
         break;
       }
-      default : {
+      default: {
         var currentLeft = element.style.left;
         if (currentLeft) {
-          currentLeft = currentLeft.replace('px','');
+          currentLeft = currentLeft.replace('px', '');
           element.style.left = (Number(currentLeft) + $leftOffset) + 'px';
         }
         break;
       }
     }
   }
+}
+
+//Save current design page
+function saveDesign(_socket) {
+  //Turn off save modal
+  $('#saveModal').modal('hide');
+
+  var mainPage1 = document.getElementById('mainPage1').innerHTML;
+  var dashboard = document.getElementById('dashboard').innerHTML;
+
+  var _sendObject = {
+    user: user,
+    deviceID: deviceID,
+    html: mainPage1,
+    dashboard: dashboard,
+    elements: elementHTML,
+    //variableList: variableList
+  }
+
+  var mainPageColor = $('#mainPage1')[0].style.background;
+  if (mainPageColor) mainPageColor = rgb2hex(mainPageColor);
+
+  var alarmPageColor = $('#alarm')[0].style.background;
+  if (alarmPageColor) alarmPageColor = rgb2hex(alarmPageColor);
+
+  var historyPageColor = $('#history')[0].style.background;
+  if (historyPageColor) historyPageColor = rgb2hex(historyPageColor);
+
+  var dashboardPageColor = $('#dashboard')[0].style.background;
+  if (dashboardPageColor) dashboardPageColor = rgb2hex(dashboardPageColor);
+
+  var backgroundObject = {
+    mainPage: mainPageColor,
+    alarmPage: alarmPageColor,
+    historyPage: historyPageColor,
+    dashboardPage: dashboardPageColor
+  }
+
+  var fileList = {
+    designFile: $('#inputSaveFilename').val() + '.json',
+    elementFile: 'Device_' + deviceID + '_Elements.json',
+    backgroundFile: 'Device_' + deviceID + '_Background.json'
+  }
+
+  _socket.emit('/save', _sendObject, backgroundObject, fileList);
+  $('#spinnerSaveModal').modal('show');
+  _socket.on('/' + deviceID + '/saveSuccess', function (data) {
+    setTimeout(function () {
+      $('#spinnerSaveModal').modal('hide');
+      $('#successSaveModal').modal('show');
+      _socket.off('/' + deviceID + '/saveSuccess');
+    }, 2000);
+  });
+}
+
+//Open a desgin
+function openDesign(_socket) {
+  var isContinue = confirm('Do you want to continue?');
+  if (isContinue) {
+    $('#mainPage1').empty();
+    $('#dashboard').empty();
+    shapes.splice(0, shapes.length);
+    arrChartJS.splice(0, arrChartJS.length);
+    arrGauge.splice(0, arrGauge.length);
+    elementHTML = [];
+    draggableObjects.splice(0, draggableObjects.length);
+
+    var fileName = openTable.$('tr.table-selected')[0].cells[0].innerText;
+    _socket.emit('/reqDesign', { user: user, deviceID: deviceID, fileName: fileName });
+    _socket.on('/' + deviceID + '/resDesign', function (data) {
+      console.log(data);
+      _socket.off('/' + deviceID + '/resDesign');
+      $('#mainPage1').append($.parseHTML(data.design.mainPage1));
+      $('#dashboard').append($.parseHTML(data.design.dashboard));
+      //Modify array elementHTML
+      elementHTML = data.element;
+      elementHTML.forEach(element => {
+        var elementDOM = document.getElementById(element.id);
+        var isMainpage = $.contains(document.getElementById('mainPage1'), elementDOM);
+        //Init HTML properties
+        if (elementDOM) {
+          for (j = 0; j < element.properties.length; j++) {
+            elementDOM[element.properties[j].name] = element.properties[j].value;
+          }
+        }
+        switch (element.type.toLowerCase()) {
+          case 'switch': 
+          case 'checkbox': {
+            shapes.push(elementDOM.parentNode);
+            if (isMainpage) elementDOM.parentNode.classList.add('draggable');
+            else elementDOM.parentNode.classList.add('draggable2');
+            break;
+          }
+          case 'chart': {
+            shapes.push(elementDOM.parentNode);
+            if (isMainpage) elementDOM.parentNode.classList.add('draggable');
+            else elementDOM.parentNode.classList.add('draggable2');
+            //Canvas = elementDOM
+            var width = elementDOM.width;
+            var height = elementDOM.height;
+            var ctx1 = elementDOM.getContext('2d');
+            var newChart = new Chart(ctx1, {
+              // The type of chart we want to create
+              type: 'line',
+              // The data for our dataset
+              data: {
+                labels: [],
+                datasets: [{
+                  steppedLine: false,
+                  backgroundColor: 'rgba(57,172,180 , 0.8)',
+                  hoverBackgroundColor: 'rgba(57,172,180 , 0.3)',
+                  data: [],
+                  label: 'Value',
+                  // backgroundColor: 'rgb(255, 255, 255, 0.2)',
+                  borderColor: 'rgb(0,102,10)',
+                  borderWidth: 2,
+                  pointRadius: 0,
+                }]
+              },
+
+              // Configuration options go here
+              options: {
+                legend: false,
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                  display: false,
+                  // text: option.title,
+                  // fontColor: 'white',
+                  // fontSize: 20
+                },
+                tooltips: {
+                  mode: 'index',
+                  intersect: false,
+                  titleFontSize: 16,
+                  bodyFontSize: 16
+                },
+                hover: {
+                  mode: 'nearest',
+                  intersect: true
+                },
+                scales: {
+                  xAxes: [{
+                    display: true,
+                    // type : 'realtime',
+                    scaleLabel: {
+                      display: true,
+                      labelString: elementDOM.xLabel || 'Time',
+                    },
+                  }],
+                  yAxes: [{
+                    ticks: {
+                      beginAtZero: true
+                    },
+                    display: true,
+                    gridLines: {
+                      color: '#282525'
+                    },
+                    scaleLabel: {
+                      display: true,
+                      labelString: elementDOM.yLabel || 'Value',
+                    }
+                  }]
+                },
+
+              }
+            });
+            if (!isMainpage) {
+              console.log('Width : ', width);
+              console.log('Height: ', height)
+              elementDOM.style.width = width + 'px';
+              elementDOM.style.height = height + 'px';
+            }
+            arrChartJS.push({ id: element.id, node: newChart });
+
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#chartModal').one('show.bs.modal', function (showEvent) {
+          
+                var selectedItem = mouseEvent.target; //Canvas selected
+                var elemWidth, elemHeight;
+          
+                elemWidth = parseInt(selectedItem.style.width, 10);
+                elemHeight = parseInt(selectedItem.style.height, 10);
+          
+                var itemModal = $('#chartModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+          
+                if (selectedItem.tag) {
+                  itemModal.querySelector('.inputValue').value = selectedItem.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+          
+                if (selectedItem.xLabel) {
+                  itemModal.querySelector('.inputXLabel').value = selectedItem.xLabel;
+                }
+                else {
+                  itemModal.querySelector('.inputXLabel').value = '';
+                }
+          
+                if (selectedItem.yLabel) {
+                  itemModal.querySelector('.inputYLabel').value = selectedItem.yLabel;
+                }
+                else {
+                  itemModal.querySelector('.inputYLabel').value = '';
+                }
+          
+                // if (selectedItem.timeRange) {
+                //   itemModal.querySelector('.inputTimeRange').value = selectedItem.timeRange;
+                // }
+                // else {
+                //   itemModal.querySelector('.inputTimeRange').value = '';
+                // }
+          
+                if (selectedItem.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = selectedItem.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+          
+                  selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                  selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  selectedItem.tag = itemModal.querySelector('.inputValue').value;
+                  selectedItem.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  selectedItem.xLabel = itemModal.querySelector('.inputXLabel').value;
+                  selectedItem.yLabel = itemModal.querySelector('.inputYLabel').value;
+                  //selectedItem.timeRange = itemModal.querySelector('.inputTimeRange').value;
+          
+                  var _foundIndex = findElementHTMLById(selectedItem.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = selectedItem.tag;
+                    elementHTML[_foundIndex].properties[1].value = selectedItem.hiddenWhen;
+                    elementHTML[_foundIndex].properties[2].value = selectedItem.xLabel;
+                    elementHTML[_foundIndex].properties[3].value = selectedItem.yLabel;
+                    // elementHTML[_foundIndex].properties[4].value = selectedItem.timeRange;
+                  }
+          
+                  var foundChartIndex = findChartById(selectedItem.id);
+                  if (foundChartIndex != -1) {
+                    arrChartJS[foundChartIndex].node.options.scales.xAxes[0].scaleLabel.labelString = selectedItem.xLabel;
+                    arrChartJS[foundChartIndex].node.options.scales.yAxes[0].scaleLabel.labelString = selectedItem.yLabel;
+                    arrChartJS[foundChartIndex].node.update();
+                  }
+                });
+          
+                //Button Value browse tag
+                $('.btnValueTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnHiddenWhen').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#chartModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValueTag').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+          
+              $('#chartModal').modal();
+            });
+            break;
+          }
+          case 'gauge': {
+            shapes.push(elementDOM);
+            if (isMainpage) elementDOM.classList.add('draggable');
+            else elementDOM.classList.add('draggable2');
+            $(elementDOM).find('svg').remove();
+            var newGauge = new JustGage({
+              id: elementDOM.id,
+              value: 50,
+              decimals: elementDOM.format || 2,
+              title: elementDOM.title || 'Gauge',
+              min: elementDOM.min || 0,
+              max: elementDOM.max || 100,
+              label: elementDOM.label || 'RPM',
+              labelFontColor: elementDOM.fontColor || '#000000',
+              donut: elementDOM.type || false,
+              relativeGaugeSize: true,
+              valueFontColor: elementDOM.fontColor || '#000000',
+              valueFontSize: '10px',
+              gaugeColor: elementDOM.gaugeColor || 'rgba(255,255,255,0.5)',
+              levelColors: elementDOM.levelColor || ['#00660a'],
+              pointer: elementDOM.usePointer || true,
+              pointerOptions: {
+                toplength: 8,
+                bottomlength: -20,
+                bottomwidth: 6,
+                color: elementDOM.pointerColor || '#00800d',
+              },
+              gaugeWidthScale: elementDOM.gaugeWidth || 0.2,
+              counter: true,
+            });
+            arrGauge.push({ id: elementDOM.id, node: newGauge });
+            elementDOM.style.cursor = 'pointer';  //Fix pointer when mouse over INPUT
+            break;
+          }
+          case 'svg': {
+            shapes.push(elementDOM);
+            console.log(shapes);
+            var draggable = new PlainDraggable(elementDOM, { leftTop: true });
+            draggable.autoScroll = true;
+            draggable.containment = document.getElementById('mainPage1');
+            draggableObjects.push(draggable);
+            break;
+          }
+          case 'input' : {
+            elementDOM.style.cursor = 'pointer';  //Fix pointer when mouse over INPUT
+          }
+          default: {
+            shapes.push(elementDOM);
+            if (isMainpage) elementDOM.classList.add('draggable');
+            else elementDOM.classList.add('draggable2');
+            break;
+          }
+        }
+        
+        if(isMainpage) {
+          $('.draggable').draggable({
+            refreshPositions: true,
+            containment: $('#mainPage1'),
+            cancel: false
+          });
+        } else {
+          $('.draggable2').draggable({
+            refreshPositions: true,
+            containment: $('#dashboard'),
+            cancel: false
+          });
+        }
+
+      })
+    });
+  }
+
 }

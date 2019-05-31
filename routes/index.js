@@ -5,6 +5,9 @@ var LocalStrategy = require('passport-local').Strategy;
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
+var recursive = require("recursive-readdir");
+var moment = require('moment');
+
 
 var databasePath = '../Server/Database';
 var symbolPath = '../Server/public/images/symbols';
@@ -116,6 +119,7 @@ router.get('/device', checkAuthtication, function (req, res, next) {
 router.get('/design/:user/:filename', checkAuthtication, function (req, res, next) {
   var variableList = [];
   var arrSymbols = [];
+  var arrDesign = [];
 
   var deviceID = req.params.filename.substring(
     req.params.filename.lastIndexOf("Config_") + 7,
@@ -155,11 +159,27 @@ router.get('/design/:user/:filename', checkAuthtication, function (req, res, nex
         })
       }
       callback();
+    },
+    //Get saved designs
+    function(callback) {
+      var designPath = path.resolve(databasePath, req.params.user, 'Save', 'Design');
+      recursive(designPath, function(err, files) {
+        if (err) console.log(err);
+        else {
+          files.forEach(file => {
+            arrDesign.push({
+              name: path.basename(file),
+              time : moment(fs.statSync(file).mtime).format('YYYY-MM-DD HH:mm:ss')
+            })
+          });
+        }
+        callback();
+      })
     }
   ], function (err) {
     if (err) console.log(err);
     console.log(arrSymbols);
-    res.render('designPage', { user: req.user.email, variableList: variableList, deviceID: deviceID, arrSymbols: arrSymbols });
+    res.render('designPage', { user: req.user.email, variableList: variableList, deviceID: deviceID, arrSymbols: arrSymbols, designFiles : arrDesign });
 
   });
 });

@@ -239,6 +239,7 @@ io.on('connection', function (socket) {
   socket.on('/reqHistory', function (_id) {
     var historyModel = historyMongoose.createModel('Device_' + _id + '_history');
     historyModel.find({}, { _id: 0, __v: 0 }, function (err, results) {
+      console.log(results);
       socket.emit('/' + _id + '/resHistory', results);
     });
   });
@@ -280,6 +281,31 @@ io.on('connection', function (socket) {
     var variableObj = JSON.parse(fs.readFileSync(variableFile));
     var backgroundObj = JSON.parse(fs.readFileSync(backgroundFile));
     socket.emit('/' + userObject.deviceID + '/resPublishParameters', { htmlElements: elementObj, variableList: variableObj, background: backgroundObj });
+  });
+
+  //Client requests all variables when start up
+  socket.on('/reqAllVariables', function(rcvObject) {
+    mqttClient.publish(rcvObject.topic, '');
+  });
+
+  //Save design
+  socket.on('/save', function(scadaObject, backgroundObject, fileList) {
+    fs.writeFileSync(path.resolve(databasePath, scadaObject.user, 'Save', 'Design', fileList.designFile), JSON.stringify({mainPage1: scadaObject.html, dashboard: scadaObject.dashboard}), null, 4);
+    fs.writeFileSync(path.resolve(databasePath, scadaObject.user, 'Save', 'Parameters' , fileList.elementFile), JSON.stringify(scadaObject.elements, null, 4));
+    fs.writeFileSync(path.resolve(databasePath, scadaObject.user, 'Save', 'Parameters' , fileList.backgroundFile), JSON.stringify(backgroundObject, null, 4));
+    socket.emit('/' + scadaObject.deviceID + '/saveSuccess', 1);
+  });
+
+  //Request design
+  socket.on('/reqDesign', function(info) {
+    var designPath = path.resolve(databasePath, info.user, 'Save', 'Design', info.fileName);
+    var elementPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', 'Device_' + info.deviceID + '_Elements.json');
+    var backgroundPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', 'Device_' + info.deviceID + '_Background.json');
+    socket.emit('/' + info.deviceID + '/resDesign', {
+      design : JSON.parse(fs.readFileSync(designPath)),
+      element : JSON.parse(fs.readFileSync(elementPath)),
+      background : JSON.parse(fs.readFileSync(backgroundPath))
+    });
   });
 
 });

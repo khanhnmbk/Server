@@ -348,3 +348,17 @@ label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
     max-height: 700px;
     overflow-y:auto;
 }
+
+/*
+***********************************************************************************************
+                                Button size
+***********************************************************************************************
+*/
+
+.saveChangeButton , .closeButton{
+    min-width: 100px;
+}
+
+.table-selected {
+    background: #b3b3b3
+}
