@@ -522,7 +522,7 @@ $(document).ready(function () {
 ***********************************************************************************************
 */
 //SVG global variable
-const draw = SVG('mainPage1');
+let draw = SVG('mainPage1');
 const shapes = [];
 const draggableObjects = [];
 const arrChartJS = [];
@@ -536,6 +536,7 @@ const user = $('#user').text();
 let variableList = [];
 let elementHTML = []; //Array contains extra-HTML properties, which is sent to server via socket.io
 const $leftOffset = 165;
+let isOpened = false;
 
 //Default option for basic objects except LINE
 const defaultOption = {
@@ -1276,6 +1277,7 @@ var startDraw = function (shape) {
   var modalId = '';
   //Stop the previous draw
   stopDraw(false);
+  console.log('Start draw');
 
   //Subscribe mouse down event
   draw.on('mousedown', function (event) {
@@ -5773,8 +5775,8 @@ function saveDesign(_socket) {
 
   var fileList = {
     designFile: $('#inputSaveFilename').val() + '.json',
-    elementFile: 'Device_' + deviceID + '_Elements.json',
-    backgroundFile: 'Device_' + deviceID + '_Background.json'
+    elementFile: $('#inputSaveFilename').val() + '_Elements.json',
+    backgroundFile: $('#inputSaveFilename').val() + '_Background.json'
   }
 
   _socket.emit('/save', _sendObject, backgroundObject, fileList);
@@ -8050,5 +8052,4 @@ function openDesign(_socket) {
       })
     });
   }
-
 }

@@ -299,8 +299,8 @@ io.on('connection', function (socket) {
   //Request design
   socket.on('/reqDesign', function(info) {
     var designPath = path.resolve(databasePath, info.user, 'Save', 'Design', info.fileName);
-    var elementPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', 'Device_' + info.deviceID + '_Elements.json');
-    var backgroundPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', 'Device_' + info.deviceID + '_Background.json');
+    var elementPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', info.fileName.replace('.json' , '') + '_Elements.json');
+    var backgroundPath = path.resolve(databasePath, info.user, 'Save', 'Parameters', info.fileName.replace('.json', '') + '_Background.json');
     socket.emit('/' + info.deviceID + '/resDesign', {
       design : JSON.parse(fs.readFileSync(designPath)),
       element : JSON.parse(fs.readFileSync(elementPath)),
