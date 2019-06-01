@@ -1,199 +1,115 @@
 [
     {
-        "type": "gauge",
-        "id": "gauge0",
+        "type": "verticalslider",
+        "id": "verticalSlider0",
         "properties": [
             {
                 "name": "tag",
-                "value": "S7_1500_MW2"
-            },
-            {
-                "name": "hiddenWhen",
                 "value": ""
             },
             {
-                "name": "type",
+                "name": "minTag",
+                "value": ""
+            },
+            {
+                "name": "minValue",
+                "value": "100"
+            },
+            {
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "400"
+            },
+            {
+                "name": "isMinTag",
                 "value": false
             },
             {
-                "name": "gaugeColor",
-                "value": "rgba(255,255,255,0.5)"
+                "name": "isMaxTag",
+                "value": false
             },
             {
-                "name": "levelColor",
-                "value": [
-                    [
-                        "#00660a"
-                    ]
-                ]
+                "name": "disableWhen",
+                "value": ""
+            }
+        ]
+    },
+    {
+        "type": "verticalslider",
+        "id": "verticalSlider1",
+        "properties": [
+            {
+                "name": "tag",
+                "value": ""
             },
             {
-                "name": "fontColor",
-                "value": "#000000"
+                "name": "minTag",
+                "value": "S7_1500_MW2"
             },
             {
-                "name": "gaugeWidth",
-                "value": "0.2"
+                "name": "minValue",
+                "value": "0"
             },
             {
-                "name": "usePointer",
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "1000"
+            },
+            {
+                "name": "isMinTag",
                 "value": true
             },
             {
-                "name": "pointerColor",
-                "value": "#00800d"
+                "name": "isMaxTag",
+                "value": false
             },
             {
-                "name": "format",
-                "value": 2
-            },
-            {
-                "name": "label",
-                "value": "value"
-            },
-            {
-                "name": "min",
-                "value": 0
-            },
-            {
-                "name": "max",
-                "value": 100
-            },
-            {
-                "name": "title",
-                "value": "Main"
+                "name": "disableWhen",
+                "value": ""
             }
         ]
     },
     {
-        "type": "chart",
-        "id": "chart1",
+        "type": "verticalslider",
+        "id": "verticalSlider2",
         "properties": [
             {
                 "name": "tag",
-                "value": "S7_1500_MW2"
-            },
-            {
-                "name": "hiddenWhen",
                 "value": ""
             },
             {
-                "name": "xLabel",
-                "value": "Time"
-            },
-            {
-                "name": "yLabel",
-                "value": "Value"
-            }
-        ]
-    },
-    {
-        "type": "chart",
-        "id": "chart2",
-        "properties": [
-            {
-                "name": "tag",
-                "value": "S7_1500_MW2"
-            },
-            {
-                "name": "hiddenWhen",
+                "name": "minTag",
                 "value": ""
             },
             {
-                "name": "xLabel",
-                "value": "Time"
+                "name": "minValue",
+                "value": "20"
             },
             {
-                "name": "yLabel",
-                "value": "Value"
-            }
-        ]
-    },
-    {
-        "type": "gauge",
-        "id": "gauge3",
-        "properties": [
-            {
-                "name": "tag",
+                "name": "maxTag",
                 "value": "S7_1500_MW2"
             },
             {
-                "name": "hiddenWhen",
-                "value": ""
+                "name": "maxValue",
+                "value": "100"
             },
             {
-                "name": "type",
+                "name": "isMinTag",
+                "value": false
+            },
+            {
+                "name": "isMaxTag",
                 "value": true
             },
             {
-                "name": "gaugeColor",
-                "value": "rgba(255,255,255,0.5)"
-            },
-            {
-                "name": "levelColor",
-                "value": [
-                    [
-                        "#00660a"
-                    ]
-                ]
-            },
-            {
-                "name": "fontColor",
-                "value": "#000000"
-            },
-            {
-                "name": "gaugeWidth",
-                "value": "0.2"
-            },
-            {
-                "name": "usePointer",
-                "value": true
-            },
-            {
-                "name": "pointerColor",
-                "value": "#00800d"
-            },
-            {
-                "name": "format",
-                "value": 2
-            },
-            {
-                "name": "label",
-                "value": "value"
-            },
-            {
-                "name": "min",
-                "value": 0
-            },
-            {
-                "name": "max",
-                "value": 100
-            },
-            {
-                "name": "title",
-                "value": "Gauge"
-            }
-        ]
-    },
-    {
-        "type": "chart",
-        "id": "chart4",
-        "properties": [
-            {
-                "name": "tag",
-                "value": "S7_1500_MW2"
-            },
-            {
-                "name": "hiddenWhen",
+                "name": "disableWhen",
                 "value": ""
-            },
-            {
-                "name": "xLabel",
-                "value": "Time"
-            },
-            {
-                "name": "yLabel",
-                "value": "Value"
             }
         ]
     }

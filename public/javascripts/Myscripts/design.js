@@ -77,6 +77,7 @@ $(document).ready(function () {
       $('.btnBrowseTag').prop('disabled', true);
       $('.btnChooseImage').prop('disabled', true);
       $('.saveChangeButton').prop('disabled', true);
+
       initSCADA(shapes, socket);
 
       socket.on('/' + deviceID + '/tag', function (data) {
@@ -742,7 +743,21 @@ function initSCADA(_shapes, _socket) {
         break;
       }
       case 'verticalslider': {
+        //Update min, max value
+        if (_shape.isMinTag) {
+          $(_shape).bootstrapSlider({'min': eval(_shape.minTag)});
+        } else {
+          $(_shape).bootstrapSlider({'min' : Number(_shape.minValue)});
+        }
+        // $(_shape).bootstrapSlider('refresh');
+        if (_shape.isMaxTag) {
+          $(_shape).bootstrapSlider({'max': eval(_shape.maxTag)});
+        } else {
+          $(_shape).bootstrapSlider({'max': Number(_shape.maxValue)});
+        }
+        $(_shape).bootstrapSlider('refresh');
         $(_shape).bootstrapSlider('enable');
+
         $(_shape).on('slideStop', function (event) {
           var _sendObj = {
             deviceID: deviceID,
@@ -1124,18 +1139,33 @@ function scadaVerticalSliderObject(item, variableName) {
   }
 
   if (item.isMinTag) {
-    if (item.minTag.includes(variableName)) item.min = eval(item.minTag);
+    if (item.minTag.includes(variableName)) {
+      if (item.min != eval(item.minTag)) {
+        item.min = eval(item.minTag);
+        $(item).bootstrapSlider({'min' : eval(item.minTag)});
+        $(item).bootstrapSlider('refresh');
+        $(item).bootstrapSlider('enable');
+      }
+    } 
   }
   else {
-    if (item.minValue) item.min = item.minValue;
+    if (item.minValue) item.min = Number(item.minValue);
   }
 
   if (item.isMaxTag) {
-    if (item.maxTag.includes(variableName)) item.max = eval(item.maxTag);
+    if (item.maxTag.includes(variableName)) {
+      if (item.max != eval(item.maxTag)) {
+        item.max = eval(item.maxTag);
+        $(item).bootstrapSlider({'max' : eval(item.maxTag)});
+        $(item).bootstrapSlider('refresh');
+        $(item).bootstrapSlider('enable');
+      }
+    } 
   }
   else {
-    if (item.maxValue) item.max = item.maxValue;
+    if (item.maxValue) item.max = Number(item.maxValue);
   }
+
 }
 
 //Chart scada
@@ -3568,11 +3598,16 @@ function verticalSliderMouseDownEventHandler(event) {
 
         if (itemModal.querySelector('.inputMinTag').value)
           _input.isMinTag = true;
-        else _input.isMinTag = false;
+        else {
+          _input.isMinTag = false;
+        }
 
         if (itemModal.querySelector('.inputMaxTag').value)
           _input.isMaxTag = true;
-        else _input.isMaxTag = false;
+        else {
+          _input.isMaxTag = false;
+        }
+
 
         var _foundIndex = findElementHTMLById(_input.id);
         if (_foundIndex != -1) {
@@ -5783,18 +5818,190 @@ function openDesign(_socket) {
             elementDOM[element.properties[j].name] = element.properties[j].value;
           }
         }
+
+       
+          $('.draggable').draggable({
+            refreshPositions: true,
+            containment: $('#mainPage1'),
+            cancel: false
+          });
+      
+          $('.draggable2').draggable({
+            refreshPositions: true,
+            containment: $('#dashboard'),
+            cancel: false
+          });
+        
+
         switch (element.type.toLowerCase()) {
-          case 'switch': 
+          case 'switch': {
+            shapes.push(elementDOM.parentNode);
+            // if (isMainpage) elementDOM.parentNode.classList.add('draggable');
+            // else elementDOM.parentNode.classList.add('draggable2');
+            $(elementDOM.parentNode).on('dblclick', function (mouseEvent) {
+              $('#switchModal').one('show.bs.modal', function (showEvent) {
+                var itemModal = $('#switchModal')[0];
+
+                if (mouseEvent.target.onCommand) {
+                  itemModal.querySelector('.inputOnCommand').value = mouseEvent.target.onCommand;
+                }
+                else {
+                  itemModal.querySelector('.inputOnCommand').value = '';
+                }
+
+                if (mouseEvent.target.offCommand) {
+                  itemModal.querySelector('.inputOffCommand').value = mouseEvent.target.offCommand;
+                }
+                else {
+                  itemModal.querySelector('.inputOffCommand').value = '';
+                }
+
+                if (mouseEvent.target.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+
+                $('.saveChangeButton').on('click', function (event) {
+                  mouseEvent.target.onCommand = itemModal.querySelector('.inputOnCommand').value;
+                  mouseEvent.target.offCommand = itemModal.querySelector('.inputOffCommand').value;
+                  mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+
+
+                  var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCommand;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.offCommand;
+                    elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+                  }
+
+                });
+
+                $('.btnOnCommand').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputOnCommand').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+                $('.btnOffCommand').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputOffCommand').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+              });
+
+              $('#switchModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnOnCommand').off('click');
+                $('.btnOffCommand').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+
+              $('#switchModal').modal();
+            });
+            break;
+          }
           case 'checkbox': {
             shapes.push(elementDOM.parentNode);
-            if (isMainpage) elementDOM.parentNode.classList.add('draggable');
-            else elementDOM.parentNode.classList.add('draggable2');
+            // if (isMainpage) elementDOM.parentNode.classList.add('draggable');
+            // else elementDOM.parentNode.classList.add('draggable2');
+
+            $(elementDOM.parentNode).on('dblclick', function (mouseEvent) {
+              $('#checkboxModal').one('show.bs.modal', function (showEvent) {
+
+                var itemModal = $('#checkboxModal')[0];
+                itemModal.querySelector('.textContent').value = mouseEvent.target.innerText;
+
+                if (mouseEvent.target.checkedCommand) {
+                  itemModal.querySelector('.inputChecked').value = mouseEvent.target.checkedCommand;
+                }
+                else {
+                  itemModal.querySelector('.inputChecked').value = '';
+                }
+
+                if (mouseEvent.target.unCheckedCommand) {
+                  itemModal.querySelector('.inputUnchecked').value = mouseEvent.target.unCheckedCommand;
+                }
+                else {
+                  itemModal.querySelector('.inputUnchecked').value = '';
+                }
+
+                if (mouseEvent.target.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+
+                $('.saveChangeButton').on('click', function (event) {
+                  mouseEvent.target.innerHTML = itemModal.querySelector('.textContent').value;
+                  mouseEvent.target.checkedCommand = itemModal.querySelector('.inputChecked').value;
+                  mouseEvent.target.unCheckedCommand = itemModal.querySelector('.inputUnchecked').value;
+                  mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+
+                  var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.checkedCommand;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.unCheckedCommand;
+                    elementHTML[_foundIndex].properties[2].value = mouseEvent.target.disableWhen;
+                  }
+                });
+
+                $('.btnChecked').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputChecked').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+                $('.btnUnchecked').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputUnchecked').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+              });
+
+              $('#checkboxModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnChecked').off('click');
+                $('.btnUnchecked').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+
+              $('#checkboxModal').modal();
+            });
             break;
           }
           case 'chart': {
             shapes.push(elementDOM.parentNode);
-            if (isMainpage) elementDOM.parentNode.classList.add('draggable');
-            else elementDOM.parentNode.classList.add('draggable2');
+            // if (isMainpage) elementDOM.parentNode.classList.add('draggable');
+            // else elementDOM.parentNode.classList.add('draggable2');
             //Canvas = elementDOM
             var width = elementDOM.width;
             var height = elementDOM.height;
@@ -5866,8 +6073,6 @@ function openDesign(_socket) {
               }
             });
             if (!isMainpage) {
-              console.log('Width : ', width);
-              console.log('Height: ', height)
               elementDOM.style.width = width + 'px';
               elementDOM.style.height = height + 'px';
             }
@@ -5875,56 +6080,56 @@ function openDesign(_socket) {
 
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#chartModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var selectedItem = mouseEvent.target; //Canvas selected
                 var elemWidth, elemHeight;
-          
+
                 elemWidth = parseInt(selectedItem.style.width, 10);
                 elemHeight = parseInt(selectedItem.style.height, 10);
-          
+
                 var itemModal = $('#chartModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
                 itemModal.querySelector('.inputHeight').value = elemHeight;
-          
+
                 if (selectedItem.tag) {
                   itemModal.querySelector('.inputValue').value = selectedItem.tag;
                 }
                 else {
                   itemModal.querySelector('.inputValue').value = '';
                 }
-          
+
                 if (selectedItem.xLabel) {
                   itemModal.querySelector('.inputXLabel').value = selectedItem.xLabel;
                 }
                 else {
                   itemModal.querySelector('.inputXLabel').value = '';
                 }
-          
+
                 if (selectedItem.yLabel) {
                   itemModal.querySelector('.inputYLabel').value = selectedItem.yLabel;
                 }
                 else {
                   itemModal.querySelector('.inputYLabel').value = '';
                 }
-          
+
                 // if (selectedItem.timeRange) {
                 //   itemModal.querySelector('.inputTimeRange').value = selectedItem.timeRange;
                 // }
                 // else {
                 //   itemModal.querySelector('.inputTimeRange').value = '';
                 // }
-          
+
                 if (selectedItem.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = selectedItem.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
-          
+
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
-          
+
                   selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
                   selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
                   selectedItem.tag = itemModal.querySelector('.inputValue').value;
@@ -5932,7 +6137,7 @@ function openDesign(_socket) {
                   selectedItem.xLabel = itemModal.querySelector('.inputXLabel').value;
                   selectedItem.yLabel = itemModal.querySelector('.inputYLabel').value;
                   //selectedItem.timeRange = itemModal.querySelector('.inputTimeRange').value;
-          
+
                   var _foundIndex = findElementHTMLById(selectedItem.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = selectedItem.tag;
@@ -5941,7 +6146,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[3].value = selectedItem.yLabel;
                     // elementHTML[_foundIndex].properties[4].value = selectedItem.timeRange;
                   }
-          
+
                   var foundChartIndex = findChartById(selectedItem.id);
                   if (foundChartIndex != -1) {
                     arrChartJS[foundChartIndex].node.options.scales.xAxes[0].scaleLabel.labelString = selectedItem.xLabel;
@@ -5949,7 +6154,7 @@ function openDesign(_socket) {
                     arrChartJS[foundChartIndex].node.update();
                   }
                 });
-          
+
                 //Button Value browse tag
                 $('.btnValueTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -5958,7 +6163,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -5966,15 +6171,15 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#chartModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnValueTag').off('click');
                 $('.btnHiddenWhen').off('click');
               });
-          
+
               $('#chartModal').modal();
             });
             break;
@@ -6011,40 +6216,1835 @@ function openDesign(_socket) {
             });
             arrGauge.push({ id: elementDOM.id, node: newGauge });
             elementDOM.style.cursor = 'pointer';  //Fix pointer when mouse over INPUT
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#gaugeModal').one('show.bs.modal', function (showEvent) {
+
+                var selectedItem = mouseEvent.target; //Canvas selected
+                switch (selectedItem.tagName) {
+                  case 'svg': {
+                    selectedItem = selectedItem.parentNode;
+                    break;
+                  }
+                  case 'path': {
+                    selectedItem = selectedItem.parentNode.parentNode;
+                    break;
+                  }
+                  case 'tspan': {
+                    selectedItem = selectedItem.parentNode.parentNode.parentNode;
+                    break;
+                  }
+                }
+
+                var elemWidth, elemHeight;
+
+                elemWidth = parseInt(selectedItem.style.width, 10);
+                elemHeight = parseInt(selectedItem.style.height, 10);
+
+                var itemModal = $('#gaugeModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+
+                if (selectedItem.type) {
+                  itemModal.querySelector('[name = gaugeType]').value = "true";
+                } else {
+                  itemModal.querySelector('[name = gaugeType]').value = "false";
+                }
+
+                if (selectedItem.format) {
+                  itemModal.querySelector('[name = gaugeFormat]').value = selectedItem.format;
+                }
+
+                if (selectedItem.gaugeWidth) {
+                  itemModal.querySelector('.inputGaugeWidth').value = selectedItem.gaugeWidth;
+                }
+
+                if (selectedItem.usePointer) {
+                  itemModal.querySelector('#gaugeUsePointerCheckbox').checked = true;
+                } else {
+                  itemModal.querySelector('#gaugeUsePointerCheckbox').checked = false;
+                }
+
+                if (selectedItem.gaugeColor) {
+                  itemModal.querySelector('.inputGaugeColor').value = selectedItem.gaugeColor;
+                }
+
+                if (selectedItem.levelColor) {
+                  itemModal.querySelector('.inputLevelColor').value = selectedItem.levelColor[0];
+                }
+
+                if (selectedItem.fontColor) {
+                  itemModal.querySelector('.inputFontColor').value = selectedItem.fontColor;
+                }
+
+                if (selectedItem.pointerColor) {
+                  itemModal.querySelector('.inputPointerColor').value = selectedItem.pointerColor;
+                }
+
+                if (selectedItem.tag) {
+                  itemModal.querySelector('.inputValue').value = selectedItem.tag;
+                } else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+
+                if (selectedItem.label) {
+                  itemModal.querySelector('.inputGaugeLabel').value = selectedItem.label;
+                } else {
+                  itemModal.querySelector('.inputGaugeLabel').value = '';
+                }
+
+                if (selectedItem.min != null) {
+                  itemModal.querySelector('.inputMin').value = selectedItem.min;
+                }
+
+                if (selectedItem.max != null) {
+                  itemModal.querySelector('.inputMax').value = selectedItem.max;
+                }
+
+                if (selectedItem.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = selectedItem.hiddenWhen;
+                } else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+
+                if (selectedItem.title) {
+                  itemModal.querySelector('.inputGaugeTitle').value = selectedItem.title;
+                } else {
+                  itemModal.querySelector('.inputGaugeTitle').value = '';
+                }
+
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+
+                  selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                  selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  selectedItem.type = (itemModal.querySelector('[name = gaugeType]').value == 'true');
+                  selectedItem.format = Number(itemModal.querySelector('[name=gaugeFormat]').value);
+                  selectedItem.gaugeWidth = itemModal.querySelector('.inputGaugeWidth').value;
+                  selectedItem.usePointer = itemModal.querySelector('#gaugeUsePointerCheckbox').checked;
+                  selectedItem.gaugeColor = itemModal.querySelector('.inputGaugeColor').value;
+                  selectedItem.levelColor = [itemModal.querySelector('.inputLevelColor').value];
+                  selectedItem.fontColor = itemModal.querySelector('.inputFontColor').value;
+                  selectedItem.pointerColor = itemModal.querySelector('.inputPointerColor').value;
+                  selectedItem.tag = itemModal.querySelector('.inputValue').value;
+                  selectedItem.label = itemModal.querySelector('.inputGaugeLabel').value;
+                  selectedItem.min = Number(itemModal.querySelector('.inputMin').value);
+                  selectedItem.max = Number(itemModal.querySelector('.inputMax').value);
+                  selectedItem.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  selectedItem.title = itemModal.querySelector('.inputGaugeTitle').value;
+
+                  var _foundIndex = findElementHTMLById(selectedItem.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = selectedItem.tag;
+                    elementHTML[_foundIndex].properties[1].value = selectedItem.hiddenWhen;
+                    elementHTML[_foundIndex].properties[2].value = selectedItem.type;
+                    elementHTML[_foundIndex].properties[3].value = selectedItem.gaugeColor;
+                    elementHTML[_foundIndex].properties[4].value = [selectedItem.levelColor];
+                    elementHTML[_foundIndex].properties[5].value = selectedItem.fontColor;
+                    elementHTML[_foundIndex].properties[6].value = selectedItem.gaugeWidth;
+                    elementHTML[_foundIndex].properties[7].value = selectedItem.usePointer;
+                    elementHTML[_foundIndex].properties[8].value = selectedItem.pointerColor;
+                    elementHTML[_foundIndex].properties[9].value = selectedItem.format;
+                    elementHTML[_foundIndex].properties[10].value = selectedItem.label;
+                    elementHTML[_foundIndex].properties[11].value = selectedItem.min;
+                    elementHTML[_foundIndex].properties[12].value = selectedItem.max;
+                    elementHTML[_foundIndex].properties[13].value = selectedItem.title;
+                  }
+
+                  var foundGaugeIndex = findGaugeById(selectedItem.id);
+                  if (foundGaugeIndex != -1) {
+                    var gaugeItem = arrGauge[foundGaugeIndex].node;
+                    var gaugeConfig = JSON.parse(JSON.stringify(gaugeItem.config));
+                    var gaugeId = arrGauge[foundGaugeIndex].id;
+
+                    //Update config 
+                    gaugeConfig.donut = selectedItem.type;
+                    gaugeConfig.gaugeColor = selectedItem.gaugeColor;
+                    gaugeConfig.levelColors = [selectedItem.levelColor];
+                    gaugeConfig.labelFontColor = selectedItem.fontColor;
+                    gaugeConfig.valueFontColor = selectedItem.fontColor;
+                    gaugeConfig.gaugeWidthScale = selectedItem.gaugeWidth;
+                    gaugeConfig.pointer = selectedItem.usePointer;
+                    gaugeConfig.pointerOptions.color = selectedItem.pointerColor;
+                    gaugeConfig.decimals = selectedItem.format;
+                    gaugeConfig.label = selectedItem.label;
+                    gaugeConfig.title = selectedItem.title;
+
+                    //Remove current svg object
+                    $('#' + gaugeId).find('svg').remove();
+
+                    //Create new gauge
+                    var newGauge = new JustGage(gaugeConfig);
+
+                    //Update arrGauge
+                    arrGauge[foundGaugeIndex].node = newGauge;
+                    console.log(arrGauge);
+                  }
+                });
+
+                //Button Value browse tag
+                $('.btnValueTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+                $('.btnHiddenWhen').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+
+              });
+
+              $('#gaugeModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValueTag').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+
+              $('#gaugeModal').modal();
+            });
             break;
           }
           case 'svg': {
             shapes.push(elementDOM);
-            console.log(shapes);
             var draggable = new PlainDraggable(elementDOM, { leftTop: true });
             draggable.autoScroll = true;
             draggable.containment = document.getElementById('mainPage1');
             draggableObjects.push(draggable);
+
+            var svgModalDOM;
+            switch (elementDOM.tagName) {
+              case 'line': {
+                //svgModalDOM = document.getElementById(lineModal);
+                $(elementDOM).on('dblclick', function (mouseEvent) {
+                  $('#lineModal').one('show.bs.modal', function (showEvent) {
+                    var htmlElement = mouseEvent.target.getBoundingClientRect();
+                    var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                    var elemX1 = $(elementDOM).attr('x1'),
+                      elemY1 = $(elementDOM).attr('y1'),
+                      elemX2 = $(elementDOM).attr('x2'),
+                      elemY2 = $(elementDOM).attr('y2'),
+                      elemWidth = $(elementDOM).attr('stroke-width'),
+                      elemLinecap = $(elementDOM).attr('stroke-linecap'),
+                      elemColor = $(elementDOM).attr('stroke');
+                    var itemModal = document.getElementById('lineModal')
+                    itemModal.querySelector('#inputX1').value = elemX1;
+                    itemModal.querySelector('#inputY1').value = elemY1;
+                    itemModal.querySelector('#inputX2').value = elemX2;
+                    itemModal.querySelector('#inputY2').value = elemY2;
+                    itemModal.querySelector('#inputStrokeWidth').value = elemWidth;
+                    itemModal.querySelector('#inputColor').value = elemColor;
+                    itemModal.querySelector('#inputLinecap').value = elemLinecap;
+                    if (mouseEvent.target.hiddenWhen) {
+                      itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                    }
+                    else {
+                      itemModal.querySelector('.inputHiddenWhen').value = '';
+                    }
+                    $('.saveChangeButton').on('click', function (event) {
+                      $(elementDOM).attr({
+                        'stroke-width': itemModal.querySelector('#inputStrokeWidth').value,
+                        'stroke-linecap': itemModal.querySelector('#inputLinecap').value,
+                        'stroke': itemModal.querySelector('#inputColor').value,
+                        'x1': itemModal.querySelector('#inputX1').value,
+                        'y1': itemModal.querySelector('#inputY1').value,
+                        'x2': itemModal.querySelector('#inputX2').value,
+                        'y2': itemModal.querySelector('#inputY2').value,
+                        'transform': 'translate(0,0)',
+                      });
+                      mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                      var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                      if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+                      for (draggableItem of draggableObjects) {
+                        if (draggableItem.element.id == elementDOM.id) {
+                          draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                          break;
+                        }
+                      }
+                      draggable = new PlainDraggable(elementDOM, { leftTop: true });
+                      draggable.autoScroll = true;
+                      draggable.containment = document.getElementById('mainPage1');
+                      draggableObjects.push(draggable);
+                    });
+
+                    $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                      $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                        if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                          itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                        }
+                      });
+                    });
+                  });
+
+                  $('#lineModal').one('hide.bs.modal', function (hideEvent) {
+                    $('.saveChangeButton').off('click');
+                    $('.btnHiddenWhen').off('click');
+                  });
+
+                  $('#lineModal').modal();
+                });
+                break;
+              }
+              case 'ellipse': {
+                $(elementDOM).on('dblclick', function (mouseEvent) {
+                  var htmlElement = mouseEvent.target.getBoundingClientRect();
+                  var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                  $('#ellipseModal').one('show.bs.modal', function (showEvent) {
+                    var elemCx = Math.round(htmlElement.left - svgOffset.left + (htmlElement.right - htmlElement.left) / 2),
+                      elemCy = Math.round(htmlElement.top - svgOffset.top + (htmlElement.bottom - htmlElement.top) / 2),
+                      elemRadiusX = parseInt($(elementDOM).attr('rx'), 10),
+                      elemRadiusY = parseInt($(elementDOM).attr('ry'), 10),
+                      elemLineWidth = parseInt($(elementDOM).attr('stroke-width'), 10),
+                      elemColor = $(elementDOM).attr('stroke');
+
+                    var elemIsFilled = false;
+                    if ($(elementDOM).attr('fill-opacity') != 0 || $(elementDOM).attr('fill-opacity') != '0') elemIsFilled = true;
+
+                    var itemModal = $('#ellipseModal')[0];
+
+                    itemModal.querySelector('#inputRadiusX').value = elemRadiusX;
+                    itemModal.querySelector('#inputRadiusY').value = elemRadiusY;
+                    itemModal.querySelector('#inputPositionX').value = elemCx;
+                    itemModal.querySelector('#inputPositionY').value = elemCy;
+                    itemModal.querySelector('#inputShapeLineWidth').value = elemLineWidth;
+                    itemModal.querySelector('#inputShapeColor').value = elemColor;
+                    itemModal.querySelector('#fillEllipseCheckbox').checked = elemIsFilled;
+                    itemModal.querySelector('#inputFillShapeColor').value = $(elementDOM).attr('fill');
+
+                    if (mouseEvent.target.hiddenWhen) {
+                      itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                    }
+                    else {
+                      itemModal.querySelector('.inputHiddenWhen').value = '';
+                    }
+
+                    $('.saveChangeButton').on('click', function (event) {
+                      $(elementDOM).attr({
+                        'stroke-width': itemModal.querySelector('#inputShapeLineWidth').value,
+                        'stroke': itemModal.querySelector('#inputShapeColor').value,
+                        'cx': itemModal.querySelector('#inputPositionX').value,
+                        'cy': itemModal.querySelector('#inputPositionY').value,
+                        'transform': 'translate(0 0)',
+                        'rx': itemModal.querySelector('#inputRadiusX').value,
+                        'ry': itemModal.querySelector('#inputRadiusY').value,
+                        'fill-opacity': Number(itemModal.querySelector('#fillEllipseCheckbox').checked),
+                        'fill': itemModal.querySelector('#inputFillShapeColor').value,
+                      });
+
+                      mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                      var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                      if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
+                      for (draggableItem of draggableObjects) {
+                        if (draggableItem.element.id == elementDOM.id) {
+                          draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                          break;
+                        }
+                      }
+                      draggable = new PlainDraggable(elementDOM, { leftTop: true });
+                      draggable.autoScroll = true;
+                      draggable.containment = document.getElementById('mainPage1');
+                      draggableObjects.push(draggable);
+                    });
+
+                    $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                      $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                        if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                          itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                        }
+                      });
+                    });
+                  });
+
+                  $('#ellipseModal').one('hide.bs.modal', function (hideEvent) {
+                    $('.saveChangeButton').off('click');
+                    $('.btnHiddenWhen').off('click');
+                  });
+
+                  $('#ellipseModal').modal();
+                });
+                break;
+              }
+              case 'circle': {
+                $(elementDOM).on('dblclick', function (mouseEvent) {
+                  var htmlElement = mouseEvent.target.getBoundingClientRect();
+                  var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                  $('#circleModal').one('show.bs.modal', function (showEvent) {
+                    var elemCx = Math.round(htmlElement.left - svgOffset.left + (htmlElement.right - htmlElement.left) / 2),
+                      elemCy = Math.round(htmlElement.top - svgOffset.top + (htmlElement.bottom - htmlElement.top) / 2),
+                      elemRadius = parseInt($(elementDOM).attr('r'), 10),
+                      elemLineWidth = parseInt($(elementDOM).attr('stroke-width'), 10),
+                      elemColor = $(elementDOM).attr('stroke');
+
+                    var elemIsFilled = false;
+                    if ($(elementDOM).attr('fill-opacity') != 0) elemIsFilled = true;
+
+                    var itemModal = $('#circleModal')[0];
+
+                    itemModal.querySelector('#inputRadius').value = elemRadius;
+                    itemModal.querySelector('#inputPositionX').value = elemCx;
+                    itemModal.querySelector('#inputPositionY').value = elemCy;
+                    itemModal.querySelector('#inputShapeLineWidth').value = elemLineWidth;
+                    itemModal.querySelector('#inputShapeColor').value = elemColor;
+                    itemModal.querySelector('#fillCircleCheckbox').checked = elemIsFilled;
+                    itemModal.querySelector('#inputFillShapeColor').value = $(elementDOM).attr('fill');
+
+                    if (mouseEvent.target.hiddenWhen) {
+                      itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                    }
+                    else {
+                      itemModal.querySelector('.inputHiddenWhen').value = '';
+                    }
+
+                    $('.saveChangeButton').on('click', function (event) {
+                      $(elementDOM).attr({
+                        'r': itemModal.querySelector('#inputRadius').value,
+                        'stroke-width': itemModal.querySelector('#inputShapeLineWidth').value,
+                        'stroke': itemModal.querySelector('#inputShapeColor').value,
+                        'cx': itemModal.querySelector('#inputPositionX').value,
+                        'cy': itemModal.querySelector('#inputPositionY').value,
+                        'transform': 'translate(0 0)',
+                        'fill-opacity': Number(itemModal.querySelector('#fillCircleCheckbox').checked),
+                        'fill': itemModal.querySelector('#inputFillShapeColor').value,
+                      });
+
+                      mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                      var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                      if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
+                      for (draggableItem of draggableObjects) {
+                        if (draggableItem.element.id == elementDOM.id) {
+                          draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                          break;
+                        }
+                      }
+                      draggable = new PlainDraggable(elementDOM, { leftTop: true });
+                      draggable.autoScroll = true;
+                      draggable.containment = document.getElementById('mainPage1');
+                      draggableObjects.push(draggable);
+                    });
+
+                    $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                      $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                        if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                          itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                        }
+                      });
+                    });
+                  });
+
+                  $('#circleModal').one('hide.bs.modal', function (hideEvent) {
+                    $('.saveChangeButton').off('click');
+                    $('.btnHiddenWhen').off('click');
+                  });
+
+                  $('#circleModal').modal();
+                });
+                break;
+              }
+              case 'rect': {
+                console.log($(elementDOM).attr('rx'));
+                if (!$(elementDOM).attr('rx')) {
+                  $(elementDOM).on('dblclick', function (mouseEvent) {
+                    var htmlElement = mouseEvent.target.getBoundingClientRect();
+                    var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                    $('#rectModal').one('show.bs.modal', function (showEvent) {
+                      var elemWidth = parseInt($(elementDOM).attr('width'), 10),
+                        elemHeight = parseInt($(elementDOM).attr('height'), 10),
+                        elemPositionX = Math.round(htmlElement.left - svgOffset.left),
+                        elemPositionY = Math.round(htmlElement.top - svgOffset.top),
+                        elemLineWidth = $(elementDOM).attr('stroke-width'),
+                        elemColor = $(elementDOM).attr('stroke');
+
+
+                      var itemModal = $('#rectModal')[0];
+
+                      itemModal.querySelector('#inputWidth').value = elemWidth;
+                      itemModal.querySelector('#inputHeight').value = elemHeight;
+                      itemModal.querySelector('#inputPositionX').value = elemPositionX;
+                      itemModal.querySelector('#inputPositionY').value = elemPositionY;
+                      itemModal.querySelector('#inputShapeLineWidth').value = elemLineWidth;
+                      itemModal.querySelector('#inputLineColor').value = elemColor;
+                      itemModal.querySelector('#fillRectCheckbox').checked = $(elementDOM).attr('fill-opacity') != 0 || $(elementDOM).attr('fill-opacity') != '0';
+                      itemModal.querySelector('#inputFillRectColor').value = $(elementDOM).attr('fill');
+                      if (mouseEvent.target.hiddenWhen) {
+                        itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                      }
+                      else {
+                        itemModal.querySelector('.inputHiddenWhen').value = '';
+                      }
+
+                      $('.saveChangeButton').on('click', function (event) {
+                        $(elementDOM).attr({
+                          'stroke-width': itemModal.querySelector('#inputShapeLineWidth').value,
+                          'stroke': itemModal.querySelector('#inputLineColor').value,
+                          'width': itemModal.querySelector('#inputWidth').value,
+                          'height': itemModal.querySelector('#inputHeight').value,
+                          'x': itemModal.querySelector('#inputPositionX').value,
+                          'y': itemModal.querySelector('#inputPositionY').value,
+                          'transform': 'translate(0 0)',
+                          'fill-opacity': Number(itemModal.querySelector('#fillRectCheckbox').checked),
+                          'fill': itemModal.querySelector('#inputFillRectColor').value,
+                        });
+
+                        mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                        if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
+                        for (draggableItem of draggableObjects) {
+                          if (draggableItem.element.id == elementDOM.id) {
+                            draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                            break;
+                          }
+                        }
+                        draggable = new PlainDraggable(elementDOM, { leftTop: true });
+                        draggable.autoScroll = true;
+                        draggable.containment = document.getElementById('mainPage1');
+                        draggableObjects.push(draggable);
+                      });
+
+                      $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                            itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                          }
+                        });
+                      });
+                    });
+
+                    $('#rectModal').one('hide.bs.modal', function (hideEvent) {
+                      $('.saveChangeButton').off('click');
+                      $('.btnHiddenWhen').off('click');
+                    });
+
+                    $('#rectModal').modal();
+                  });
+                  break;
+                } else {
+                  $(elementDOM).on('dblclick', function (mouseEvent) {
+                    var htmlElement = mouseEvent.target.getBoundingClientRect();
+                    var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                    $('#roundRectModal').one('show.bs.modal', function (showEvent) {
+                      var elemWidth = parseInt($(elementDOM).attr('width'), 10),
+                        elemHeight = parseInt($(elementDOM).attr('height'), 10),
+                        elemPositionX = Math.round(htmlElement.left - svgOffset.left),
+                        elemPositionY = Math.round(htmlElement.top - svgOffset.top),
+                        elemRadiusX = parseInt($(elementDOM).attr('rx'), 10),
+                        elemRadiusY = parseInt($(elementDOM).attr('ry'), 10),
+                        elemLineWidth = $(elementDOM).attr('stroke-width'),
+                        elemColor = $(elementDOM).attr('stroke');
+
+                      var itemModal = $('#roundRectModal')[0];
+
+                      itemModal.querySelector('#inputWidth').value = elemWidth;
+                      itemModal.querySelector('#inputHeight').value = elemHeight;
+                      itemModal.querySelector('#inputPositionX').value = elemPositionX;
+                      itemModal.querySelector('#inputPositionY').value = elemPositionY;
+                      itemModal.querySelector('#inputRadiusX').value = elemRadiusX;
+                      itemModal.querySelector('#inputRadiusY').value = elemRadiusY;
+                      itemModal.querySelector('#inputShapeLineWidth').value = elemLineWidth;
+                      itemModal.querySelector('#inputShapeColor').value = elemColor;
+                      itemModal.querySelector('#fillRoundRectCheckbox').checked = $(elementDOM).attr('fill-opacity') != 0 || $(elementDOM).attr('fill-opacity') != '0';
+                      itemModal.querySelector('#inputFillShapeColor').value = $(elementDOM).attr('fill');
+
+                      if (mouseEvent.target.hiddenWhen) {
+                        itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                      }
+                      else {
+                        itemModal.querySelector('.inputHiddenWhen').value = '';
+                      }
+
+                      $('.saveChangeButton').on('click', function (event) {
+                        $(elementDOM).attr({
+                          'stroke-width': itemModal.querySelector('#inputShapeLineWidth').value,
+                          'stroke': itemModal.querySelector('#inputShapeColor').value,
+                          'width': itemModal.querySelector('#inputWidth').value,
+                          'height': itemModal.querySelector('#inputHeight').value,
+                          'x': itemModal.querySelector('#inputPositionX').value,
+                          'y': itemModal.querySelector('#inputPositionY').value,
+                          'rx': itemModal.querySelector('#inputRadiusX').value,
+                          'ry': itemModal.querySelector('#inputRadiusY').value,
+                          'transform': 'translate(0 0)',
+                          'fill-opacity': Number(itemModal.querySelector('#fillRoundRectCheckbox').checked),
+                          'fill': itemModal.querySelector('#inputFillShapeColor').value,
+                        });
+
+                        mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                        var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                        if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
+                        for (draggableItem of draggableObjects) {
+                          if (draggableItem.element.id == elementDOM.id) {
+                            draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                            break;
+                          }
+                        }
+                        draggable = new PlainDraggable(elementDOM, { leftTop: true });
+                        draggable.autoScroll = true;
+                        draggable.containment = document.getElementById('mainPage1');
+                        draggableObjects.push(draggable);
+                      });
+
+                      $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                        $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                          if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                            itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                          }
+                        });
+                      });
+                    });
+
+                    $('#roundRectModal').one('hide.bs.modal', function (hideEvent) {
+                      $('.saveChangeButton').off('click');
+                      $('.btnHiddenWhen').off('click');
+                    });
+
+                    $('#roundRectModal').modal();
+                  });
+                  break;
+                }
+              }
+              case 'polyline': {
+                $(elementDOM).on('dblclick', function (mouseEvent) {
+                  var htmlElement = mouseEvent.target.getBoundingClientRect();
+                  var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                  $('#polylineModal').one('show.bs.modal', function (showEvent) {
+                    var elemWidth = $(elementDOM).attr('stroke-width'),
+                      elemColor = $(elementDOM).attr('stroke');
+
+                    var itemModal = $('#polylineModal')[0];
+
+                    itemModal.querySelector('#inputWidth').value = elemWidth;
+                    itemModal.querySelector('#inputColor').value = elemColor;
+
+                    if (mouseEvent.target.hiddenWhen) {
+                      itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                    }
+                    else {
+                      itemModal.querySelector('.inputHiddenWhen').value = '';
+                    }
+
+                    $('.saveChangeButton').on('click', function (event) {
+                      $(elementDOM).attr({
+                        'stroke-width': itemModal.querySelector('#inputWidth').value,
+                        'stroke': itemModal.querySelector('#inputColor').value,
+                      });
+
+                      mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                      var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                      if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+                    });
+
+                    $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                      $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                        if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                          itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                        }
+                      });
+                    });
+                  });
+
+                  $('#polylineModal').one('hide.bs.modal', function (hideEvent) {
+                    $('.saveChangeButton').off('click');
+                    $('.btnHiddenWhen').off('click');
+                  });
+
+                  $('#polylineModal').modal();
+                });
+                break;
+              }
+              case 'polygon': {
+                $(elementDOM).on('dblclick', function (mouseEvent) {
+                  var htmlElement = mouseEvent.target.getBoundingClientRect();
+                  var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+                  $('#polygonModal').one('show.bs.modal', function (showEvent) {
+                    var elemWidth = $(elementDOM).attr('stroke-width'),
+                      elemColor = $(elementDOM).attr('stroke');
+
+
+                    var itemModal = $('#polygonModal')[0];
+
+                    itemModal.querySelector('#inputShapeLineWidth').value = elemWidth;
+                    itemModal.querySelector('#inputShapeColor').value = elemColor;
+
+                    itemModal.querySelector('#fillPolygonCheckbox').checked = $(elementDOM).attr('fill-opacity') != 0 || $(elementDOM).attr('fill-opacity') != '0';
+                    itemModal.querySelector('#inputFillShapeColor').value = $(elementDOM).attr('fill');
+
+                    if (mouseEvent.target.hiddenWhen) {
+                      itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                    }
+                    else {
+                      itemModal.querySelector('.inputHiddenWhen').value = '';
+                    }
+
+                    $('.saveChangeButton').on('click', function (event) {
+                      $(elementDOM).attr({
+                        'stroke-width': itemModal.querySelector('#inputShapeLineWidth').value,
+                        'stroke': itemModal.querySelector('#inputShapeColor').value,
+                        'fill-opacity': Number(itemModal.querySelector('#fillPolygonCheckbox').checked),
+                        'fill': itemModal.querySelector('#inputFillShapeColor').value,
+                      });
+
+                      mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+
+                      var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                      if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+
+                    });
+
+                    $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                      $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                        if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                          itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                        }
+                      });
+                    });
+
+                  });
+
+                  $('#polygonModal').one('hide.bs.modal', function (hideEvent) {
+                    $('.saveChangeButton').off('click');
+                    $('.btnHiddenWhen').off('click');
+                  });
+
+                  $('#polygonModal').modal();
+                });
+                break;
+              }
+            }
             break;
           }
-          case 'input' : {
+          case 'input': {
             elementDOM.style.cursor = 'pointer';  //Fix pointer when mouse over INPUT
-          }
-          default: {
             shapes.push(elementDOM);
-            if (isMainpage) elementDOM.classList.add('draggable');
-            else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#inputModal').one('show.bs.modal', function (showEvent) {
+                var elemStyle = mouseEvent.target.style;
+                var elemId = mouseEvent.target.id;
+                var elemBound = mouseEvent.target.getBoundingClientRect();
+          
+                var elemWidth = parseInt(elemStyle.width, 10),
+                  elemHeight = Math.round(elemBound.bottom - elemBound.top);
+                elemType = mouseEvent.target.type;
+          
+                var itemModal = $('#inputModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+                itemModal.querySelector('.inputType').value = elemType;
+          
+                if (mouseEvent.target.tag) {
+                  itemModal.querySelector('.inputTag').value = mouseEvent.target.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputTag').value = '';
+                }
+          
+                if (mouseEvent.target.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+          
+                $('.saveChangeButton').on('click', function (event) {
+                  document.getElementById(elemId).style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                  document.getElementById(elemId).style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
+                  mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+                  mouseEvent.target.type = itemModal.querySelector('.inputType').value;
+          
+                  var _foundIndex = findElementHTMLById(elemId);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
+                  }
+                });
+          
+                $('.btnTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#inputModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnTag').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+          
+              $('#inputModal').modal();
+            });
             break;
           }
-        }
-        
-        if(isMainpage) {
-          $('.draggable').draggable({
-            refreshPositions: true,
-            containment: $('#mainPage1'),
-            cancel: false
-          });
-        } else {
-          $('.draggable2').draggable({
-            refreshPositions: true,
-            containment: $('#dashboard'),
-            cancel: false
-          });
+          case 'text': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#textModal').one('show.bs.modal', function (showEvent) {
+                var elemStyle = mouseEvent.target.style;
+                var elemId = mouseEvent.target.id;
+                var elemFontsize = parseInt(elemStyle.fontSize, 10).toString(),
+                  elemFontstyle = elemStyle.fontStyle,
+                  elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
+                  elemColor = rgb2hex(elemStyle.color),
+                  elemText = mouseEvent.target.innerText;
+          
+                var itemModal = $('#textModal')[0];
+          
+                itemModal.querySelector('#inputFontSize').value = elemFontsize;
+                itemModal.querySelector('#fontPicker').value = elemFontFamily;
+                itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
+                itemModal.querySelector('#inputTextColor').value = elemColor;
+                itemModal.querySelector('#textContent').value = elemText;
+                if (mouseEvent.target.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+          
+                $('.saveChangeButton').on('click', function (event) {
+                  document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
+                  document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
+                  document.getElementById(elemId).style.color = itemModal.querySelector('#inputTextColor').value;
+                  document.getElementById(elemId).style.fontStyle = itemModal.querySelector('#fontStyleForm').value;
+                  document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
+                  mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+          
+                  var _foundIndex = findElementHTMLById(elemId);
+                  if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+                });
+          
+                $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#textModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+          
+              $('#textModal').modal();
+            });
+            break;
+          }
+          case 'img': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#imageModal').one('show.bs.modal', function (showEvent) {
+          
+                var elem = document.getElementById(mouseEvent.target.id);
+          
+                var elemStyle = elem.style;
+          
+                var elemWidth = parseInt(elemStyle.width, 10),
+                  elemHeight = parseInt(elemStyle.height, 10),
+                  elemPositionX = parseInt(elemStyle.left, 10),
+                  elemPositionY = parseInt(elemStyle.top, 10),
+                  elemSource = elem.src;
+
+                var itemModal = document.getElementById('imageModal');
+                itemModal.querySelector('#inputWidth').value = elemWidth;
+                itemModal.querySelector('#inputHeight').value = elemHeight;
+                itemModal.querySelector('#inputPositionX').value = elemPositionX;
+                itemModal.querySelector('#inputPositionY').value = elemPositionY;
+                itemModal.querySelector('.inputImageSource').value = elemSource;
+          
+                if (mouseEvent.target.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  elemStyle.width = imageModal.querySelector('#inputWidth').value + 'px';
+                  elemStyle.height = imageModal.querySelector('#inputHeight').value + 'px';
+                  elemStyle.left = imageModal.querySelector('#inputPositionX').value + 'px';
+                  elemStyle.top = imageModal.querySelector('#inputPositionY').value + 'px';
+                  mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  mouseEvent.target.src = itemModal.querySelector('.inputImageSource').value;
+          
+                  var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                  if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
+          
+                });
+          
+                $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#imageModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnHiddenWhen').off('click');
+                $('.btnSelect').off('click');
+              });
+          
+              $('#chooseImageModal').one('show.bs.modal', function (event) {
+                $('.btnSelect').on('click', function (btnEvent) {
+                  if ($("[name=symbol]").is(":checked"))
+                    $('.inputImageSource').val($('[name=symbol]:checked').val());
+                  $('#chooseImageModal').modal('toggle');
+                });
+              });
+          
+              $('#imageModal').modal();
+            });
+          
+            break;
+          }
+          case 'displayvalue': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#displayValueModal').one('show.bs.modal', function (showEvent) {
+                var elemStyle = mouseEvent.target.style;
+                var elemId = mouseEvent.target.id;
+                var elemFontsize = parseInt(elemStyle.fontSize, 10).toString(),
+                  elemFontstyle = elemStyle.fontStyle,
+                  elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
+                  elemColor = rgb2hex(elemStyle.color),
+                  elemText = mouseEvent.target.innerText;
+                elemFormat = mouseEvent.target.format;
+          
+                var itemModal = $('#displayValueModal')[0];
+          
+                itemModal.querySelector('#inputFontSize').value = elemFontsize;
+                itemModal.querySelector('#fontPicker').value = elemFontFamily;
+                itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
+                itemModal.querySelector('#inputTextColor').value = elemColor;
+                itemModal.querySelector('#textContent').value = elemText;
+                if (elemFormat) itemModal.querySelector('#displayFormat').value = elemFormat;
+                else itemModal.querySelector('#displayFormat').value = 3;
+          
+                if (mouseEvent.target.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+                if (mouseEvent.target.tag) {
+                  itemModal.querySelector('.inputTag').value = mouseEvent.target.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputTag').value = '';
+                }
+          
+                $('.saveChangeButton').on('click', function (event) {
+                  document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
+                  document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
+                  document.getElementById(elemId).style.color = itemModal.querySelector('#inputTextColor').value;
+                  document.getElementById(elemId).style.fontStyle = itemModal.querySelector('#fontStyleForm').value;
+                  document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
+                  mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
+                  mouseEvent.target.format = itemModal.querySelector('#displayFormat').value;
+          
+                  var _foundIndex = findElementHTMLById(elemId);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.format;
+                    elementHTML[_foundIndex].properties[2].value = mouseEvent.target.hiddenWhen;
+                  }
+          
+                });
+          
+                $('.btnTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#displayValueModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnTag').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+          
+              $('#displayValueModal').modal();
+            });
+            break;
+          }
+          case 'button': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#buttonModal').one('show.bs.modal', function (showEvent) {
+                var elemStyle = mouseEvent.target.style;
+                var elemId = mouseEvent.target.id;
+          
+                var htmlElement = mouseEvent.target.getBoundingClientRect();
+                var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
+          
+                var elemFontsize = parseInt(elemStyle.fontSize, 10).toString(),
+                  elemFontstyle = elemStyle.fontStyle,
+                  elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
+                  elemColor = rgb2hex(elemStyle.color),
+                  elemBackground = rgb2hex(elemStyle.background),
+                  elemWidth = Math.round(htmlElement.right - htmlElement.left),
+                  elemHeight = Math.round(htmlElement.bottom - htmlElement.top),
+                  elemPositionX = Math.round(htmlElement.left - svgOffset.left),
+                  elemPositionY = Math.round(htmlElement.top - svgOffset.top),
+                  elemText = mouseEvent.target.innerText;
+          
+          
+                var itemModal = $('#buttonModal')[0];
+          
+                itemModal.querySelector('#inputFontSize').value = elemFontsize;
+                itemModal.querySelector('#fontPicker').value = elemFontFamily;
+                itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
+                itemModal.querySelector('#inputTextColor').value = elemColor;
+                itemModal.querySelector('#inputBackgroundColor').value = elemBackground;
+                itemModal.querySelector('#textContent').value = elemText;
+                itemModal.querySelector('#inputWidth').value = elemWidth;
+                itemModal.querySelector('#inputHeight').value = elemHeight;
+                itemModal.querySelector('#inputPositionX').value = elemPositionX;
+                itemModal.querySelector('#inputPositionY').value = elemPositionY;
+          
+                if (mouseEvent.target.command) {
+                  itemModal.querySelector('.inputCommand').value = mouseEvent.target.command;
+                }
+                else {
+                  itemModal.querySelector('.inputCommand').value = '';
+                }
+          
+                if (mouseEvent.target.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+          
+                $('.saveChangeButton').on('click', function (event) {
+                  document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
+                  document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
+                  document.getElementById(elemId).style.color = itemModal.querySelector('#inputTextColor').value;
+                  document.getElementById(elemId).style.background = itemModal.querySelector('#inputBackgroundColor').value;
+                  document.getElementById(elemId).style.fontStyle = itemModal.querySelector('#fontStyleForm').value;
+                  document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
+                  document.getElementById(elemId).style.left = itemModal.querySelector('#inputPositionX').value + 'px';
+                  document.getElementById(elemId).style.top = Number(itemModal.querySelector('#inputPositionY').value) + 43 + 'px';
+                  document.getElementById(elemId).style.width = itemModal.querySelector('#inputWidth').value + 'px';
+                  document.getElementById(elemId).style.height = itemModal.querySelector('#inputHeight').value + 'px';
+                  mouseEvent.target.command = itemModal.querySelector('.inputCommand').value;
+                  mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+          
+                  var _foundIndex = findElementHTMLById(elemId);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.command;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
+                  }
+          
+                  // var html = document.getElementById(elemId);
+                  // for (draggableItem of draggableObjects) {
+                  //   if (draggableItem.element.id == html.id) {
+                  //     draggableObjects.splice(draggableObjects.indexOf(draggableItem), 1);
+                  //     break;
+                  //   }
+                  // }
+                  // draggable = new PlainDraggable(html, { leftTop: true });
+                  // draggable.autoScroll = true;
+                  // draggable.containment = document.getElementById('mainPage1');
+                  // draggableObjects.push(draggable);
+                });
+          
+                $('.btnCommand').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputCommand').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#buttonModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnCommand').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+          
+              $('#buttonModal').modal();
+            });
+            break;
+          }
+          case 'slider': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#sliderModal').one('show.bs.modal', function (showEvent) {
+          
+                var elem = document.getElementById(mouseEvent.target.id);
+                var elemStyle = elem.style;
+          
+                var elemWidth = parseInt(elemStyle.width, 10);
+          
+                var itemModal = $('#sliderModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+          
+                if (mouseEvent.target.tag) {
+                  itemModal.querySelector('.inputValue').value = mouseEvent.target.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+          
+                if (mouseEvent.target.minTag) {
+                  itemModal.querySelector('.inputMinTag').value = mouseEvent.target.minTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMinTag').value = '';
+                }
+          
+                if (mouseEvent.target.minValue) {
+                  itemModal.querySelector('.inputMinValue').value = mouseEvent.target.minValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMinValue').value = '';
+                }
+          
+                if (mouseEvent.target.maxTag) {
+                  itemModal.querySelector('.inputMaxTag').value = mouseEvent.target.maxTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxTag').value = '';
+                }
+          
+                if (mouseEvent.target.maxValue) {
+                  itemModal.querySelector('.inputMaxValue').value = mouseEvent.target.maxValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxValue').value = '';
+                }
+          
+                if (mouseEvent.target.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
+                  mouseEvent.target.tag = itemModal.querySelector('.inputValue').value;
+                  mouseEvent.target.minTag = itemModal.querySelector('.inputMinTag').value;
+                  mouseEvent.target.minValue = itemModal.querySelector('.inputMinValue').value;
+                  mouseEvent.target.maxTag = itemModal.querySelector('.inputMaxTag').value;
+                  mouseEvent.target.maxValue = itemModal.querySelector('.inputMaxValue').value;
+                  mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+          
+                  if (itemModal.querySelector('.inputMinTag').value)
+                    mouseEvent.target.isMinTag = true;
+                  else mouseEvent.target.isMinTag = false;
+          
+                  if (itemModal.querySelector('.inputMaxTag').value)
+                    mouseEvent.target.isMaxTag = true;
+                  else mouseEvent.target.isMaxTag = false;
+          
+                  var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.minTag;
+                    elementHTML[_foundIndex].properties[2].value = mouseEvent.target.minValue;
+                    elementHTML[_foundIndex].properties[3].value = mouseEvent.target.maxTag;
+                    elementHTML[_foundIndex].properties[4].value = mouseEvent.target.maxValue;
+                    elementHTML[_foundIndex].properties[5].value = mouseEvent.target.isMinTag;
+                    elementHTML[_foundIndex].properties[6].value = mouseEvent.target.isMaxTag;
+                    elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
+                  }
+                });
+          
+                //Browse button
+                $('.btnValue').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMinTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMaxTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#sliderModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValue').off('click');
+                $('.btnMinTag').off('click');
+                $('.btnMaxTag').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+          
+              $('#sliderModal').modal();
+            });
+            break;
+          }
+          case 'verticalslider': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM.parentNode).on('dblclick', function (mouseEvent) {
+              var elem = $(mouseEvent.target).closest('.slider')[0];
+              $('#verticalSliderModal').one('show.bs.modal', function (showEvent) {
+          
+                var elemHeight = elem.style.height;
+                if (elemHeight) elemHeight = parseInt(elemHeight, 10);
+          
+                var _input = $(elem).siblings('input')[0];
+          
+                var itemModal = $('#verticalSliderModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemHeight;
+          
+                if (_input.tag) {
+                  itemModal.querySelector('.inputValue').value = _input.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+          
+                if (_input.minTag) {
+                  itemModal.querySelector('.inputMinTag').value = _input.minTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMinTag').value = '';
+                }
+          
+                if (_input.minValue) {
+                  itemModal.querySelector('.inputMinValue').value = _input.minValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMinValue').value = '';
+                }
+          
+                if (_input.maxTag) {
+                  itemModal.querySelector('.inputMaxTag').value = _input.maxTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxTag').value = '';
+                }
+          
+                if (_input.maxValue) {
+                  itemModal.querySelector('.inputMaxValue').value = _input.maxValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxValue').value = '';
+                }
+          
+                if (_input.disableWhen) {
+                  itemModal.querySelector('.inputDisableWhen').value = _input.disableWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputDisableWhen').value = '';
+                }
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  elem.style.height = itemModal.querySelector('.inputWidth').value + 'px';
+                  _input.tag = itemModal.querySelector('.inputValue').value;
+                  _input.minTag = itemModal.querySelector('.inputMinTag').value;
+                  _input.minValue = itemModal.querySelector('.inputMinValue').value;
+                  _input.maxTag = itemModal.querySelector('.inputMaxTag').value;
+                  _input.maxValue = itemModal.querySelector('.inputMaxValue').value;
+                  _input.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
+          
+                  if (itemModal.querySelector('.inputMinTag').value)
+                    _input.isMinTag = true;
+                  else _input.isMinTag = false;
+          
+                  if (itemModal.querySelector('.inputMaxTag').value)
+                    _input.isMaxTag = true;
+                  else _input.isMaxTag = false;
+          
+                  var _foundIndex = findElementHTMLById(_input.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = _input.tag;
+                    elementHTML[_foundIndex].properties[1].value = _input.minTag;
+                    elementHTML[_foundIndex].properties[2].value = _input.minValue;
+                    elementHTML[_foundIndex].properties[3].value = _input.maxTag;
+                    elementHTML[_foundIndex].properties[4].value = _input.maxValue;
+                    elementHTML[_foundIndex].properties[5].value = _input.isMinTag;
+                    elementHTML[_foundIndex].properties[6].value = _input.isMaxTag;
+                    elementHTML[_foundIndex].properties[7].value = _input.disableWhen;
+                  }
+                });
+          
+                //Browse button
+                $('.btnValue').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMinTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMaxTag').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputDisableWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#verticalSliderModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValue').off('click');
+                $('.btnMinTag').off('click');
+                $('.btnMaxTag').off('click');
+                $('.btnDisableWhen').off('click');
+              });
+          
+              $('#verticalSliderModal').modal();
+            });
+          
+            break;
+          }
+          case 'progressbar': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#progressBarModal').one('show.bs.modal', function (showEvent) {
+          
+                var selectedItem = mouseEvent.target;
+                var elemWidth, elemHeight;
+                var progressElement;
+                var isHideLabel = false;
+                var isRawValue = false;
+          
+                if (selectedItem.id) { //Progress is chosen
+                  progressElement = selectedItem;
+                  elemWidth = parseInt(selectedItem.style.width, 10);
+                  elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
+                }
+                else { //Bar is chosen
+                  progressElement = selectedItem.parentNode;
+                  elemWidth = parseInt(selectedItem.parentNode.style.width, 10);
+                  elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
+                }
+                isHideLabel = progressElement.isHideLabel;
+                isRawValue = progressElement.isRawValue;
+          
+                var itemModal = $('#progressBarModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+                itemModal.querySelector('#hideLabelCheckbox').checked = isHideLabel;
+                itemModal.querySelector('#rawValueCheckbox').checked = isRawValue;
+          
+                if (progressElement.tag) {
+                  itemModal.querySelector('.inputValue').value = progressElement.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+          
+                if (progressElement.minTag) {
+                  itemModal.querySelector('.inputMinTag').value = progressElement.minTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMinTag').value = '';
+                }
+          
+                if (progressElement.minValue) {
+                  itemModal.querySelector('.inputMinValue').value = progressElement.minValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMinValue').value = '';
+                }
+          
+                if (progressElement.maxTag) {
+                  itemModal.querySelector('.inputMaxTag').value = progressElement.maxTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxTag').value = '';
+                }
+          
+                if (progressElement.maxValue) {
+                  itemModal.querySelector('.inputMaxValue').value = progressElement.maxValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxValue').value = '';
+                }
+          
+                if (progressElement.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = progressElement.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  if (selectedItem.id) { //Progress is chosen
+                    selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                    selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  }
+                  else {  //Bar is chosen
+                    selectedItem.parentNode.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                    selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  }
+          
+                  progressElement.tag = itemModal.querySelector('.inputValue').value;
+                  progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
+                  progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
+                  progressElement.maxTag = itemModal.querySelector('.inputMaxTag').value;
+                  progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
+                  progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
+                  progressElement.isRawValue = itemModal.querySelector('#rawValueCheckbox').checked;
+          
+          
+                  if (itemModal.querySelector('.inputMinTag').value)
+                    progressElement.isMinTag = true;
+                  else progressElement.isMinTag = false;
+          
+                  if (itemModal.querySelector('.inputMaxTag').value)
+                    progressElement.isMaxTag = true;
+                  else progressElement.isMaxTag = false;
+          
+                  var _bar = $(progressElement).find('.progress-bar')[0];
+                  if (progressElement.isHideLabel) _bar.innerText = '';
+                  else _bar.innerText = _bar.style.width;
+          
+                  var _foundIndex = findElementHTMLById(progressElement.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = progressElement.tag;
+                    elementHTML[_foundIndex].properties[1].value = progressElement.minTag;
+                    elementHTML[_foundIndex].properties[2].value = progressElement.minValue;
+                    elementHTML[_foundIndex].properties[3].value = progressElement.maxTag;
+                    elementHTML[_foundIndex].properties[4].value = progressElement.maxValue;
+                    elementHTML[_foundIndex].properties[5].value = progressElement.isMinTag;
+                    elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
+                    elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
+                    elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
+                  }
+                });
+          
+                //Button Value browse tag
+                $('.btnValueTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMinTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMaxTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnHiddenWhen').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#progressBarModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValueTag').off('click');
+                $('.btnMinTag').off('click');
+                $('.btnMaxTag').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+          
+              $('#progressBarModal').modal();
+            });
+            break;
+          }
+          case 'verticalprogressbar': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#verticalProgressBarModal').one('show.bs.modal', function (showEvent) {
+          
+                var selectedItem = mouseEvent.target;
+                var elemWidth, elemHeight;
+                var progressElement;
+                var isHideLabel = false;
+                var isRawValue = false;
+          
+                if (selectedItem.id) { //Progress is chosen
+                  progressElement = selectedItem;
+                  elemWidth = parseInt(selectedItem.style.width, 10);
+                  elemHeight = Math.round(selectedItem.getBoundingClientRect().bottom - selectedItem.getBoundingClientRect().top);
+                }
+                else { //Bar is chosen
+                  progressElement = selectedItem.parentNode;
+                  elemWidth = parseInt(selectedItem.parentNode.style.width, 10);
+                  elemHeight = Math.round(selectedItem.parentNode.getBoundingClientRect().bottom - selectedItem.parentNode.getBoundingClientRect().top);
+                }
+                isHideLabel = progressElement.isHideLabel;
+                isRawValue = progressElement.isRawValue;
+          
+                var itemModal = $('#verticalProgressBarModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+                itemModal.querySelector('#hideVerticalLabelCheckbox').checked = isHideLabel;
+                itemModal.querySelector('#rawVerticalValueCheckbox').checked = isRawValue;
+          
+                if (progressElement.tag) {
+                  itemModal.querySelector('.inputValue').value = progressElement.tag;
+                }
+                else {
+                  itemModal.querySelector('.inputValue').value = '';
+                }
+          
+                if (progressElement.minTag) {
+                  itemModal.querySelector('.inputMinTag').value = progressElement.minTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMinTag').value = '';
+                }
+          
+                if (progressElement.minValue) {
+                  itemModal.querySelector('.inputMinValue').value = progressElement.minValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMinValue').value = '';
+                }
+          
+                if (progressElement.maxTag) {
+                  itemModal.querySelector('.inputMaxTag').value = progressElement.maxTag;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxTag').value = '';
+                }
+          
+                if (progressElement.maxValue) {
+                  itemModal.querySelector('.inputMaxValue').value = progressElement.maxValue;
+                }
+                else {
+                  itemModal.querySelector('.inputMaxValue').value = '';
+                }
+          
+                if (progressElement.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = progressElement.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  if (selectedItem.id) { //Progress is chosen
+                    selectedItem.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                    selectedItem.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  }
+                  else {  //Bar is chosen
+                    selectedItem.parentNode.style.width = itemModal.querySelector('.inputWidth').value + 'px';
+                    selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  }
+          
+                  progressElement.tag = itemModal.querySelector('.inputValue').value;
+                  progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
+                  progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
+                  progressElement.maxTag = itemModal.querySelector('.inputMaxTag').value;
+                  progressElement.maxValue = itemModal.querySelector('.inputMaxValue').value;
+                  progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  progressElement.isHideLabel = itemModal.querySelector('#hideVerticalLabelCheckbox').checked;
+                  progressElement.isRawValue = itemModal.querySelector('#rawVerticalValueCheckbox').checked;
+          
+          
+                  if (itemModal.querySelector('.inputMinTag').value)
+                    progressElement.isMinTag = true;
+                  else progressElement.isMinTag = false;
+          
+                  if (itemModal.querySelector('.inputMaxTag').value)
+                    progressElement.isMaxTag = true;
+                  else progressElement.isMaxTag = false;
+          
+                  var _bar = $(progressElement).find('.progress-bar')[0];
+                  if (progressElement.isHideLabel) _bar.innerText = '';
+                  else _bar.innerText = _bar.style.width;
+          
+                  var _foundIndex = findElementHTMLById(progressElement.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = progressElement.tag;
+                    elementHTML[_foundIndex].properties[1].value = progressElement.minTag;
+                    elementHTML[_foundIndex].properties[2].value = progressElement.minValue;
+                    elementHTML[_foundIndex].properties[3].value = progressElement.maxTag;
+                    elementHTML[_foundIndex].properties[4].value = progressElement.maxValue;
+                    elementHTML[_foundIndex].properties[5].value = progressElement.isMinTag;
+                    elementHTML[_foundIndex].properties[6].value = progressElement.isMaxTag;
+                    elementHTML[_foundIndex].properties[7].value = progressElement.hiddenWhen;
+                    elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
+                    elementHTML[_foundIndex].properties[9].value = progressElement.isRawValue;
+                  }
+                });
+          
+                //Button Value browse tag
+                $('.btnValueTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputValue').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMinTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMinTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnMaxTag').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputMaxTag').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                $('.btnHiddenWhen').on('click', function (valueEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#verticalProgressBarModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('.btnValueTag').off('click');
+                $('.btnMinTag').off('click');
+                $('.btnMaxTag').off('click');
+                $('.btnHiddenWhen').off('click');
+              });
+          
+              $('#verticalProgressBarModal').modal();
+            });
+            break;
+          }
+          case 'symbolset': {
+            shapes.push(elementDOM);
+            // if (isMainpage) elementDOM.classList.add('draggable');
+            // else elementDOM.classList.add('draggable2');
+            $(elementDOM).on('dblclick', function (mouseEvent) {
+              $('#symbolSetModal').one('show.bs.modal', function (showEvent) {
+          
+                var elem = document.getElementById(mouseEvent.target.id);
+                var elemStyle = elem.style;
+          
+                var elemWidth = parseInt(elemStyle.width, 10),
+                  elemHeight = parseInt(elemStyle.height, 10),
+                  elemPositionX = parseInt(elemStyle.left, 10),
+                  elemPositionY = parseInt(elemStyle.top, 10),
+                  elemOnSymbol = elem.onSymbol,
+                  elemOffSymbol = elem.offSymbol;
+          
+                var itemModal = $('#symbolSetModal')[0];
+                itemModal.querySelector('.inputWidth').value = elemWidth;
+                itemModal.querySelector('.inputHeight').value = elemHeight;
+                itemModal.querySelector('.inputPositionX').value = elemPositionX;
+                itemModal.querySelector('.inputPositionY').value = elemPositionY;
+                itemModal.querySelector('.inputOnImageSource').value = elemOnSymbol;
+                itemModal.querySelector('.inputOffImageSource').value = elemOffSymbol;
+          
+                if (mouseEvent.target.onCondition) {
+                  itemModal.querySelector('.inputOnCondition').value = mouseEvent.target.onCondition;
+                }
+                else {
+                  itemModal.querySelector('.inputOnCondition').value = '';
+                }
+          
+                if (mouseEvent.target.hiddenWhen) {
+                  itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
+                }
+                else {
+                  itemModal.querySelector('.inputHiddenWhen').value = '';
+                }
+          
+                //Button save 
+                $('.saveChangeButton').on('click', function (event) {
+                  elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
+                  elemStyle.height = itemModal.querySelector('.inputHeight').value + 'px';
+                  elemStyle.left = itemModal.querySelector('.inputPositionX').value + 'px';
+                  elemStyle.top = itemModal.querySelector('.inputPositionY').value + 'px';
+                  mouseEvent.target.onCondition = itemModal.querySelector('.inputOnCondition').value;
+                  mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
+                  mouseEvent.target.onSymbol = itemModal.querySelector('.inputOnImageSource').value;
+                  mouseEvent.target.offSymbol = itemModal.querySelector('.inputOffImageSource').value;
+                  mouseEvent.target.src = mouseEvent.target.offSymbol;
+          
+                  var _foundIndex = findElementHTMLById(mouseEvent.target.id);
+                  if (_foundIndex != -1) {
+                    elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCondition;
+                    elementHTML[_foundIndex].properties[1].value = mouseEvent.target.onSymbol;
+                    elementHTML[_foundIndex].properties[2].value = mouseEvent.target.offSymbol;
+                    elementHTML[_foundIndex].properties[3].value = mouseEvent.target.hiddenWhen;
+                  }
+                });
+          
+                //Browse Tag button
+                $('#btnOnCondition').on('click', function (onConditionClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputOnCondition').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+                //Browse Tag button
+                $('.btnHiddenWhen').on('click', function (onHiddenWhenClickEvent) {
+                  $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
+                    if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
+                      itemModal.querySelector('.inputHiddenWhen').value += $('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked').value;
+                    }
+                  });
+                });
+          
+              });
+          
+              $('#symbolSetModal').one('hide.bs.modal', function (hideEvent) {
+                $('.saveChangeButton').off('click');
+                $('#btnOnCondition').off('click');
+                $('.btnHiddenWhen').off('click');
+                $('.btnSelect').off('click');
+              });
+          
+              $('#chooseImageModal').on('show.bs.modal', function (event) {
+                var _target = event.relatedTarget.id;
+                $('.btnSelect').one('click', function (btnEvent) {
+                  if ($("[name=symbol]").is(":checked")) {
+                    if (_target == 'btnOnSymbol')
+                      $('.inputOnImageSource').val($('[name=symbol]:checked').val());
+                    else
+                      $('.inputOffImageSource').val($('[name=symbol]:checked').val());
+                  }
+                  $('#chooseImageModal').modal('hide');
+                });
+              });
+          
+              $('#symbolSetModal').modal();
+            });
+            break;
+          }
         }
 
       })

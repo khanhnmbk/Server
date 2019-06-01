@@ -29,6 +29,20 @@ module.exports.createUserDir = function (user) {
                         if (err) console.log(err);
                         else console.log('Create folder successfully: Config');
                     });
+                    fs.mkdir(path.resolve(rootDir,'Database',user, 'Save'),function (err) { 
+                        if (err) console.log(err);
+                        else {
+                            console.log('Create folder successfully: Save');
+                            fs.mkdir(path.resolve(rootDir,'Database',user, 'Save', 'Design'),function (err) { 
+                                if (err) console.log(err);
+                                else console.log('Create folder successfully: Save/Design');
+                            });
+                            fs.mkdir(path.resolve(rootDir,'Database',user, 'Save', 'Parameters'),function (err) { 
+                                if (err) console.log(err);
+                                else console.log('Create folder successfully: Save/Parameters');
+                            });
+                        } 
+                    });
                 }
             });
             

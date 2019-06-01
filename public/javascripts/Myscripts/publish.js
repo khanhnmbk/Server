@@ -900,14 +900,28 @@ function scadaVerticalSlider(id, variableName) {
   }
 
   if (verticalSlider.isMinTag) {
-    if (verticalSlider.minTag.includes(variableName)) verticalSlider.min = eval(verticalSlider.minTag);
+    if (verticalSlider.minTag.includes(variableName)) {
+      if (verticalSlider.min != eval(verticalSlider.minTag)) {
+        verticalSlider.min = eval(verticalSlider.minTag);
+        $(verticalSlider).bootstrapSlider({'min' : Number(verticalSlider.min)});
+      $(verticalSlider).bootstrapSlider('refresh');
+      $(verticalSlider).bootstrapSlider('enable');
+      }
+    } 
   }
   else {
     if (verticalSlider.minValue) verticalSlider.min = verticalSlider.minValue;
   }
 
   if (verticalSlider.isMaxTag) {
-    if (verticalSlider.maxTag.includes(variableName)) verticalSlider.max = eval(verticalSlider.maxTag);
+    if (verticalSlider.maxTag.includes(variableName)) {
+      if (verticalSlider.max != eval(verticalSlider.maxTag)) {
+        verticalSlider.max = eval(verticalSlider.maxTag);
+        $(verticalSlider).bootstrapSlider({'max' : Number(verticalSlider.max)});
+      $(verticalSlider).bootstrapSlider('refresh');
+      $(verticalSlider).bootstrapSlider('enable');
+      }
+    } 
   }
   else {
     if (verticalSlider.maxValue) verticalSlider.max = verticalSlider.maxValue;
@@ -1025,8 +1039,8 @@ function reInitVerticalSlider() {
       $('#mainPage1').append(verticalSliderDiv);
       //Create vertical slider
       $(htmlObj).bootstrapSlider({
-        min: min,
-        max: max,
+        min: Number(min),
+        max: Number(max),
         value: 50,
         orientation: 'vertical',
         tooltip_position: 'left',
