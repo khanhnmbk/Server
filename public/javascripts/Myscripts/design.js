@@ -82,7 +82,6 @@ $(document).ready(function () {
 
       socket.on('/' + deviceID + '/tag', function (data) {
         var arrVarObjects = JSON.parse(data);
-        console.log(arrVarObjects);
         if (arrVarObjects) {
           arrVarObjects.variables.forEach(function (varObject) {
             eval(varObject.tagName + '=' + varObject.value);
@@ -94,8 +93,6 @@ $(document).ready(function () {
       //Clear table body first
       $('#alarmTable tbody').empty();
       socket.on('/' + deviceID + '/alarm', function (alarmObject) {
-        console.log('Alarm Object');
-        console.log(alarmObject);
         var arrAlarmSource = Array.from($('#alarmTable tr td:nth-child(4)'));
         var arrAlarmType = Array.from($('#alarmTable tr td:nth-child(7)'));
         var arrAlarmState = Array.from($('#alarmTable tr td:nth-child(8)'));
@@ -191,7 +188,6 @@ $(document).ready(function () {
             </tr>`
             $('#historyTable tbody').append(_htmlMarkup);
             $('#historyTable tbody').css({ 'height': '800px', 'overflow-y': 'auto' });
-            console.log(dataItem);
           });
         }
       });
@@ -406,7 +402,6 @@ $(document).ready(function () {
         if (shapes[i].id) {
           if (typeof (shapes[i].id) == 'string') {
             if (shapes[i].id.includes('verticalSlider')) {
-              console.log(shapes[i]);
               $(shapes[i]).bootstrapSlider('enable');
             }
           }
@@ -448,13 +443,10 @@ $(document).ready(function () {
 
       socket.emit('/publish', _sendObject, backgroundObject);
       $('#spinnerModal').modal('show');
-      console.log(mainPage1);
       socket.on('/' + deviceID + '/publishSuccess', function (data) {
-        console.log('Socket on ' + '/' + deviceID + '/publishSuccess');
         setTimeout(function () {
           $('#spinnerModal').modal('hide');
           var href = '/published/' + user + '/' + 'Device_' + deviceID + '_publish.ejs';
-          console.log(href)
           $('#publishedLink').attr('href', href)
           $('#successModal').modal('show');
         }, 3000);
@@ -479,7 +471,6 @@ $(document).ready(function () {
   });
 
   $('#btnSaveColors').click(function () {
-    console.log($('#mainPageColor').prop('value') + ' !important');
     //$('#mainPage1')[0].style.cssText = '#ff0000';
     $('#mainPage1')[0].style.setProperty('background', $('#mainPageColor').prop('value'), 'important');
     $('#alarm')[0].style.setProperty('background', $('#alarmPageColor').prop('value'), 'important');
@@ -502,6 +493,9 @@ $(document).ready(function () {
 
   //Open designs
   $('#btnOpenDesign').click(function () {
+    console.log('Button Open Design');
+    console.log('Selected row');
+    console.log(openTable.$('tr.table-selected'));
     if (openTable.$('tr.table-selected').length > 0) { //Detect selected row
       openDesign(socket);
       $('#openModal').modal('hide');
@@ -614,7 +608,6 @@ function removeItem() {
     else item.parentNode.removeChild(item);
 
     for (var elem of shapes) {
-      console.log(elem);
       try {
         if (elem.node.id == selectedItemId) {
           shapes.splice(shapes.indexOf(elem), 1);
@@ -698,7 +691,7 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.command,
           }
-          if (isRunning) _socket.emit('/write', _sendObj);
+          if (isRunning && this.command) _socket.emit('/write', _sendObj);
         })
         break;
       }
@@ -746,15 +739,15 @@ function initSCADA(_shapes, _socket) {
       case 'verticalslider': {
         //Update min, max value
         if (_shape.isMinTag) {
-          $(_shape).bootstrapSlider({'min': eval(_shape.minTag)});
+          $(_shape).bootstrapSlider({ 'min': eval(_shape.minTag) });
         } else {
-          $(_shape).bootstrapSlider({'min' : Number(_shape.minValue)});
+          $(_shape).bootstrapSlider({ 'min': Number(_shape.minValue) });
         }
         // $(_shape).bootstrapSlider('refresh');
         if (_shape.isMaxTag) {
-          $(_shape).bootstrapSlider({'max': eval(_shape.maxTag)});
+          $(_shape).bootstrapSlider({ 'max': eval(_shape.maxTag) });
         } else {
-          $(_shape).bootstrapSlider({'max': Number(_shape.maxValue)});
+          $(_shape).bootstrapSlider({ 'max': Number(_shape.maxValue) });
         }
         $(_shape).bootstrapSlider('refresh');
         $(_shape).bootstrapSlider('enable');
@@ -764,12 +757,12 @@ function initSCADA(_shapes, _socket) {
             deviceID: deviceID,
             command: this.tag + ' = ' + this.value
           }
-          console.log(_sendObj)
           if (this.tag && isRunning) _socket.emit('/write', _sendObj);
         });
         break;
       }
       default: {
+        //Switch
         if ($(_shape).find('span')[0]) {
           var _checkbox = $(_shape).find('input')[0];
           var _span = $(_shape).find('span')[0];
@@ -780,18 +773,18 @@ function initSCADA(_shapes, _socket) {
                   deviceID: deviceID,
                   command: _span.onCommand,
                 }
-                if (isRunning) _socket.emit('/write', _sendObj);
+                if (isRunning && _span.onCommand) _socket.emit('/write', _sendObj);
               }
               else {
                 var _sendObj = {
                   deviceID: deviceID,
                   command: _span.offCommand,
                 }
-                if (isRunning) _socket.emit('/write', _sendObj);
+                if (isRunning && _span.offCommand) _socket.emit('/write', _sendObj);
               }
             });
           }
-        } else {
+        } else { //Checkbox
           var _label = $(_shape).find('label')[0];
           var _checkbox = $(_shape).find('input')[0];
           if (_checkbox) {
@@ -801,14 +794,14 @@ function initSCADA(_shapes, _socket) {
                   deviceID: deviceID,
                   command: _label.checkedCommand,
                 }
-                if (isRunning) _socket.emit('/write', _sendObj);
+                if (isRunning && _label.checkedCommand) _socket.emit('/write', _sendObj);
               }
               else {
                 var _sendObj = {
                   deviceID: deviceID,
                   command: _label.unCheckedCommand,
                 }
-                if (isRunning) _socket.emit('/write', _sendObj);
+                if (isRunning && _label.unCheckedCommand) _socket.emit('/write', _sendObj);
               }
             });
           }
@@ -821,7 +814,6 @@ function initSCADA(_shapes, _socket) {
 function SCADA(arrHtmlElems, variableName, variableTimestamp) {
   shapes.forEach(function (_shape) {
     var _id = _shape.id.toString().toLowerCase().replace(/[0-9]/g, '');
-    console.log(_id);
     switch (_id) {
       case 'text': {
         scadaTextObject(_shape, variableName);
@@ -895,7 +887,6 @@ function SCADA(arrHtmlElems, variableName, variableTimestamp) {
 
 //Svg scada
 function scadaSvgObject(item, variableName) {
-  console.log(item);
   if (item.node.hiddenWhen) {
     if (item.node.hiddenWhen.includes(variableName)) {
       if (eval(item.node.hiddenWhen)) item.hide();
@@ -926,7 +917,6 @@ function scadaImageObject(item, variableName) {
 
 //DisplayValue scada
 function scadaDisplayValueObject(item, variableName) {
-  console.log($(item));
   if (item.hiddenWhen) {
     if (item.hiddenWhen.includes(variableName)) {
       if (eval(item.hiddenWhen)) $(item).hide();
@@ -1143,11 +1133,11 @@ function scadaVerticalSliderObject(item, variableName) {
     if (item.minTag.includes(variableName)) {
       if (item.min != eval(item.minTag)) {
         item.min = eval(item.minTag);
-        $(item).bootstrapSlider({'min' : eval(item.minTag)});
+        $(item).bootstrapSlider({ 'min': eval(item.minTag) });
         $(item).bootstrapSlider('refresh');
         $(item).bootstrapSlider('enable');
       }
-    } 
+    }
   }
   else {
     if (item.minValue) item.min = Number(item.minValue);
@@ -1157,11 +1147,11 @@ function scadaVerticalSliderObject(item, variableName) {
     if (item.maxTag.includes(variableName)) {
       if (item.max != eval(item.maxTag)) {
         item.max = eval(item.maxTag);
-        $(item).bootstrapSlider({'max' : eval(item.maxTag)});
+        $(item).bootstrapSlider({ 'max': eval(item.maxTag) });
         $(item).bootstrapSlider('refresh');
         $(item).bootstrapSlider('enable');
       }
-    } 
+    }
   }
   else {
     if (item.maxValue) item.max = Number(item.maxValue);
@@ -1277,8 +1267,6 @@ var startDraw = function (shape) {
   var modalId = '';
   //Stop the previous draw
   stopDraw(false);
-  console.log('Start draw');
-
   //Subscribe mouse down event
   draw.on('mousedown', function (event) {
     switch (shape) {
@@ -1360,8 +1348,6 @@ var startDraw = function (shape) {
                 elemWidth = element.attr('stroke-width'),
                 elemLinecap = element.attr('stroke-linecap'),
                 elemColor = element.attr('stroke');
-
-              console.log(element.attr());
 
               var itemModal = $(modalId)[0];
 
@@ -4088,7 +4074,6 @@ function verticalProcessbarMouseDownEventHandler(event) {
         elemWidth = parseInt(selectedItem.parentNode.style.width, 10);
         elemHeight = Math.round(selectedItem.parentNode.getBoundingClientRect().bottom - selectedItem.parentNode.getBoundingClientRect().top);
       }
-      console.log(elemHeight + ' ' + elemWidth);
       isHideLabel = progressElement.isHideLabel;
       isRawValue = progressElement.isRawValue;
 
@@ -4560,7 +4545,7 @@ function chartMouseDownEventHandler(event) {
     }
   });
   arrChartJS.push({ id: canvas.id, node: newChart });
-  console.log(arrChartJS)
+
 
 
   //Image mouse events
@@ -4682,7 +4667,6 @@ function chartMouseDownEventHandler(event) {
   shapes[index] = chartDiv;
   index++;
   nameIndex++;
-  console.log(chartDiv);
 
   //Add draggable feature
   // draggable = new PlainDraggable(progressbar, { leftTop: true });
@@ -5000,7 +4984,7 @@ function gaugeMouseDownEventHandler(event) {
 
           //Update arrGauge
           arrGauge[foundGaugeIndex].node = newGauge;
-          console.log(arrGauge);
+
         }
       });
 
@@ -5177,7 +5161,7 @@ function chartDashboardMouseDownEventHandler(event) {
     }
   });
   arrChartJS.push({ id: canvas.id, node: newChart });
-  console.log(arrChartJS)
+
 
 
   //Image mouse events
@@ -5299,7 +5283,7 @@ function chartDashboardMouseDownEventHandler(event) {
   shapes[index] = chartDiv;
   index++;
   nameIndex++;
-  console.log(chartDiv);
+
 
   //Add draggable feature
   // draggable = new PlainDraggable(progressbar, { leftTop: true });
@@ -5617,7 +5601,7 @@ function gaugeDashboardMouseDownEventHandler(event) {
 
           //Update arrGauge
           arrGauge[foundGaugeIndex].node = newGauge;
-          console.log(arrGauge);
+
         }
       });
 
@@ -5694,7 +5678,7 @@ function enableAllItems() {
 function addPixel() {
   for (var i = 0; i < elementHTML.length; i++) {
     var element = document.getElementById(elementHTML[i].id);
-    console.log(element);
+
     switch (elementHTML[i].type) {
       case 'svg': {
         $(element).attr({
@@ -5805,10 +5789,15 @@ function openDesign(_socket) {
     var fileName = openTable.$('tr.table-selected')[0].cells[0].innerText;
     _socket.emit('/reqDesign', { user: user, deviceID: deviceID, fileName: fileName });
     _socket.on('/' + deviceID + '/resDesign', function (data) {
-      console.log(data);
       _socket.off('/' + deviceID + '/resDesign');
       $('#mainPage1').append($.parseHTML(data.design.mainPage1));
       $('#dashboard').append($.parseHTML(data.design.dashboard));
+      var oldSvg = $('#mainPage1').find('svg')[0];
+      var svgObjects = $(oldSvg).contents();
+      $(oldSvg).remove();
+      draw = SVG('mainPage1');
+      $(draw.node).append(svgObjects);
+
       //Modify array elementHTML
       elementHTML = data.element;
       elementHTML.forEach(element => {
@@ -5821,19 +5810,19 @@ function openDesign(_socket) {
           }
         }
 
-       
-          $('.draggable').draggable({
-            refreshPositions: true,
-            containment: $('#mainPage1'),
-            cancel: false
-          });
-      
-          $('.draggable2').draggable({
-            refreshPositions: true,
-            containment: $('#dashboard'),
-            cancel: false
-          });
-        
+
+        $('.draggable').draggable({
+          refreshPositions: true,
+          containment: $('#mainPage1'),
+          cancel: false
+        });
+
+        $('.draggable2').draggable({
+          refreshPositions: true,
+          containment: $('#dashboard'),
+          cancel: false
+        });
+
 
         switch (element.type.toLowerCase()) {
           case 'switch': {
@@ -6379,7 +6368,6 @@ function openDesign(_socket) {
 
                     //Update arrGauge
                     arrGauge[foundGaugeIndex].node = newGauge;
-                    console.log(arrGauge);
                   }
                 });
 
@@ -6652,7 +6640,6 @@ function openDesign(_socket) {
                 break;
               }
               case 'rect': {
-                console.log($(elementDOM).attr('rx'));
                 if (!$(elementDOM).attr('rx')) {
                   $(elementDOM).on('dblclick', function (mouseEvent) {
                     var htmlElement = mouseEvent.target.getBoundingClientRect();
@@ -6934,44 +6921,44 @@ function openDesign(_socket) {
                 var elemStyle = mouseEvent.target.style;
                 var elemId = mouseEvent.target.id;
                 var elemBound = mouseEvent.target.getBoundingClientRect();
-          
+
                 var elemWidth = parseInt(elemStyle.width, 10),
                   elemHeight = Math.round(elemBound.bottom - elemBound.top);
                 elemType = mouseEvent.target.type;
-          
+
                 var itemModal = $('#inputModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
                 itemModal.querySelector('.inputHeight').value = elemHeight;
                 itemModal.querySelector('.inputType').value = elemType;
-          
+
                 if (mouseEvent.target.tag) {
                   itemModal.querySelector('.inputTag').value = mouseEvent.target.tag;
                 }
                 else {
                   itemModal.querySelector('.inputTag').value = '';
                 }
-          
+
                 if (mouseEvent.target.disableWhen) {
                   itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
                 }
                 else {
                   itemModal.querySelector('.inputDisableWhen').value = '';
                 }
-          
+
                 $('.saveChangeButton').on('click', function (event) {
                   document.getElementById(elemId).style.width = itemModal.querySelector('.inputWidth').value + 'px';
                   document.getElementById(elemId).style.height = itemModal.querySelector('.inputHeight').value + 'px';
                   mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
                   mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
                   mouseEvent.target.type = itemModal.querySelector('.inputType').value;
-          
+
                   var _foundIndex = findElementHTMLById(elemId);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
                     elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
                   }
                 });
-          
+
                 $('.btnTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -6979,7 +6966,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -6987,15 +6974,15 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#inputModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnTag').off('click');
                 $('.btnDisableWhen').off('click');
               });
-          
+
               $('#inputModal').modal();
             });
             break;
@@ -7013,9 +7000,9 @@ function openDesign(_socket) {
                   elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
                   elemColor = rgb2hex(elemStyle.color),
                   elemText = mouseEvent.target.innerText;
-          
+
                 var itemModal = $('#textModal')[0];
-          
+
                 itemModal.querySelector('#inputFontSize').value = elemFontsize;
                 itemModal.querySelector('#fontPicker').value = elemFontFamily;
                 itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
@@ -7027,8 +7014,8 @@ function openDesign(_socket) {
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
-          
+
+
                 $('.saveChangeButton').on('click', function (event) {
                   document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
                   document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
@@ -7036,11 +7023,11 @@ function openDesign(_socket) {
                   document.getElementById(elemId).style.fontStyle = itemModal.querySelector('#fontStyleForm').value;
                   document.getElementById(elemId).innerHTML = itemModal.querySelector('#textContent').value;
                   mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
-          
+
                   var _foundIndex = findElementHTMLById(elemId);
                   if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7048,14 +7035,14 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#textModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnHiddenWhen').off('click');
               });
-          
+
               $('#textModal').modal();
             });
             break;
@@ -7066,11 +7053,11 @@ function openDesign(_socket) {
             // else elementDOM.classList.add('draggable2');
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#imageModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var elem = document.getElementById(mouseEvent.target.id);
-          
+
                 var elemStyle = elem.style;
-          
+
                 var elemWidth = parseInt(elemStyle.width, 10),
                   elemHeight = parseInt(elemStyle.height, 10),
                   elemPositionX = parseInt(elemStyle.left, 10),
@@ -7083,14 +7070,14 @@ function openDesign(_socket) {
                 itemModal.querySelector('#inputPositionX').value = elemPositionX;
                 itemModal.querySelector('#inputPositionY').value = elemPositionY;
                 itemModal.querySelector('.inputImageSource').value = elemSource;
-          
+
                 if (mouseEvent.target.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   elemStyle.width = imageModal.querySelector('#inputWidth').value + 'px';
@@ -7099,12 +7086,12 @@ function openDesign(_socket) {
                   elemStyle.top = imageModal.querySelector('#inputPositionY').value + 'px';
                   mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
                   mouseEvent.target.src = itemModal.querySelector('.inputImageSource').value;
-          
+
                   var _foundIndex = findElementHTMLById(mouseEvent.target.id);
                   if (_foundIndex != -1) elementHTML[_foundIndex].properties[0].value = mouseEvent.target.hiddenWhen;
-          
+
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7112,15 +7099,15 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#imageModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnHiddenWhen').off('click');
                 $('.btnSelect').off('click');
               });
-          
+
               $('#chooseImageModal').one('show.bs.modal', function (event) {
                 $('.btnSelect').on('click', function (btnEvent) {
                   if ($("[name=symbol]").is(":checked"))
@@ -7128,10 +7115,10 @@ function openDesign(_socket) {
                   $('#chooseImageModal').modal('toggle');
                 });
               });
-          
+
               $('#imageModal').modal();
             });
-          
+
             break;
           }
           case 'displayvalue': {
@@ -7148,9 +7135,9 @@ function openDesign(_socket) {
                   elemColor = rgb2hex(elemStyle.color),
                   elemText = mouseEvent.target.innerText;
                 elemFormat = mouseEvent.target.format;
-          
+
                 var itemModal = $('#displayValueModal')[0];
-          
+
                 itemModal.querySelector('#inputFontSize').value = elemFontsize;
                 itemModal.querySelector('#fontPicker').value = elemFontFamily;
                 itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
@@ -7158,21 +7145,21 @@ function openDesign(_socket) {
                 itemModal.querySelector('#textContent').value = elemText;
                 if (elemFormat) itemModal.querySelector('#displayFormat').value = elemFormat;
                 else itemModal.querySelector('#displayFormat').value = 3;
-          
+
                 if (mouseEvent.target.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
+
                 if (mouseEvent.target.tag) {
                   itemModal.querySelector('.inputTag').value = mouseEvent.target.tag;
                 }
                 else {
                   itemModal.querySelector('.inputTag').value = '';
                 }
-          
+
                 $('.saveChangeButton').on('click', function (event) {
                   document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
                   document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
@@ -7182,16 +7169,16 @@ function openDesign(_socket) {
                   mouseEvent.target.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
                   mouseEvent.target.tag = itemModal.querySelector('.inputTag').value;
                   mouseEvent.target.format = itemModal.querySelector('#displayFormat').value;
-          
+
                   var _foundIndex = findElementHTMLById(elemId);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
                     elementHTML[_foundIndex].properties[1].value = mouseEvent.target.format;
                     elementHTML[_foundIndex].properties[2].value = mouseEvent.target.hiddenWhen;
                   }
-          
+
                 });
-          
+
                 $('.btnTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7199,7 +7186,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7207,15 +7194,15 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#displayValueModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnTag').off('click');
                 $('.btnHiddenWhen').off('click');
               });
-          
+
               $('#displayValueModal').modal();
             });
             break;
@@ -7228,10 +7215,10 @@ function openDesign(_socket) {
               $('#buttonModal').one('show.bs.modal', function (showEvent) {
                 var elemStyle = mouseEvent.target.style;
                 var elemId = mouseEvent.target.id;
-          
+
                 var htmlElement = mouseEvent.target.getBoundingClientRect();
                 var svgOffset = mouseEvent.target.parentNode.getBoundingClientRect();
-          
+
                 var elemFontsize = parseInt(elemStyle.fontSize, 10).toString(),
                   elemFontstyle = elemStyle.fontStyle,
                   elemFontFamily = elemStyle.fontFamily.replace(/["']/g, ""), //Replace double quote from font with WHITESPACE
@@ -7242,10 +7229,10 @@ function openDesign(_socket) {
                   elemPositionX = Math.round(htmlElement.left - svgOffset.left),
                   elemPositionY = Math.round(htmlElement.top - svgOffset.top),
                   elemText = mouseEvent.target.innerText;
-          
-          
+
+
                 var itemModal = $('#buttonModal')[0];
-          
+
                 itemModal.querySelector('#inputFontSize').value = elemFontsize;
                 itemModal.querySelector('#fontPicker').value = elemFontFamily;
                 itemModal.querySelector('#fontStyleForm').value = elemFontstyle;
@@ -7256,21 +7243,21 @@ function openDesign(_socket) {
                 itemModal.querySelector('#inputHeight').value = elemHeight;
                 itemModal.querySelector('#inputPositionX').value = elemPositionX;
                 itemModal.querySelector('#inputPositionY').value = elemPositionY;
-          
+
                 if (mouseEvent.target.command) {
                   itemModal.querySelector('.inputCommand').value = mouseEvent.target.command;
                 }
                 else {
                   itemModal.querySelector('.inputCommand').value = '';
                 }
-          
+
                 if (mouseEvent.target.disableWhen) {
                   itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
                 }
                 else {
                   itemModal.querySelector('.inputDisableWhen').value = '';
                 }
-          
+
                 $('.saveChangeButton').on('click', function (event) {
                   document.getElementById(elemId).style.fontSize = itemModal.querySelector('#inputFontSize').value + 'px';
                   document.getElementById(elemId).style.fontFamily = itemModal.querySelector('#fontPicker').value;
@@ -7284,13 +7271,13 @@ function openDesign(_socket) {
                   document.getElementById(elemId).style.height = itemModal.querySelector('#inputHeight').value + 'px';
                   mouseEvent.target.command = itemModal.querySelector('.inputCommand').value;
                   mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
-          
+
                   var _foundIndex = findElementHTMLById(elemId);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = mouseEvent.target.command;
                     elementHTML[_foundIndex].properties[1].value = mouseEvent.target.disableWhen;
                   }
-          
+
                   // var html = document.getElementById(elemId);
                   // for (draggableItem of draggableObjects) {
                   //   if (draggableItem.element.id == html.id) {
@@ -7303,7 +7290,7 @@ function openDesign(_socket) {
                   // draggable.containment = document.getElementById('mainPage1');
                   // draggableObjects.push(draggable);
                 });
-          
+
                 $('.btnCommand').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7311,7 +7298,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7319,15 +7306,15 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#buttonModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnCommand').off('click');
                 $('.btnDisableWhen').off('click');
               });
-          
+
               $('#buttonModal').modal();
             });
             break;
@@ -7338,57 +7325,57 @@ function openDesign(_socket) {
             // else elementDOM.classList.add('draggable2');
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#sliderModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var elem = document.getElementById(mouseEvent.target.id);
                 var elemStyle = elem.style;
-          
+
                 var elemWidth = parseInt(elemStyle.width, 10);
-          
+
                 var itemModal = $('#sliderModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
-          
+
                 if (mouseEvent.target.tag) {
                   itemModal.querySelector('.inputValue').value = mouseEvent.target.tag;
                 }
                 else {
                   itemModal.querySelector('.inputValue').value = '';
                 }
-          
+
                 if (mouseEvent.target.minTag) {
                   itemModal.querySelector('.inputMinTag').value = mouseEvent.target.minTag;
                 }
                 else {
                   itemModal.querySelector('.inputMinTag').value = '';
                 }
-          
+
                 if (mouseEvent.target.minValue) {
                   itemModal.querySelector('.inputMinValue').value = mouseEvent.target.minValue;
                 }
                 else {
                   itemModal.querySelector('.inputMinValue').value = '';
                 }
-          
+
                 if (mouseEvent.target.maxTag) {
                   itemModal.querySelector('.inputMaxTag').value = mouseEvent.target.maxTag;
                 }
                 else {
                   itemModal.querySelector('.inputMaxTag').value = '';
                 }
-          
+
                 if (mouseEvent.target.maxValue) {
                   itemModal.querySelector('.inputMaxValue').value = mouseEvent.target.maxValue;
                 }
                 else {
                   itemModal.querySelector('.inputMaxValue').value = '';
                 }
-          
+
                 if (mouseEvent.target.disableWhen) {
                   itemModal.querySelector('.inputDisableWhen').value = mouseEvent.target.disableWhen;
                 }
                 else {
                   itemModal.querySelector('.inputDisableWhen').value = '';
                 }
-          
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
@@ -7398,15 +7385,15 @@ function openDesign(_socket) {
                   mouseEvent.target.maxTag = itemModal.querySelector('.inputMaxTag').value;
                   mouseEvent.target.maxValue = itemModal.querySelector('.inputMaxValue').value;
                   mouseEvent.target.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
-          
+
                   if (itemModal.querySelector('.inputMinTag').value)
                     mouseEvent.target.isMinTag = true;
                   else mouseEvent.target.isMinTag = false;
-          
+
                   if (itemModal.querySelector('.inputMaxTag').value)
                     mouseEvent.target.isMaxTag = true;
                   else mouseEvent.target.isMaxTag = false;
-          
+
                   var _foundIndex = findElementHTMLById(mouseEvent.target.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = mouseEvent.target.tag;
@@ -7419,7 +7406,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[7].value = mouseEvent.target.disableWhen;
                   }
                 });
-          
+
                 //Browse button
                 $('.btnValue').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -7428,7 +7415,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMinTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7436,7 +7423,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMaxTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7444,7 +7431,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7452,9 +7439,9 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#sliderModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnValue').off('click');
@@ -7462,69 +7449,118 @@ function openDesign(_socket) {
                 $('.btnMaxTag').off('click');
                 $('.btnDisableWhen').off('click');
               });
-          
+
               $('#sliderModal').modal();
             });
             break;
           }
           case 'verticalslider': {
-            shapes.push(elementDOM);
+            var min, max, height;
+            if (element.properties[5].value) min = eval(element.properties[1].value);
+            else if (element.properties[2].value) min = element.properties[2].value;
+            else {
+              min = 0;
+              elementDOM.minValue = min;
+            } 
+
+            if (element.properties[6].value) max = eval(element.properties[3].value);
+            else if (element.properties[4].value) max = element.properties[4].value;
+            else {
+              max = 100;
+              elementDOM.maxValue = max;
+            } 
+
+            console.log('Min: ', min);
+            console.log('Max: ', max);
+
+            height = $(elementDOM).siblings('.slider')[0].style.height;
+
+            var htmlObj = elementDOM.cloneNode(true);
+            htmlObj.min = min;
+            htmlObj.max = max;
+            htmlObj.minValue = elementDOM.minValue;
+            htmlObj.maxValue = elementDOM.maxValue;
+            var topDiv = elementDOM.parentNode.style.top;
+            var leftDiv = elementDOM.parentNode.style.left;
+            //Remove current slider
+            $(elementDOM.parentNode).remove();
+
+            //Create new slider
+            var verticalSliderDiv = document.createElement('div');
+            verticalSliderDiv.style.position = 'absolute';
+            verticalSliderDiv.style.top = topDiv;
+            verticalSliderDiv.style.left = leftDiv;
+            verticalSliderDiv.append(htmlObj);
+            $('#mainPage1').append(verticalSliderDiv);
+            //Create vertical slider
+            $(htmlObj).bootstrapSlider({
+              min: Number(min),
+              max: Number(max),
+              value: (Number(min) + Number(max)) / 2,
+              orientation: 'vertical',
+              tooltip_position: 'left',
+              reversed: true,
+            });
+            $(htmlObj).siblings('.slider')[0].style.height = height;
+            fixTooltip(htmlObj.id);
+            shapes.push(htmlObj);
+            $(htmlObj).bootstrapSlider('disable');
             // if (isMainpage) elementDOM.classList.add('draggable');
             // else elementDOM.classList.add('draggable2');
-            $(elementDOM.parentNode).on('dblclick', function (mouseEvent) {
+            $(htmlObj.parentNode).on('dblclick', function (mouseEvent) {
               var elem = $(mouseEvent.target).closest('.slider')[0];
               $('#verticalSliderModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var elemHeight = elem.style.height;
                 if (elemHeight) elemHeight = parseInt(elemHeight, 10);
-          
+
                 var _input = $(elem).siblings('input')[0];
-          
+
                 var itemModal = $('#verticalSliderModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemHeight;
-          
+
                 if (_input.tag) {
                   itemModal.querySelector('.inputValue').value = _input.tag;
                 }
                 else {
                   itemModal.querySelector('.inputValue').value = '';
                 }
-          
+
                 if (_input.minTag) {
                   itemModal.querySelector('.inputMinTag').value = _input.minTag;
                 }
                 else {
                   itemModal.querySelector('.inputMinTag').value = '';
                 }
-          
+
                 if (_input.minValue) {
                   itemModal.querySelector('.inputMinValue').value = _input.minValue;
                 }
                 else {
                   itemModal.querySelector('.inputMinValue').value = '';
                 }
-          
+
                 if (_input.maxTag) {
                   itemModal.querySelector('.inputMaxTag').value = _input.maxTag;
                 }
                 else {
                   itemModal.querySelector('.inputMaxTag').value = '';
                 }
-          
+
                 if (_input.maxValue) {
                   itemModal.querySelector('.inputMaxValue').value = _input.maxValue;
                 }
                 else {
                   itemModal.querySelector('.inputMaxValue').value = '';
                 }
-          
+
                 if (_input.disableWhen) {
                   itemModal.querySelector('.inputDisableWhen').value = _input.disableWhen;
                 }
                 else {
                   itemModal.querySelector('.inputDisableWhen').value = '';
                 }
-          
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   elem.style.height = itemModal.querySelector('.inputWidth').value + 'px';
@@ -7534,15 +7570,15 @@ function openDesign(_socket) {
                   _input.maxTag = itemModal.querySelector('.inputMaxTag').value;
                   _input.maxValue = itemModal.querySelector('.inputMaxValue').value;
                   _input.disableWhen = itemModal.querySelector('.inputDisableWhen').value;
-          
+
                   if (itemModal.querySelector('.inputMinTag').value)
                     _input.isMinTag = true;
                   else _input.isMinTag = false;
-          
+
                   if (itemModal.querySelector('.inputMaxTag').value)
                     _input.isMaxTag = true;
                   else _input.isMaxTag = false;
-          
+
                   var _foundIndex = findElementHTMLById(_input.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = _input.tag;
@@ -7555,7 +7591,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[7].value = _input.disableWhen;
                   }
                 });
-          
+
                 //Browse button
                 $('.btnValue').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -7564,7 +7600,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMinTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7572,7 +7608,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMaxTag').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7580,7 +7616,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnDisableWhen').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7588,9 +7624,9 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#verticalSliderModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnValue').off('click');
@@ -7598,10 +7634,10 @@ function openDesign(_socket) {
                 $('.btnMaxTag').off('click');
                 $('.btnDisableWhen').off('click');
               });
-          
+
               $('#verticalSliderModal').modal();
             });
-          
+
             break;
           }
           case 'progressbar': {
@@ -7610,13 +7646,13 @@ function openDesign(_socket) {
             // else elementDOM.classList.add('draggable2');
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#progressBarModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var selectedItem = mouseEvent.target;
                 var elemWidth, elemHeight;
                 var progressElement;
                 var isHideLabel = false;
                 var isRawValue = false;
-          
+
                 if (selectedItem.id) { //Progress is chosen
                   progressElement = selectedItem;
                   elemWidth = parseInt(selectedItem.style.width, 10);
@@ -7629,56 +7665,56 @@ function openDesign(_socket) {
                 }
                 isHideLabel = progressElement.isHideLabel;
                 isRawValue = progressElement.isRawValue;
-          
+
                 var itemModal = $('#progressBarModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
                 itemModal.querySelector('.inputHeight').value = elemHeight;
                 itemModal.querySelector('#hideLabelCheckbox').checked = isHideLabel;
                 itemModal.querySelector('#rawValueCheckbox').checked = isRawValue;
-          
+
                 if (progressElement.tag) {
                   itemModal.querySelector('.inputValue').value = progressElement.tag;
                 }
                 else {
                   itemModal.querySelector('.inputValue').value = '';
                 }
-          
+
                 if (progressElement.minTag) {
                   itemModal.querySelector('.inputMinTag').value = progressElement.minTag;
                 }
                 else {
                   itemModal.querySelector('.inputMinTag').value = '';
                 }
-          
+
                 if (progressElement.minValue) {
                   itemModal.querySelector('.inputMinValue').value = progressElement.minValue;
                 }
                 else {
                   itemModal.querySelector('.inputMinValue').value = '';
                 }
-          
+
                 if (progressElement.maxTag) {
                   itemModal.querySelector('.inputMaxTag').value = progressElement.maxTag;
                 }
                 else {
                   itemModal.querySelector('.inputMaxTag').value = '';
                 }
-          
+
                 if (progressElement.maxValue) {
                   itemModal.querySelector('.inputMaxValue').value = progressElement.maxValue;
                 }
                 else {
                   itemModal.querySelector('.inputMaxValue').value = '';
                 }
-          
+
                 if (progressElement.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = progressElement.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
-          
+
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   if (selectedItem.id) { //Progress is chosen
@@ -7689,7 +7725,7 @@ function openDesign(_socket) {
                     selectedItem.parentNode.style.width = itemModal.querySelector('.inputWidth').value + 'px';
                     selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
                   }
-          
+
                   progressElement.tag = itemModal.querySelector('.inputValue').value;
                   progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
                   progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
@@ -7698,20 +7734,20 @@ function openDesign(_socket) {
                   progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
                   progressElement.isHideLabel = itemModal.querySelector('#hideLabelCheckbox').checked;
                   progressElement.isRawValue = itemModal.querySelector('#rawValueCheckbox').checked;
-          
-          
+
+
                   if (itemModal.querySelector('.inputMinTag').value)
                     progressElement.isMinTag = true;
                   else progressElement.isMinTag = false;
-          
+
                   if (itemModal.querySelector('.inputMaxTag').value)
                     progressElement.isMaxTag = true;
                   else progressElement.isMaxTag = false;
-          
+
                   var _bar = $(progressElement).find('.progress-bar')[0];
                   if (progressElement.isHideLabel) _bar.innerText = '';
                   else _bar.innerText = _bar.style.width;
-          
+
                   var _foundIndex = findElementHTMLById(progressElement.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = progressElement.tag;
@@ -7725,7 +7761,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[8].value = progressElement.isHideLabel;
                   }
                 });
-          
+
                 //Button Value browse tag
                 $('.btnValueTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -7734,7 +7770,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMinTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7742,7 +7778,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMaxTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7750,7 +7786,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7758,9 +7794,9 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#progressBarModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnValueTag').off('click');
@@ -7768,7 +7804,7 @@ function openDesign(_socket) {
                 $('.btnMaxTag').off('click');
                 $('.btnHiddenWhen').off('click');
               });
-          
+
               $('#progressBarModal').modal();
             });
             break;
@@ -7779,13 +7815,13 @@ function openDesign(_socket) {
             // else elementDOM.classList.add('draggable2');
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#verticalProgressBarModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var selectedItem = mouseEvent.target;
                 var elemWidth, elemHeight;
                 var progressElement;
                 var isHideLabel = false;
                 var isRawValue = false;
-          
+
                 if (selectedItem.id) { //Progress is chosen
                   progressElement = selectedItem;
                   elemWidth = parseInt(selectedItem.style.width, 10);
@@ -7798,56 +7834,56 @@ function openDesign(_socket) {
                 }
                 isHideLabel = progressElement.isHideLabel;
                 isRawValue = progressElement.isRawValue;
-          
+
                 var itemModal = $('#verticalProgressBarModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
                 itemModal.querySelector('.inputHeight').value = elemHeight;
                 itemModal.querySelector('#hideVerticalLabelCheckbox').checked = isHideLabel;
                 itemModal.querySelector('#rawVerticalValueCheckbox').checked = isRawValue;
-          
+
                 if (progressElement.tag) {
                   itemModal.querySelector('.inputValue').value = progressElement.tag;
                 }
                 else {
                   itemModal.querySelector('.inputValue').value = '';
                 }
-          
+
                 if (progressElement.minTag) {
                   itemModal.querySelector('.inputMinTag').value = progressElement.minTag;
                 }
                 else {
                   itemModal.querySelector('.inputMinTag').value = '';
                 }
-          
+
                 if (progressElement.minValue) {
                   itemModal.querySelector('.inputMinValue').value = progressElement.minValue;
                 }
                 else {
                   itemModal.querySelector('.inputMinValue').value = '';
                 }
-          
+
                 if (progressElement.maxTag) {
                   itemModal.querySelector('.inputMaxTag').value = progressElement.maxTag;
                 }
                 else {
                   itemModal.querySelector('.inputMaxTag').value = '';
                 }
-          
+
                 if (progressElement.maxValue) {
                   itemModal.querySelector('.inputMaxValue').value = progressElement.maxValue;
                 }
                 else {
                   itemModal.querySelector('.inputMaxValue').value = '';
                 }
-          
+
                 if (progressElement.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = progressElement.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
-          
+
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   if (selectedItem.id) { //Progress is chosen
@@ -7858,7 +7894,7 @@ function openDesign(_socket) {
                     selectedItem.parentNode.style.width = itemModal.querySelector('.inputWidth').value + 'px';
                     selectedItem.parentNode.style.height = itemModal.querySelector('.inputHeight').value + 'px';
                   }
-          
+
                   progressElement.tag = itemModal.querySelector('.inputValue').value;
                   progressElement.minTag = itemModal.querySelector('.inputMinTag').value;
                   progressElement.minValue = itemModal.querySelector('.inputMinValue').value;
@@ -7867,20 +7903,20 @@ function openDesign(_socket) {
                   progressElement.hiddenWhen = itemModal.querySelector('.inputHiddenWhen').value;
                   progressElement.isHideLabel = itemModal.querySelector('#hideVerticalLabelCheckbox').checked;
                   progressElement.isRawValue = itemModal.querySelector('#rawVerticalValueCheckbox').checked;
-          
-          
+
+
                   if (itemModal.querySelector('.inputMinTag').value)
                     progressElement.isMinTag = true;
                   else progressElement.isMinTag = false;
-          
+
                   if (itemModal.querySelector('.inputMaxTag').value)
                     progressElement.isMaxTag = true;
                   else progressElement.isMaxTag = false;
-          
+
                   var _bar = $(progressElement).find('.progress-bar')[0];
                   if (progressElement.isHideLabel) _bar.innerText = '';
                   else _bar.innerText = _bar.style.width;
-          
+
                   var _foundIndex = findElementHTMLById(progressElement.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = progressElement.tag;
@@ -7895,7 +7931,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[9].value = progressElement.isRawValue;
                   }
                 });
-          
+
                 //Button Value browse tag
                 $('.btnValueTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -7904,7 +7940,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMinTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7912,7 +7948,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnMaxTag').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7920,7 +7956,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 $('.btnHiddenWhen').on('click', function (valueEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
                     if ($('#tagModal')[0].querySelector('input[name="rdoChoseTag"]:checked')) {
@@ -7928,9 +7964,9 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#verticalProgressBarModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('.btnValueTag').off('click');
@@ -7938,7 +7974,7 @@ function openDesign(_socket) {
                 $('.btnMaxTag').off('click');
                 $('.btnHiddenWhen').off('click');
               });
-          
+
               $('#verticalProgressBarModal').modal();
             });
             break;
@@ -7949,17 +7985,17 @@ function openDesign(_socket) {
             // else elementDOM.classList.add('draggable2');
             $(elementDOM).on('dblclick', function (mouseEvent) {
               $('#symbolSetModal').one('show.bs.modal', function (showEvent) {
-          
+
                 var elem = document.getElementById(mouseEvent.target.id);
                 var elemStyle = elem.style;
-          
+
                 var elemWidth = parseInt(elemStyle.width, 10),
                   elemHeight = parseInt(elemStyle.height, 10),
                   elemPositionX = parseInt(elemStyle.left, 10),
                   elemPositionY = parseInt(elemStyle.top, 10),
                   elemOnSymbol = elem.onSymbol,
                   elemOffSymbol = elem.offSymbol;
-          
+
                 var itemModal = $('#symbolSetModal')[0];
                 itemModal.querySelector('.inputWidth').value = elemWidth;
                 itemModal.querySelector('.inputHeight').value = elemHeight;
@@ -7967,21 +8003,21 @@ function openDesign(_socket) {
                 itemModal.querySelector('.inputPositionY').value = elemPositionY;
                 itemModal.querySelector('.inputOnImageSource').value = elemOnSymbol;
                 itemModal.querySelector('.inputOffImageSource').value = elemOffSymbol;
-          
+
                 if (mouseEvent.target.onCondition) {
                   itemModal.querySelector('.inputOnCondition').value = mouseEvent.target.onCondition;
                 }
                 else {
                   itemModal.querySelector('.inputOnCondition').value = '';
                 }
-          
+
                 if (mouseEvent.target.hiddenWhen) {
                   itemModal.querySelector('.inputHiddenWhen').value = mouseEvent.target.hiddenWhen;
                 }
                 else {
                   itemModal.querySelector('.inputHiddenWhen').value = '';
                 }
-          
+
                 //Button save 
                 $('.saveChangeButton').on('click', function (event) {
                   elemStyle.width = itemModal.querySelector('.inputWidth').value + 'px';
@@ -7993,7 +8029,7 @@ function openDesign(_socket) {
                   mouseEvent.target.onSymbol = itemModal.querySelector('.inputOnImageSource').value;
                   mouseEvent.target.offSymbol = itemModal.querySelector('.inputOffImageSource').value;
                   mouseEvent.target.src = mouseEvent.target.offSymbol;
-          
+
                   var _foundIndex = findElementHTMLById(mouseEvent.target.id);
                   if (_foundIndex != -1) {
                     elementHTML[_foundIndex].properties[0].value = mouseEvent.target.onCondition;
@@ -8002,7 +8038,7 @@ function openDesign(_socket) {
                     elementHTML[_foundIndex].properties[3].value = mouseEvent.target.hiddenWhen;
                   }
                 });
-          
+
                 //Browse Tag button
                 $('#btnOnCondition').on('click', function (onConditionClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -8011,7 +8047,7 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
                 //Browse Tag button
                 $('.btnHiddenWhen').on('click', function (onHiddenWhenClickEvent) {
                   $('#tagModal').one('hide.bs.modal', function (modalHideEvent) {
@@ -8020,16 +8056,16 @@ function openDesign(_socket) {
                     }
                   });
                 });
-          
+
               });
-          
+
               $('#symbolSetModal').one('hide.bs.modal', function (hideEvent) {
                 $('.saveChangeButton').off('click');
                 $('#btnOnCondition').off('click');
                 $('.btnHiddenWhen').off('click');
                 $('.btnSelect').off('click');
               });
-          
+
               $('#chooseImageModal').on('show.bs.modal', function (event) {
                 var _target = event.relatedTarget.id;
                 $('.btnSelect').one('click', function (btnEvent) {
@@ -8042,14 +8078,15 @@ function openDesign(_socket) {
                   $('#chooseImageModal').modal('hide');
                 });
               });
-          
+
               $('#symbolSetModal').modal();
             });
             break;
           }
         }
 
-      })
+      });
+      addContextMenu();
     });
   }
 }
