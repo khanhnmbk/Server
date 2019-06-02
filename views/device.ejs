@@ -86,7 +86,7 @@
                     <div class="btn-toolbar ml-auto" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group mx-2" role="group" aria-label="Clipboard group">
                             <button type="button" class="btn btn-primary min-button" data-toggle="modal"
-                                data-target="#newDeviceModal" >New device</button>
+                                data-target="#newDeviceModal">New device</button>
                         </div>
                         <!-- <div class="btn-group mx-2" role="group" aria-label="Clipboard group">
                             <button type="button" class="btn btn-success" id="btnOpen">Open</button>
@@ -110,6 +110,7 @@
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Children nodes</th>
                                 <th class="text-center">Publish state</th>
+                                <th class="text-center">Edit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -164,15 +165,16 @@
                         <div>
                             <table class="table table-hover">
                                 <thead>
-                                    <tr class = "text-center">
+                                    <tr class="text-center">
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Protocol</th>
                                         <th>IP address</th>
                                         <th>Variables</th>
+                                        <th>Edit</th>
                                     </tr>
                                 </thead>
-                                <tbody class = "text-center">
+                                <tbody class="text-center">
                                     <tr>
                                         <td>1</td>
                                         <td>PLC S7-1500</td>
@@ -249,6 +251,7 @@
                                         <th>Unit</th>
                                         <th>Alarm</th>
                                         <th>History</th>
+                                        <th>Edit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -361,7 +364,7 @@
                                 <div class="col-sm">
                                     <select name="protocol" class="custom-select">
                                         <option selected value="S7-connection">S7 Connection</option>
-                                        <option value="ModbusTCP">Modbus TCP/IP</option>
+                                        <!-- <option value="ModbusTCP">Modbus TCP/IP</option> -->
                                         <option value="OPCUA">OPC UA</option>
                                     </select>
                                 </div>
@@ -463,24 +466,26 @@
                                         <input type="text" class="form-control inputAddress" placeholder="required">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="row py-1">
-                                    <div class="col-sm-3">Access</div>
-                                    <div class="col-sm">
-                                        <select name="access" class="custom-select">
-                                            <option selected value="read">Only Read</option>
-                                            <option value="read/write">Read/Write</option>
-                                        </select>
-                                    </div>
-                                </div>
 
                                 <div class="row py-1">
-                                    <div class="col-sm-3">Unit</div>
-                                    <div class="col-sm">
-                                        <input type="text" class="form-control inputUnit">
+                                        <div class="col-sm-3">Access</div>
+                                        <div class="col-sm">
+                                            <select name="access" class="custom-select">
+                                                <option selected value="read">Only Read</option>
+                                                <option value="read/write">Read/Write</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
+    
+                                    <div class="row py-1">
+                                        <div class="col-sm-3">Unit</div>
+                                        <div class="col-sm">
+                                            <input type="text" class="form-control inputUnit">
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-sm">
+
 
                                 <div class="row py-1">
                                     <div class="col-sm-3">
@@ -581,7 +586,8 @@
                     </fieldset>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btnSave" data-dismiss="modal" style="min-width: 120px;">Save</button>
+                    <button type="button" class="btn btn-primary btnSave" data-dismiss="modal"
+                        style="min-width: 120px;">Save</button>
                 </div>
             </div>
         </div>
@@ -614,6 +620,221 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btnClose" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Edit gateway modal-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="editGatewayModal" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><strong>Edit gateway information</strong> </h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row py-1">
+                        <div class="col-sm-4">Device name</div>
+                        <div class="col-sm">
+                            <input type="text" class="form-control inputName" placeholder="required" required>
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Longitude</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputLongitude">
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Latitude</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputLatitude">
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Data interval</div>
+                        <div class="col-sm">
+                            <input type="number" class="form-control inputInterval" min="0" placeholder="miliseconds">
+                        </div>
+                    </div>
+                    <div class="row py-1">
+                        <div class="col-sm-4">Reset publish</div>
+                        <div class="col-sm">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input" id="cbResetPublish">
+                                <label class="custom-control-label" for="cbResetPublish"></label>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnNext">Save</button>
+                    <button type="button" class="btn btn-secondary btnCancel" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Edit PLC modal-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="editPLCModal" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><strong>Edit PLC</strong></h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row py-1">
+                        <div class="col-sm-3">Name</div>
+                        <div class="col-sm">
+                            <input type="text" class="form-control inputName" placeholder="required">
+                        </div>
+                    </div>
+
+                    <div class="row py-1">
+                        <div class="col-sm-3">Protocol</div>
+                        <div class="col-sm">
+                            <select name="protocol" class="custom-select">
+                                <option selected value="S7-connection">S7 Connection</option>
+                                <!-- <option value="ModbusTCP">Modbus TCP/IP</option> -->
+                                <option value="OPCUA">OPC UA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row py-1">
+                        <div class="col-sm-3">IP address</div>
+                        <div class="col-sm">
+                            <input type="text" class="form-control inputIPAddress" placeholder="required">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btnNext">Save</button>
+                    <button type="button" class="btn btn-secondary btnCancel" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Edit variable modal-->
+    <div class="modal fade" tabindex="-1" role="dialog" id="editVariableModal" data-backdrop="static">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><strong>Edit variable</strong> </h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="min-height: 200">
+                    <div class="row">
+                        <div class="col-sm">
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">Name</div>
+                                <div class="col-sm">
+                                    <input type="text" class="form-control inputName" placeholder="required">
+                                </div>
+                            </div>
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">Datatype</div>
+                                <div class="col-sm">
+                                    <select name="dataType" class="custom-select">
+                                        <option selected value="Bool">Boolean</option>
+                                        <option value="sByte">sByte</option>
+                                        <option value="uByte">uByte</option>
+                                        <option value="sInt">sInt</option>
+                                        <option value="uInt">uInt</option>
+                                        <option value="sDInt">sDInt</option>
+                                        <option value="uDInt">uDInt</option>
+                                        <option value="Double">Double</option>
+                                        <option value="String">String</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">PLC</div>
+                                <div class="col-sm">
+                                    <input type="text" class="form-control inputPLC" disabled>
+                                </div>
+                            </div>
+                            
+                            <div class="row py-1">
+                                <div class="col-sm-3">Address</div>
+                                <div class="col-sm">
+                                    <input type="text" class="form-control inputAddress" placeholder="required">
+                                </div>
+                            </div>
+                            <div class="row py-1">
+                                    <div class="col-sm-3">Access</div>
+                                    <div class="col-sm">
+                                        <select name="access" class="custom-select">
+                                            <option selected value="read">Only Read</option>
+                                            <option value="read/write">Read/Write</option>
+                                        </select>
+                                    </div>
+                                </div>
+    
+                                <div class="row py-1">
+                                    <div class="col-sm-3">Unit</div>
+                                    <div class="col-sm">
+                                        <input type="text" class="form-control inputUnit">
+                                    </div>
+                                </div>
+                        </div>
+                            <div class="col-sm">
+                                
+
+                            <div class="row py-1">
+                                <div class="col-sm-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input inputAlarm" id="editAlarmCheck"
+                                            name="example1">
+                                        <label class="custom-control-label" for="editAlarmCheck">Alarm</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-9">
+                                    <select class="custom-select my-0 input-alarm alarm-type">
+                                        <option selected disabled>Alarm type</option>
+                                        <option value="0">Digital</option>
+                                        <option value="1">Analog</option>
+                                    </select>
+                                    <input type="number" class="form-control my-1 input-alarm hihi" placeholder="HI HI">
+                                    <input type="number" class="form-control my-1 input-alarm hi" placeholder="HI">
+                                    <input type="number" class="form-control my-1 input-alarm lo" placeholder="LO">
+                                    <input type="number" class="form-control my-1 input-alarm lolo" placeholder="LO LO">
+                                    <input type="number" class="form-control my-1 input-alarm deadband"
+                                        placeholder="Deadband">
+
+                                </div>
+                            </div>
+                            <div class="row py-1">
+                                <div class="col-sm">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input inputHistory"
+                                            id="editHistoryCheck" name="example1">
+                                        <label class="custom-control-label" for="editHistoryCheck">History</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                     <button type="button" class="btn btn-primary btnNext">Save</button>
+                    <button type="button" class="btn btn-secondary btnCancel" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>

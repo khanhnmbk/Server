@@ -100,6 +100,7 @@ $(document).ready(function () {
                             <i class="fas fa-cog variable-icon" data-toggle="modal" data-target="#gatewayChildrenModal">
                         </td>
                         <td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + _user + '/deviceConfig_' + deviceObject.deviceID + '.json' + `">Designable</a></td>
+                        <td ><i class="fas fa-pencil-alt function-icon" data-toggle="modal" data-target="#editGatewayModal"></i></td>
                     </tr>
                     `
                     $('#deviceTable tbody').append(htmlMarkup);
@@ -326,9 +327,73 @@ $(document).ready(function () {
             });
         });
 
+        //Edit gateway modal
+        $('#editGatewayModal').on('show.bs.modal', function(e) {
+            var row = $(e.relatedTarget).closest('tr');
+            var currentDeviceName = row.find('td:eq(1)').text();
+            var currentLongitude = row.find('td:eq(4)').text();
+            var currentLatitude = row.find('td:eq(5)').text();
+            var currentInterval = row.find('td:eq(6)').text();
+            var currentPublishState = row.find('td:eq(9) a').hasClass('btn-success');
+
+            $('#editGatewayModal .inputName').val(currentDeviceName);
+            $('#editGatewayModal .inputLongitude').val(currentLongitude);
+            $('#editGatewayModal .inputLatitude').val(currentLatitude);
+            $('#editGatewayModal .inputInterval').val(currentInterval);
+            if (currentPublishState) {
+                $('#cbResetPublish').prop('disabled', false);
+            } else {
+                $('#cbResetPublish').prop('disabled', true);
+            }
+        });
+
+        //Edit PLC modal
+        $('#editPLCModal').on('show.bs.modal', function(e) {
+            $('#gatewayChildrenModal').css('opacity', 0.7);
+            var row = $(e.relatedTarget).closest('tr');
+            var currentPLCName = row.find('td:eq(1)').text();
+            var currentProtocol = row.find('td:eq(2)').text();
+            var currentIpAddress = row.find('td:eq(3)').text();
+            $('#editPLCModal .inputName').val(currentPLCName);
+            $('#editPLCModal [name=protocol]').val(currentProtocol);
+            $('#editPLCModal .inputIPAddress').val(currentIpAddress);
+        })
+
+        $('#editPLCModal').on('hide.bs.modal', function(e) {
+            $('#gatewayChildrenModal').css('opacity', 1);
+        })
+    
+        //Edit variable modal
+        $('#editVariableModal').on('show.bs.modal', function(e) {
+            $('#variableModal').css('opacity',0.7);
+            $('#gatewayChildrenModal').css('opacity',0);
+            var row = $(e.relatedTarget).closest('tr');
+            var currentName = row.find('td:eq(1)').text();
+            var currentDatatype = row.find('td:eq(2)').text();
+            var currentAddress = row.find('td:eq(3)').text();
+            var currentAccess = row.find('td:eq(4)').text();
+            var currentUnit = row.find('td:eq(5)').text();
+            var currentIsAlarm = row.find('td:eq(6)').text() == 'true';
+            var currentIsHistory = row.find('td:eq(7)').text() == 'true';
+            var currentPLC = $(e.relatedTarget).closest('.modal-body').find('.plcName').text();
+
+            $('#editVariableModal .inputName').val(currentName);
+            $('#editVariableModal [name=dataType]').val(currentDatatype);
+            $('#editVariableModal .inputPLC').val(currentPLC);
+            $('#editVariableModal .inputAddress').val(currentAddress);
+            $('#editVariableModal [name=access]').val(currentAccess);
+            $('#editVariableModal .inputUnit').val(currentUnit);
+            $('#editAlarmCheck').prop('checked', currentIsAlarm);
+            $('#editHistoryCheck').prop('checked', currentIsHistory);
+
+
+        });
+
+        $('#editVariableModal').on('hide.bs.modal', function(e) {
+            $('#variableModal').css('opacity',1);
+            $('#gatewayChildrenModal').css('opacity',1);
+        })
     });
-
-
 });
 
 function loadDeviceTable(arrDeviceObject) {
@@ -354,8 +419,9 @@ function loadDeviceTable(arrDeviceObject) {
                     </td>` ;
 
             if (!device.published)
-                htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Designable</a></td> </tr>`;
-            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "` + device.link + `">Published</a></td> </tr>`;
+                htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + device.user + '/' + device.fileName + `">Designable</a></td>`;
+            else htmlMarkup += `<td class = "text-center"><a class = "btn btn-link btn-success text-white btn-block" style="max-width:180px" href = "` + device.link + `">Published</a></td>`;
+            htmlMarkup += ` <td class = "text-center" ><i class="fas fa-pencil-alt  variable-icon" data-toggle="modal" data-target="#editGatewayModal"></i></td></tr>`
             $('#deviceTable > tbody').append(htmlMarkup);
 
         });
@@ -412,6 +478,7 @@ function loadPLCModal($modal, deviceObj) {
             <td class = "text-center">
                 <i class="fas fa-cog variable-icon" data-index=`+ plcList.indexOf(plc) + ` data-toggle="modal" data-target="#variableModal">
             </td>
+            <td class = "text-center" ><i class="fas fa-pencil-alt  variable-icon" data-toggle="modal" data-target="#editPLCModal"></i></td>
         </tr>`
         $modal.find('.table > tbody').append(htmlMarkup);
     });
@@ -435,6 +502,7 @@ function loadVariables($modal, plcObject) {
             <td>` + variable.unit + `</td>
             <td>` + variable.isAlarm + `</td>
             <td>` + variable.isHistory + `</td>
+            <td><i class="fas fa-pencil-alt  variable-icon" data-toggle="modal" data-target="#editVariableModal"></i></td>
         </tr>`
         $modal.find('.table > tbody').append(htmlMarkup);
     });
