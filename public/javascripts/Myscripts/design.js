@@ -12,12 +12,14 @@ let saveTable, openTable;
 $(document).ready(function () {
   //Load table file
   saveTable = $('#saveModal .file-table').DataTable({
-    scrollY: 500,
+    scrollY: 400,
+    scrollCollapse: true,
     // scrollX : 'auto'
     paging: false,
   });
   openTable = $('#openModal .file-table').DataTable({
-    scrollY: 500,
+    scrollY: 400,
+    scrollCollapse: true,
     // scrollX : 'auto'
     paging: false,
   });
@@ -25,6 +27,21 @@ $(document).ready(function () {
   $('#saveModal').on('shown.bs.modal', function (e) {
     $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
   });
+
+  $('#saveModal').on('show.bs.modal', function (e) {
+    saveTable.$('tr.table-selected').removeClass('table-selected');
+  });
+
+    //Save table: select row
+    $('#saveModal table tbody').on('click', 'tr', function () {
+      if ($(this).hasClass('table-selected')) {
+        $(this).removeClass('table-selected');
+      }
+      else {
+        saveTable.$('tr.table-selected').removeClass('table-selected');
+        $(this).addClass('table-selected');
+      }
+    });
 
   $('#openModal').on('shown.bs.modal', function (e) {
     openTable.$('tr.table-selected').removeClass('table-selected');
@@ -47,8 +64,74 @@ $(document).ready(function () {
     }
   });
 
+  //Rename modal
+  $('#renameModal').on('show.bs.modal', function (e) {
+    if ($('#openModal').hasClass('show')) {
+      $('#openModal').css('opacity', 0.7);
+    } else {
+      $('#saveModal').css('opacity', 0.7);
+    }
 
+    var currentName = $(e.relatedTarget).closest('tr').children('td')[0].innerText.replace('.json', '');
+    $('#inputRename').val(currentName);
+    $('#btnRenameOK').on('click', function () {
+      if ($('#inputRename').val() != currentName) {
+        socket.emit('/rename', { user: user, currentName: currentName + '.json', newName: $('#inputRename').val() + '.json' })
+        console.log({ user: user, currentName: currentName + '.json', newName: $('#inputRename').val() + '.json' });
+        $(e.relatedTarget).closest('tr').children('td')[0].innerText = $('#inputRename').val() + '.json';
+        var rowIndex = $(e.relatedTarget).closest('tr')[0].rowIndex - 1;
+        if ($('#openModal').hasClass('show')) {
+          $('#saveModal').find('table tbody')[0].rows[rowIndex].cells[0].innerText = $('#inputRename').val() + '.json';
+        } else {
+          $('#openModal').find('table tbody')[0].rows[rowIndex].cells[0].innerText = $('#inputRename').val() + '.json';
+        }
+        $('#renameModal').modal('hide');
+      }
+    })
+  });
 
+  $('#renameModal').on('hide.bs.modal', function () {
+    if ($('#openModal').hasClass('show')) {
+      $('#openModal').css('opacity', 1);
+    } else {
+      $('#saveModal').css('opacity', 1);
+    }
+    $('#btnRenameOK').off('click');
+  });
+
+  //Delete modal
+  $('#deleteModal').on('show.bs.modal', function (e) {
+    if ($('#openModal').hasClass('show')) {
+      $('#openModal').css('opacity', 0.7);
+    } else {
+      $('#saveModal').css('opacity', 0.7);
+    }
+    var currentName = $(e.relatedTarget).closest('tr').children('td')[0].innerText;
+    $('#deleteFilename').text(currentName);
+    $('#btnDeleteOK').on('click', function () {
+      socket.emit('/deleteDesign', { user: user, file: currentName });
+      if ($('#openModal').hasClass('show')) {
+        var rowIndex = openTable.row('.table-selected').index();
+        openTable.row('.table-selected').remove().draw(false);
+        saveTable.row(rowIndex).remove().draw(false);
+
+      } else {
+        var rowIndex = saveTable.row('.table-selected').index();
+        saveTable.row('.table-selected').remove().draw(false);
+        openTable.row(rowIndex).remove().draw(false);
+      }
+      $('#deleteModal').modal('hide');
+    });
+  })
+
+  $('#deleteModal').on('hide.bs.modal', function (e) {
+    if ($('#openModal').hasClass('show')) {
+      $('#openModal').css('opacity', 1);
+    } else {
+      $('#saveModal').css('opacity', 1);
+    }
+    $('#btnDeleteOK').off('click');
+  })
 
   //Disable all elements in alarm and history when not RUN
   $('#alarm *').prop('disabled', true);
@@ -71,6 +154,13 @@ $(document).ready(function () {
       });
       $('.draggable').draggable('disable');
       $('.draggable2').draggable('disable');
+
+      //Disable menu button
+      $('#btnOpen').prop('disabled', true);
+      $('#btnSave').prop('disabled', true);
+      $('#btnSetting').prop('disabled', true);
+      $('#btnPublish').prop('disabled', true);
+
 
       //Disable all input in Modals: to prevent users from changing elements' properties
       $('.inputModal').prop('disabled', true);
@@ -205,6 +295,13 @@ $(document).ready(function () {
       });
       $('.draggable').draggable('enable');
       $('.draggable2').draggable('enable');
+
+      //Enable menu buttons
+      $('#btnOpen').prop('disabled', false);
+      $('#btnSave').prop('disabled', false);
+      $('#btnSetting').prop('disabled', false);
+      $('#btnPublish').prop('disabled', false);
+
       //Enable input
       $('.inputModal').prop('disabled', false);
       $('.btnBrowseTag').prop('disabled', false);
@@ -493,9 +590,6 @@ $(document).ready(function () {
 
   //Open designs
   $('#btnOpenDesign').click(function () {
-    console.log('Button Open Design');
-    console.log('Selected row');
-    console.log(openTable.$('tr.table-selected'));
     if (openTable.$('tr.table-selected').length > 0) { //Detect selected row
       openDesign(socket);
       $('#openModal').modal('hide');
@@ -887,12 +981,22 @@ function SCADA(arrHtmlElems, variableName, variableTimestamp) {
 
 //Svg scada
 function scadaSvgObject(item, variableName) {
-  if (item.node.hiddenWhen) {
-    if (item.node.hiddenWhen.includes(variableName)) {
-      if (eval(item.node.hiddenWhen)) item.hide();
-      else item.show();
+  try {
+    if (item.node.hiddenWhen) {
+      if (item.node.hiddenWhen.includes(variableName)) {
+        if (eval(item.node.hiddenWhen)) item.hide();
+        else item.show();
+      }
+    }
+  } catch {
+    if (item.hiddenWhen) {
+      if (item.hiddenWhen.includes(variableName)) {
+        if (eval(item.hiddenWhen)) $(item).hide();
+        else $(item).show();
+      }
     }
   }
+
 }
 
 //Text scada
@@ -5656,8 +5760,10 @@ function gaugeDashboardMouseDownEventHandler(event) {
 //Show all hidden element 
 function showHiddenItems() {
   for (var i = 0; i < elementHTML.length; i++) {
-    if (elementHTML[i].type != 'verticalslider')
-      $('#' + elementHTML[i].id).show();
+    if (elementHTML[i].type != 'verticalslider') {
+      if (elementHTML[i].type == 'chart') $(document.getElementById(elementHTML[i].id).parentNode).show();
+      else $('#' + elementHTML[i].id).show();
+    }
   }
 }
 
@@ -5723,6 +5829,9 @@ function addPixel() {
 
 //Save current design page
 function saveDesign(_socket) {
+  $('#btnSaveSuccess').click(function() {
+    window.location.reload();
+  })
   //Turn off save modal
   $('#saveModal').modal('hide');
 
@@ -7461,27 +7570,28 @@ function openDesign(_socket) {
             else {
               min = 0;
               elementDOM.minValue = min;
-            } 
+            }
 
             if (element.properties[6].value) max = eval(element.properties[3].value);
             else if (element.properties[4].value) max = element.properties[4].value;
             else {
               max = 100;
               elementDOM.maxValue = max;
-            } 
+            }
 
             console.log('Min: ', min);
             console.log('Max: ', max);
 
             height = $(elementDOM).siblings('.slider')[0].style.height;
 
-            var htmlObj = elementDOM.cloneNode(true);
+            var htmlObj = document.getElementById(elementDOM.id).cloneNode(true);
             htmlObj.min = min;
             htmlObj.max = max;
             htmlObj.minValue = elementDOM.minValue;
             htmlObj.maxValue = elementDOM.maxValue;
             var topDiv = elementDOM.parentNode.style.top;
             var leftDiv = elementDOM.parentNode.style.left;
+            console.log('Vertical slider tag: ', htmlObj.tag);
             //Remove current slider
             $(elementDOM.parentNode).remove();
 
@@ -7505,6 +7615,12 @@ function openDesign(_socket) {
             fixTooltip(htmlObj.id);
             shapes.push(htmlObj);
             $(htmlObj).bootstrapSlider('disable');
+
+            //Re-init HTML properties
+
+            for (j = 0; j < element.properties.length; j++) {
+              htmlObj[element.properties[j].name] = element.properties[j].value;
+            }
             // if (isMainpage) elementDOM.classList.add('draggable');
             // else elementDOM.classList.add('draggable2');
             $(htmlObj.parentNode).on('dblclick', function (mouseEvent) {

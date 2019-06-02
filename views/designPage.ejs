@@ -45,8 +45,8 @@
                         class="far fa-save mr-2"></i>Save</button>
             </div>
             <div class="btn-group" role="group" aria-label="Clipboard group">
-                <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#settingModal"><i
-                        class="fas fa-cog mr-2"></i>Settings</button>
+                <button id="btnSetting" type="button" class="btn btn-dark" data-toggle="modal"
+                    data-target="#settingModal"><i class="fas fa-cog mr-2"></i>Settings</button>
             </div>
             <!-- <div class="btn-group" role="group" aria-label="Clipboard group">
                 <button type="button" class="btn btn-dark"><i class="fas fa-undo mr-2"></i>Undo</button>
@@ -441,7 +441,7 @@
     </div>
 
     <!--Line modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="lineModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="lineModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -548,7 +548,7 @@
     </div>
 
     <!--Rect modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="rectModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="rectModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -653,7 +653,8 @@
     </div>
 
     <!--Round rect modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="roundRectModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="roundRectModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -777,7 +778,7 @@
     </div>
 
     <!--Circle modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="circleModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="circleModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -877,7 +878,8 @@
     </div>
 
     <!--Ellipse modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="ellipseModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="ellipseModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -983,7 +985,8 @@
     </div>
 
     <!--Polyline modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="polylineModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="polylineModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1045,7 +1048,8 @@
     </div>
 
     <!--Polygon modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="polygonModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="polygonModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1117,7 +1121,7 @@
     </div>
 
     <!--Text modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="textModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="textModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1196,7 +1200,7 @@
     </div>
 
     <!--Image modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="imageModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="imageModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1282,7 +1286,8 @@
     </div>
 
     <!--Display value modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="displayValueModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="displayValueModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1392,7 +1397,7 @@
     </div>
 
     <!--Button modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="buttonModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="buttonModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1534,7 +1539,7 @@
     </div>
 
     <!--Switch modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="switchModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="switchModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1601,7 +1606,7 @@
     </div>
 
     <!--Input modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="inputModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="inputModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1683,7 +1688,7 @@
     </div>
 
     <!--Slider modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="sliderModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="sliderModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1912,7 +1917,8 @@
     </div>
 
     <!--Progress bar modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="progressBarModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="progressBarModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2052,7 +2058,8 @@
     </div>
 
     <!--Vertical progress bar modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="verticalProgressBarModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="verticalProgressBarModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2193,7 +2200,8 @@
     </div>
 
     <!--Checkbox modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="checkboxModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="checkboxModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2272,7 +2280,8 @@
     </div>
 
     <!--Symbol Set modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="symbolSetModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="symbolSetModal"
+        data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2453,7 +2462,7 @@
     </div>
 
     <!-- Choose Image Modal -->
-    <div class="modal modal fade" id="chooseImageModal" data-backdrop="static">
+    <div class="modal modal fade" style="z-index : 10000" id="chooseImageModal" data-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2521,8 +2530,8 @@
     </div>
 
     <!-- Spinner publish modal -->
-    <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1"
-        id="spinnerModal">
+    <div class="modal fade bd-example-modal-lg" style="z-index : 10000" data-backdrop="static" data-keyboard="false"
+        tabindex="-1" id="spinnerModal">
         <div class="modal-dialog modal-sm">
             <div class="modal-content" style="width: 48px">
                 <span class="fa fa-spinner fa-spin fa-3x"></span>
@@ -2533,8 +2542,8 @@
     </div>
 
     <!-- Spinner save modal -->
-    <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1"
-        id="spinnerSaveModal">
+    <div class="modal fade bd-example-modal-lg" style="z-index : 10000" data-backdrop="static" data-keyboard="false"
+        tabindex="-1" id="spinnerSaveModal">
         <div class="modal-dialog modal-sm">
             <div class="modal-content" style="width: 48px">
                 <span class="fa fa-spinner fa-spin fa-3x"></span>
@@ -2545,7 +2554,7 @@
     </div>
 
     <!-- Success publish modal -->
-    <div class="modal fade" id="successModal" role="dialog" data-backdrop="static">
+    <div class="modal fade" id="successModal" style="z-index : 10000" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body">
@@ -2561,7 +2570,7 @@
     </div>
 
     <!-- Success save modal -->
-    <div class="modal fade" id="successSaveModal" role="dialog" data-backdrop="static">
+    <div class="modal fade" id="successSaveModal" style="z-index : 10000" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2577,14 +2586,15 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" style="width:100px" data-dismiss="modal">OK</button>
+                    <button type="button" class="btn btn-success" style="width:100px" data-dismiss="modal" id="btnSaveSuccess">OK</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!--Setting modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="settingModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="settingModal"
+        data-backdrop="static">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2641,7 +2651,7 @@
     </div>
 
     <!--Chart modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="chartModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="chartModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2741,7 +2751,7 @@
     </div>
 
     <!--Gauge modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="gaugeModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="gaugeModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2927,7 +2937,7 @@
     </div>
 
     <!--Save modal-->
-    <div class="modal fade" tabindex="-1" role="dialog" id="saveModal" data-backdrop="static">
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="saveModal" data-backdrop="static">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -2938,18 +2948,22 @@
                 </div>
                 <div class="modal-body">
                     <div class="">
-                        <table class="table table-borderless table-hover file-table">
-                            <thead>
+                        <table class="table table-borderless table-hover file-table table-sm">
+                            <thead class="thead-light">
                                 <tr>
                                     <th>Filename</th>
                                     <th>Date modified</th>
+                                    <th>Rename</th>
+                                    <th>Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% for (var i = 0; i < designFiles.length; i++) { %>
                                 <tr>
-                                    <td><%= designFiles[i].name %></td>
+                                    <td class="file-name"><%= designFiles[i].name %></td>
                                     <td><%= designFiles[i].time %></td>
+                                    <td ><i class="fas fa-pencil-alt function-icon" data-toggle="modal" data-target="#renameModal"></i></td>
+                                    <td ><i class="fas fa-trash-alt function-icon" data-toggle="modal" data-target="#deleteModal"></i></td>
                                 </tr>
                                 <% } %>
                             </tbody>
@@ -2963,57 +2977,111 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary saveChangeButton" id="btnSaveDesign">Save</button>
+                    <button type="button" class="btn btn-primary btn-100-Width " id="btnSaveDesign">Save</button>
                     <button type="button" class="btn btn-secondary closeButton" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-        <!--Open modal-->
-        <div class="modal fade" tabindex="-1" role="dialog" id="openModal" data-backdrop="static">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Open design</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="">
-                                <table class="table table-borderless table-hover file-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Filename</th>
-                                            <th>Date modified</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% for (var i = 0; i < designFiles.length; i++) { %>
-                                        <tr>
-                                            <td><%= designFiles[i].name %></td>
-                                            <td><%= designFiles[i].time %></td>
-                                        </tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- <div class="input-group mt-2">
+    <!--Open modal-->
+    <div class="modal fade" tabindex="-1" style="z-index : 10000" role="dialog" id="openModal" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Open design</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <table class="table table-borderless table-hover file-table table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Date modified</th>
+                                    <th>Rename</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (var i = 0; i < designFiles.length; i++) { %>
+                                <tr>
+                                    <td><%= designFiles[i].name %></td>
+                                    <td><%= designFiles[i].time %></td>
+                                    <td ><i class="fas fa-pencil-alt function-icon" data-toggle="modal" data-target="#renameModal"></i></td>
+                                    <td ><i class="fas fa-trash-alt function-icon" data-toggle="modal" data-target="#deleteModal"></i></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="input-group mt-2">
                                 <input type="text" class="form-control" placeholder="Filename" id="inputSaveFilename">
                                 <div class="input-group-append">
                                     <span class="input-group-text px-5">.ejs</span>
                                 </div>
                             </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-100-Width " id="btnOpenDesign">Open</button>
+                    <button type="button" class="btn btn-secondary closeButton" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!--Rename modal-->
+        <div class="modal fade " tabindex="-1" style="z-index : 10000" role="dialog" id="renameModal" data-backdrop="static">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rename</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="inputRename">
+                            <div class="input-group-append">
+                                <span class="input-group-text px-5">.json</span>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary saveChangeButton" id="btnOpenDesign">Open</button>
-                            <button type="button" class="btn btn-secondary closeButton" data-dismiss="modal">Close</button>
-                        </div>
+                       
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary btn-100-Width " id="btnRenameOK">OK</button>
+                        <button type="button" class="btn btn-secondary closeButton btn-100-Width " data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
+        </div>
 
+                <!--Delete modal-->
+                <div class="modal fade " tabindex="-1" style="z-index : 10000" role="dialog" id="deleteModal" data-backdrop="static">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="modal-title">Do you want to delete this file?</h6>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                
+                               <p id="deleteFilename"></p>
+                               
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger btn-100-Width " id="btnDeleteOK">OK</button>
+                                <button type="button" class="btn btn-secondary closeButton btn-100-Width " data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     <!------------------------ SCRIPT ------------------------->
     <!-- JQuery scripts -->
     <script src="/javascripts/jquery-3.3.1.min.js"></script>

@@ -362,3 +362,12 @@ label[class=imgMenu] > input:checked + img { /* (RADIO CHECKED) IMAGE STYLES */
 .table-selected {
     background: #b3b3b3
 }
+
+.btn-100-Width {
+    min-width: 100px;
+}
+
+.function-icon:hover{
+    cursor: pointer;
+    color: #4285F4;
+}

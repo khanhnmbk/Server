@@ -308,6 +308,30 @@ io.on('connection', function (socket) {
     });
   });
 
+  //Rename saved design
+  socket.on('/rename', function(renameObj) {
+    var oldDesignFile = path.resolve(databasePath, renameObj.user, 'Save', 'Design' , renameObj.currentName);
+    var newDesignFile = path.resolve(databasePath, renameObj.user, 'Save', 'Design' , renameObj.newName);
+    var oldElementFile = path.resolve(databasePath, renameObj.user, 'Save', 'Parameters', renameObj.currentName.replace('.json' , '') + '_Elements.json');
+    var newElementFile = path.resolve(databasePath, renameObj.user, 'Save', 'Parameters', renameObj.newName.replace('.json' , '') + '_Elements.json');
+    var oldBackgroundPath = path.resolve(databasePath, renameObj.user, 'Save', 'Parameters', renameObj.currentName.replace('.json', '') + '_Background.json');
+    var newBackgroundPath = path.resolve(databasePath, renameObj.user, 'Save', 'Parameters', renameObj.newName.replace('.json', '') + '_Background.json');
+    fs.renameSync(oldDesignFile, newDesignFile);
+    fs.renameSync(oldElementFile, newElementFile);
+    fs.renameSync(oldBackgroundPath, newBackgroundPath);
+  });
+
+  //Delete design
+  socket.on('/deleteDesign', function(deleteObj){
+    var designPath = path.resolve(databasePath, deleteObj.user, 'Save', 'Design');
+    var parameterPath = path.resolve(databasePath, deleteObj.user, 'Save', 'Parameters');
+    if (fs.existsSync(path.resolve(designPath, deleteObj.file))) {
+      fs.unlinkSync(path.resolve(designPath, deleteObj.file));
+      fs.unlinkSync(path.resolve(parameterPath, deleteObj.file.replace('.json', '') + '_Elements.json'));
+      fs.unlinkSync(path.resolve(parameterPath, deleteObj.file.replace('.json', '') + '_Background.json'));
+    }
+  })
+
 });
 server.listen(port);
 server.on('error', onError);

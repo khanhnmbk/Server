@@ -5,67 +5,67 @@
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsPolyline1089",
+        "id": "SvgjsPolyline1167",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsEllipse1422",
+        "id": "SvgjsEllipse1660",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsCircle1423",
+        "id": "SvgjsCircle1661",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsRect1424",
+        "id": "SvgjsRect1662",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsRect1425",
+        "id": "SvgjsRect1663",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "svg",
-        "id": "SvgjsPolygon1426",
+        "id": "SvgjsPolygon1723",
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
@@ -75,7 +75,7 @@
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
@@ -85,7 +85,7 @@
         "properties": [
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
@@ -95,15 +95,15 @@
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "format",
-                "value": ""
+                "value": "1"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
@@ -113,91 +113,53 @@
         "properties": [
             {
                 "name": "command",
-                "value": ""
+                "value": "S7_1500_M0_0 = 1"
             },
             {
                 "name": "disableWhen",
-                "value": ""
+                "value": "S7_1500_MW2 > 2000"
             }
         ]
     },
     {
         "type": "switch",
-        "id": "switch4",
+        "id": "switch5",
         "properties": [
             {
                 "name": "onCommand",
-                "value": ""
+                "value": "S7_1500_MW2 = 0"
             },
             {
                 "name": "offCommand",
-                "value": ""
+                "value": "S7_1500_MW2 = 100"
             },
             {
                 "name": "disableWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
         "type": "input",
-        "id": "input5",
+        "id": "input7",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "disableWhen",
-                "value": ""
+                "value": "S7_1500_MW2 > 2000"
             }
         ]
     },
     {
         "type": "slider",
-        "id": "slider6",
+        "id": "slider8",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
-            },
-            {
-                "name": "minTag",
-                "value": ""
-            },
-            {
-                "name": "minValue",
-                "value": ""
-            },
-            {
-                "name": "maxTag",
-                "value": ""
-            },
-            {
-                "name": "maxValue",
-                "value": ""
-            },
-            {
-                "name": "isMinTag",
-                "value": ""
-            },
-            {
-                "name": "isMaxTag",
-                "value": ""
-            },
-            {
-                "name": "disableWhen",
-                "value": ""
-            }
-        ]
-    },
-    {
-        "type": "verticalslider",
-        "id": "verticalSlider7",
-        "properties": [
-            {
-                "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "minTag",
@@ -213,29 +175,29 @@
             },
             {
                 "name": "maxValue",
-                "value": "100"
+                "value": "3000"
             },
             {
                 "name": "isMinTag",
-                "value": ""
+                "value": false
             },
             {
                 "name": "isMaxTag",
-                "value": ""
+                "value": false
             },
             {
                 "name": "disableWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             }
         ]
     },
     {
-        "type": "progressbar",
-        "id": "progressbar8",
+        "type": "verticalslider",
+        "id": "verticalSlider9",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "minTag",
@@ -243,7 +205,7 @@
             },
             {
                 "name": "minValue",
-                "value": ""
+                "value": "0"
             },
             {
                 "name": "maxTag",
@@ -251,23 +213,61 @@
             },
             {
                 "name": "maxValue",
-                "value": ""
+                "value": "3000"
             },
             {
                 "name": "isMinTag",
-                "value": ""
+                "value": false
             },
             {
                 "name": "isMaxTag",
+                "value": false
+            },
+            {
+                "name": "disableWhen",
+                "value": "S7_1500_M0_0"
+            }
+        ]
+    },
+    {
+        "type": "progressbar",
+        "id": "progressbar10",
+        "properties": [
+            {
+                "name": "tag",
+                "value": "S7_1500_MW2"
+            },
+            {
+                "name": "minTag",
                 "value": ""
+            },
+            {
+                "name": "minValue",
+                "value": "0"
+            },
+            {
+                "name": "maxTag",
+                "value": ""
+            },
+            {
+                "name": "maxValue",
+                "value": "3000"
+            },
+            {
+                "name": "isMinTag",
+                "value": false
+            },
+            {
+                "name": "isMaxTag",
+                "value": false
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "isHideLabel",
-                "value": ""
+                "value": false
             },
             {
                 "name": "isRawValue",
@@ -277,11 +277,11 @@
     },
     {
         "type": "verticalprogressbar",
-        "id": "verticalProgressbar9",
+        "id": "verticalProgressbar11",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "minTag",
@@ -289,7 +289,7 @@
             },
             {
                 "name": "minValue",
-                "value": ""
+                "value": "0"
             },
             {
                 "name": "maxTag",
@@ -297,173 +297,155 @@
             },
             {
                 "name": "maxValue",
-                "value": ""
+                "value": "3000"
             },
             {
                 "name": "isMinTag",
-                "value": ""
+                "value": false
             },
             {
                 "name": "isMaxTag",
-                "value": ""
+                "value": false
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "isHideLabel",
-                "value": ""
+                "value": false
             },
             {
                 "name": "isRawValue",
-                "value": ""
+                "value": true
             }
         ]
     },
     {
         "type": "checkbox",
-        "id": "checkbox10",
+        "id": "checkbox12",
         "properties": [
             {
                 "name": "checkedCommand",
-                "value": ""
+                "value": "S7_1500_M0_0 = 1"
             },
             {
                 "name": "unCheckedCommand",
-                "value": ""
+                "value": "S7_1500_M0_0 = 0"
             },
             {
                 "name": "disableWhen",
-                "value": ""
+                "value": "S7_1500_MW2 > 2000"
             }
         ]
     },
     {
         "type": "symbolSet",
-        "id": "symbolSet11",
+        "id": "symbolSet13",
         "properties": [
             {
                 "name": "onCondition",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "onSymbol",
-                "value": ""
+                "value": "/images/symbols/Light/Light_026.png"
             },
             {
                 "name": "offSymbol",
-                "value": ""
+                "value": "/images/symbols/Light/Light_027.png"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_MW2 > 2000"
             }
         ]
     },
     {
         "type": "chart",
-        "id": "chart12",
+        "id": "chart14",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "xLabel",
-                "value": "Time"
+                "value": "Thoi gian"
             },
             {
                 "name": "yLabel",
-                "value": "Value"
+                "value": "Gia tri"
             }
         ]
     },
     {
         "type": "gauge",
-        "id": "gauge14",
+        "id": "gauge15",
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "type",
-                "value": ""
+                "value": false
             },
             {
                 "name": "gaugeColor",
-                "value": ""
+                "value": "rgba(255,255,255,0.5)"
             },
             {
                 "name": "levelColor",
-                "value": ""
+                "value": [
+                    [
+                        "#00660a"
+                    ]
+                ]
             },
             {
                 "name": "fontColor",
-                "value": ""
+                "value": "#000000"
             },
             {
                 "name": "gaugeWidth",
-                "value": ""
+                "value": "0.2"
             },
             {
                 "name": "usePointer",
-                "value": ""
+                "value": true
             },
             {
                 "name": "pointerColor",
-                "value": ""
+                "value": "#00800d"
             },
             {
                 "name": "format",
-                "value": ""
+                "value": 1
             },
             {
                 "name": "label",
-                "value": ""
+                "value": "RPM"
             },
             {
                 "name": "min",
-                "value": ""
+                "value": 0
             },
             {
                 "name": "max",
-                "value": ""
+                "value": 3000
             },
             {
                 "name": "title",
-                "value": ""
-            }
-        ]
-    },
-    {
-        "type": "chart",
-        "id": "chart15",
-        "properties": [
-            {
-                "name": "tag",
-                "value": "Demo1"
-            },
-            {
-                "name": "hiddenWhen",
-                "value": ""
-            },
-            {
-                "name": "xLabel",
-                "value": "Time"
-            },
-            {
-                "name": "yLabel",
-                "value": "Value"
+                "value": "Speed"
             }
         ]
     },
@@ -473,11 +455,11 @@
         "properties": [
             {
                 "name": "tag",
-                "value": "Demo2"
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "xLabel",
@@ -495,59 +477,63 @@
         "properties": [
             {
                 "name": "tag",
-                "value": ""
+                "value": "S7_1500_MW2"
             },
             {
                 "name": "hiddenWhen",
-                "value": ""
+                "value": "S7_1500_M0_0"
             },
             {
                 "name": "type",
-                "value": ""
+                "value": false
             },
             {
                 "name": "gaugeColor",
-                "value": ""
+                "value": "rgba(255,255,255,0.5)"
             },
             {
                 "name": "levelColor",
-                "value": ""
+                "value": [
+                    [
+                        "#00660a"
+                    ]
+                ]
             },
             {
                 "name": "fontColor",
-                "value": ""
+                "value": "#000000"
             },
             {
                 "name": "gaugeWidth",
-                "value": ""
+                "value": "0.2"
             },
             {
                 "name": "usePointer",
-                "value": ""
+                "value": true
             },
             {
                 "name": "pointerColor",
-                "value": ""
+                "value": "#00800d"
             },
             {
                 "name": "format",
-                "value": ""
+                "value": 2
             },
             {
                 "name": "label",
-                "value": ""
+                "value": "value"
             },
             {
                 "name": "min",
-                "value": ""
+                "value": 0
             },
             {
                 "name": "max",
-                "value": ""
+                "value": 3000
             },
             {
                 "name": "title",
-                "value": ""
+                "value": "Gauge"
             }
         ]
     }
