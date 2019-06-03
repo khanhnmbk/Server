@@ -1,23 +1,23 @@
 {
-    "deviceName": "Automation Lab",
+    "deviceName": "Automation",
     "deviceID": "0379699593",
     "longitude": "106.629662",
     "latitude": "10.823099",
-    "period": "4000",
+    "period": 5000,
     "PLCs": [
         {
-            "name": "S7_1500",
+            "name": "PLC_1500",
             "protocol": "S7-connection",
-            "ipAddress": "192.168.100.150",
+            "ipAddress": "192.160.100.150",
             "variables": [
                 {
-                    "name": "M0_0",
+                    "name": "M0_2",
                     "dataType": "Bool",
                     "plc": "S7_1500",
-                    "address": "M0.0",
-                    "access": "read/write",
+                    "address": "M0.2",
+                    "access": "read",
                     "unit": "",
-                    "isAlarm": true,
+                    "isAlarm": false,
                     "alarmType": "0",
                     "parameters": {
                         "lolo": "",
@@ -26,25 +26,25 @@
                         "hihi": "",
                         "deadband": ""
                     },
-                    "isHistory": true
+                    "isHistory": false
                 },
                 {
-                    "name": "MW2",
-                    "dataType": "Int",
+                    "name": "Speed",
+                    "dataType": "Double",
                     "plc": "S7_1500",
-                    "address": "MW2",
-                    "access": "read/write",
+                    "address": "MD2",
+                    "access": "read",
                     "unit": "RPM",
                     "isAlarm": true,
                     "alarmType": "1",
                     "parameters": {
-                        "lolo": "10",
-                        "lo": "20",
-                        "hi": "80",
-                        "hihi": "90",
-                        "deviation": "5"
+                        "lolo": 100,
+                        "lo": 500,
+                        "hi": 1000,
+                        "hihi": 1500,
+                        "deadband": 20
                     },
-                    "isHistory": true
+                    "isHistory": false
                 }
             ]
         }

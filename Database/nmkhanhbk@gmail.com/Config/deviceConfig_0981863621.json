@@ -1,9 +1,9 @@
 {
-    "deviceName": "Test gateway",
+    "deviceName": "Demo gateway",
     "deviceID": "0981863621",
-    "longitude": "",
-    "latitude": "",
-    "period": "5000",
+    "longitude": 106.7,
+    "latitude": 10.9,
+    "period": 2000,
     "PLCs": [
         {
             "name": "MotorControl",

@@ -4,7 +4,7 @@ let deviceObject = {};
 let rcvDeviceObject = [];
 let deviceIndex;
 const regexPattern = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
-
+let isLoaded = false;
 
 $(document).ready(function () {
     var _user = $('#user').text();
@@ -18,20 +18,24 @@ $(document).ready(function () {
         socket.on('/' + _user + '/resDeviceConfig', function (data) {
             console.log(data);
             rcvDeviceObject = data;
-            loadDeviceTable(rcvDeviceObject);
-            socketOnStatus(socket); //Subscribe status topic
+            if (!isLoaded) {
+                isLoaded = true;
+                loadDeviceTable(rcvDeviceObject);
+                socketOnStatus(socket); //Subscribe status topic
 
-            //Choose first td when click on tr
-            $('table tbody tr').each(function () {
-                $(this).click(function () {
-                    var checkbox = $(this).find('input');
-                    checkbox.prop('checked', !checkbox.prop('checked'));
+                //Choose first td when click on tr
+                $('table tbody tr').each(function () {
+                    $(this).click(function () {
+                        var checkbox = $(this).find('input');
+                        checkbox.prop('checked', !checkbox.prop('checked'));
+                    });
+
+                    $(this).hover(function () {
+                        $(this).css('cursor', 'pointer');
+                    })
                 });
+            }
 
-                $(this).hover(function () {
-                    $(this).css('cursor', 'pointer');
-                })
-            });
         });
 
         socket.emit('/reqDeviceConfig', _user); //Get device config array
@@ -145,11 +149,11 @@ $(document).ready(function () {
                         'overflow-y': 'scroll'
                     });
 
-                    $('#plcTable tbody tr:last').click(function() {
-                        var checkbox =  $(this).find('input');
+                    $('#plcTable tbody tr:last').click(function () {
+                        var checkbox = $(this).find('input');
                         checkbox.prop('checked', !checkbox.prop('checked'));
                     });
-                    $('#plcTable tbody tr:last').hover(function() {
+                    $('#plcTable tbody tr:last').hover(function () {
                         $(this).css('cursor', 'pointer');
                     });
 
@@ -239,11 +243,11 @@ $(document).ready(function () {
                         'overflow-y': 'scroll'
                     });
 
-                    $('#tableVariableList tbody tr:last').click(function() {
-                        var checkbox =  $(this).find('input');
+                    $('#tableVariableList tbody tr:last').click(function () {
+                        var checkbox = $(this).find('input');
                         checkbox.prop('checked', !checkbox.prop('checked'));
                     });
-                    $('#tableVariableList tbody tr:last').hover(function() {
+                    $('#tableVariableList tbody tr:last').hover(function () {
                         $(this).css('cursor', 'pointer');
                     });
 
@@ -328,7 +332,7 @@ $(document).ready(function () {
         });
 
         //Edit gateway modal
-        $('#editGatewayModal').on('show.bs.modal', function(e) {
+        $('#editGatewayModal').on('show.bs.modal', function (e) {
             var row = $(e.relatedTarget).closest('tr');
             var currentDeviceName = row.find('td:eq(1)').text();
             var currentLongitude = row.find('td:eq(4)').text();
@@ -345,53 +349,301 @@ $(document).ready(function () {
             } else {
                 $('#cbResetPublish').prop('disabled', true);
             }
+
+            $('#editGatewayModal .btnSave').on('click', function () {
+                for (var i = 0; i < rcvDeviceObject.length; i++) {
+                    if (rcvDeviceObject[i].deviceName == currentDeviceName) {
+                        var isChanged = false;
+                        var sendObject = {
+                            user: _user,
+                            fileName: rcvDeviceObject[i].fileName,
+                            type: 0,
+                            properties: []
+                        };
+                        if (currentDeviceName != $('#editGatewayModal .inputName').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'deviceName',
+                                value: $('#editGatewayModal .inputName').val()
+                            });
+                            row.find('td:eq(1)').text($('#editGatewayModal .inputName').val());
+                        }
+                        if (currentLongitude != $('#editGatewayModal .inputLongitude').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'longitude',
+                                value: Number($('#editGatewayModal .inputLongitude').val())
+                            });
+                            row.find('td:eq(4)').text($('#editGatewayModal .inputLongitude').val());
+                        }
+                        if (currentLatitude != $('#editGatewayModal .inputLatitude').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'latitude',
+                                value: Number($('#editGatewayModal .inputLatitude').val())
+                            });
+                            row.find('td:eq(5)').text($('#editGatewayModal .inputLatitude').val());
+                        }
+                        if (currentInterval != $('#editGatewayModal .inputInterval').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'period',
+                                value: Number($('#editGatewayModal .inputInterval').val())
+                            });
+                            row.find('td:eq(6)').text($('#editGatewayModal .inputInterval').val());
+                        }
+                        if (isChanged) socket.emit('/editConfig', sendObject);
+                        $('#editGatewayModal').modal('hide');
+                        break;
+                    }
+                }
+            });
         });
 
+        $('#editGatewayModal').on('hide.bs.modal', function () {
+            $('#editGatewayModal .btnSave').off('click');
+        })
+
         //Edit PLC modal
-        $('#editPLCModal').on('show.bs.modal', function(e) {
+        $('#editPLCModal').on('show.bs.modal', function (e) {
             $('#gatewayChildrenModal').css('opacity', 0.7);
             var row = $(e.relatedTarget).closest('tr');
             var currentPLCName = row.find('td:eq(1)').text();
             var currentProtocol = row.find('td:eq(2)').text();
             var currentIpAddress = row.find('td:eq(3)').text();
+            var currentDeviceName = $('#gatewayChildrenModal .gatewayName').text();
+
             $('#editPLCModal .inputName').val(currentPLCName);
             $('#editPLCModal [name=protocol]').val(currentProtocol);
             $('#editPLCModal .inputIPAddress').val(currentIpAddress);
+
+            $('#editPLCModal .btnSave').on('click', function () {
+                if (!($('#editPLCModal .inputName').val() && $('#editPLCModal .inputIPAddress').val())) {
+                    alert('Please fill required parameters');
+                }
+                else if (!regexPattern.test($('#editPLCModal .inputName').val())) alert('Invalid PLC name');
+                else {
+                    for (var i = 0; i < rcvDeviceObject.length; i++) {
+                        if (rcvDeviceObject[i].deviceName == currentDeviceName) {
+                            for (var j = 0; j < rcvDeviceObject[i].PLCs.length; j++) {
+                                if (rcvDeviceObject[i].PLCs[j].ipAddress == currentIpAddress) {
+                                    var isChanged = false;
+                                    var sendObject = {
+                                        user: _user,
+                                        fileName: rcvDeviceObject[i].fileName,
+                                        type: 1,
+                                        plcIndex: j,
+                                        properties: []
+                                    };
+
+                                    if (currentPLCName != $('#editPLCModal .inputName').val()) {
+                                        isChanged = true;
+                                        sendObject.properties.push({
+                                            name: 'name',
+                                            value: $('#editPLCModal .inputName').val()
+                                        });
+                                        row.find('td:eq(1)').text($('#editPLCModal .inputName').val());
+                                    }
+
+                                    if (currentProtocol != $('#editPLCModal [name=protocol]').val()) {
+                                        isChanged = true;
+                                        sendObject.properties.push({
+                                            name: 'protocol',
+                                            value: $('#editPLCModal [name=protocol]').val()
+                                        });
+                                        row.find('td:eq(2)').text($('#editPLCModal [name=protocol]').val());
+                                    }
+
+                                    if (currentIpAddress != $('#editPLCModal .inputIPAddress').val()) {
+                                        isChanged = true;
+                                        sendObject.properties.push({
+                                            name: 'ipAddress',
+                                            value: $('#editPLCModal .inputIPAddress').val()
+                                        });
+                                        row.find('td:eq(3)').text($('#editPLCModal .inputIPAddress').val());
+                                    }
+                                    if (isChanged) socket.emit('/editConfig', sendObject);
+                                    $('#editPLCModal').modal('hide');
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            });
         })
 
-        $('#editPLCModal').on('hide.bs.modal', function(e) {
+        $('#editPLCModal').on('hide.bs.modal', function (e) {
             $('#gatewayChildrenModal').css('opacity', 1);
+            $('#editPLCModal .btnSave').off('click');
         })
-    
+
         //Edit variable modal
-        $('#editVariableModal').on('show.bs.modal', function(e) {
-            $('#variableModal').css('opacity',0.7);
-            $('#gatewayChildrenModal').css('opacity',0);
+        $('#editVariableModal').on('show.bs.modal', function (e) {
+            $('#variableModal').css('opacity', 0.7);
+            $('#gatewayChildrenModal').css('opacity', 0);
+            $('#editAlarmCheck').on('change', function () {
+                if (this.checked) {
+                    $('#editVariableModal .alarm-options').find('*').prop('disabled', false);
+                } else {
+                    $('#editVariableModal .alarm-options').find('*').prop('disabled', true);
+                }
+            })
             var row = $(e.relatedTarget).closest('tr');
-            var currentName = row.find('td:eq(1)').text();
-            var currentDatatype = row.find('td:eq(2)').text();
-            var currentAddress = row.find('td:eq(3)').text();
-            var currentAccess = row.find('td:eq(4)').text();
-            var currentUnit = row.find('td:eq(5)').text();
-            var currentIsAlarm = row.find('td:eq(6)').text() == 'true';
-            var currentIsHistory = row.find('td:eq(7)').text() == 'true';
             var currentPLC = $(e.relatedTarget).closest('.modal-body').find('.plcName').text();
+            var currentPLCAddress = $(e.relatedTarget).closest('.modal-body').find('.plcIPAddress').text();
+            var currentGatewayName = $('#gatewayChildrenModal').find('.gatewayName').text()
+            var currentAddress = $(e.relatedTarget).closest('tr').find('td:eq(3)').text();
+            findVariable({ gateway: currentGatewayName, plc: currentPLCAddress, variable: currentAddress }, function (result) {
+                var varObj = rcvDeviceObject[result.gatewayIndex].PLCs[result.plcIndex].variables[result.variableIndex];
+                $('#editVariableModal .inputName').val(varObj.name);
+                $('#editVariableModal [name=dataType]').val(varObj.dataType);
+                $('#editVariableModal .inputPLC').val(currentPLC);
+                $('#editVariableModal .inputAddress').val(varObj.address);
+                $('#editVariableModal [name=access]').val(varObj.access);
+                $('#editVariableModal .inputUnit').val(varObj.unit);
+                $('#editAlarmCheck').prop('checked', varObj.isAlarm);
+                $('#editHistoryCheck').prop('checked', varObj.isHistory);
+                if (varObj.isAlarm) {
+                    $('#editVariableModal .alarm-options').find('*').prop('disabled', false);
+                    $('#editVariableModal .alarm-type').val(varObj.alarmType);
+                    if (varObj.alarmType == '1' || varObj.alarmType == 1) {
+                        $('#editVariableModal .hihi').val(varObj.parameters.hihi);
+                        $('#editVariableModal .hi').val(varObj.parameters.hi);
+                        $('#editVariableModal .lo').val(varObj.parameters.lo);
+                        $('#editVariableModal .lolo').val(varObj.parameters.lolo);
+                        $('#editVariableModal .deadband').val(varObj.parameters.deadband);
+                    }
+                } else {
+                    $('#editVariableModal .alarm-options').find('*').prop('disabled', true);
+                }
+            });
+            $('#editVariableModal .btnSave').on('click', function () {
+                if (!($('#editVariableModal .inputName').val() && $('#editVariableModal .inputAddress').val())) {
+                    alert('Please fill required parameters');
+                }
+                else if (!regexPattern.test($('#editVariableModal .inputName').val()))
+                    alert('Invalid variable name');
+                else {
+                    findVariable({ gateway: currentGatewayName, plc: currentPLCAddress, variable: currentAddress }, function (result) {
+                        var varObj = rcvDeviceObject[result.gatewayIndex].PLCs[result.plcIndex].variables[result.variableIndex];
+                        var isChanged = false;
+                        var sendObject = {
+                            user: _user,
+                            fileName: rcvDeviceObject[result.gatewayIndex].fileName,
+                            type: 2,
+                            plcIndex: result.plcIndex,
+                            variableIndex: result.variableIndex,
+                            properties: []
+                        };
 
-            $('#editVariableModal .inputName').val(currentName);
-            $('#editVariableModal [name=dataType]').val(currentDatatype);
-            $('#editVariableModal .inputPLC').val(currentPLC);
-            $('#editVariableModal .inputAddress').val(currentAddress);
-            $('#editVariableModal [name=access]').val(currentAccess);
-            $('#editVariableModal .inputUnit').val(currentUnit);
-            $('#editAlarmCheck').prop('checked', currentIsAlarm);
-            $('#editHistoryCheck').prop('checked', currentIsHistory);
+                        if (varObj.name != $('#editVariableModal .inputName').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'name',
+                                value: $('#editVariableModal .inputName').val()
+                            });
+                            row.find('td:eq(1)').text($('#editVariableModal .inputName').val());
+                        }
 
+                        if (varObj.dataType != $('#editVariableModal [name=dataType]').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'dataType',
+                                value: $('#editVariableModal [name=dataType]').val()
+                            });
+                            row.find('td:eq(2)').text($('#editVariableModal [name=dataType]').val());
+                        }
 
+                        if (varObj.address != $('#editVariableModal .inputAddress').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'address',
+                                value: $('#editVariableModal .inputAddress').val()
+                            });
+                            row.find('td:eq(3)').text($('#editVariableModal .inputAddress').val());
+                        }
+
+                        if (varObj.access != $('#editVariableModal [name=access]').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'access',
+                                value: $('#editVariableModal [name=access]').val()
+                            });
+                            row.find('td:eq(4)').text($('#editVariableModal [name=access]').val());
+                        }
+
+                        if (varObj.unit != $('#editVariableModal .inputUnit').val()) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'unit',
+                                value: $('#editVariableModal .inputUnit').val()
+                            });
+                            row.find('td:eq(5)').text($('#editVariableModal .inputUnit').val());
+                        }
+
+                        if (varObj.isAlarm != $('#editAlarmCheck').prop('checked')) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'isAlarm',
+                                value: $('#editAlarmCheck').prop('checked')
+                            });
+                            row.find('td:eq(6)').text($('#editAlarmCheck').prop('checked'));
+                        }
+
+                        if (varObj.isHistory != $('#editHistoryCheck').prop('checked')) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'isHistory',
+                                value: $('#editHistoryCheck').prop('checked')
+                            });
+                            row.find('td:eq(7)').text($('#editHistoryCheck').prop('checked'));
+                        }
+
+                        if ($('#editAlarmCheck').prop('checked')) {
+                            sendObject.properties.push({
+                                name: 'alarmType',
+                                value: $('#editVariableModal .alarm-type').val()
+                            });
+
+                            if ($('#editVariableModal .alarm-type').val() == 1 || $('#editVariableModal .alarm-type').val() == "1") {
+                                sendObject.properties.push({
+                                    name: 'hihi',
+                                    value: Number($('#editVariableModal .hihi').val())
+                                });
+                                sendObject.properties.push({
+                                    name: 'hi',
+                                    value: Number($('#editVariableModal .hi').val())
+                                });
+                                sendObject.properties.push({
+                                    name: 'lo',
+                                    value: Number($('#editVariableModal .lo').val())
+                                });
+                                sendObject.properties.push({
+                                    name: 'lolo',
+                                    value: Number($('#editVariableModal .lolo').val())
+                                });
+                                sendObject.properties.push({
+                                    name: 'deadband',
+                                    value: Number($('#editVariableModal .deadband').val())
+                                });
+                            }
+                        }
+
+                        //console.log(sendObject);
+                        if (isChanged) socket.emit('/editConfig', sendObject);
+                        $('#editVariableModal').modal('hide');
+                    });
+                }
+            })
         });
 
-        $('#editVariableModal').on('hide.bs.modal', function(e) {
-            $('#variableModal').css('opacity',1);
-            $('#gatewayChildrenModal').css('opacity',1);
+        $('#editVariableModal').on('hide.bs.modal', function (e) {
+            $('#variableModal').css('opacity', 1);
+            $('#gatewayChildrenModal').css('opacity', 1);
+            $('#editAlarmCheck').off('change');
+            $('#editVariableModal .btnSave').off('click');
         })
     });
 });
@@ -543,3 +795,25 @@ $('#alarmCheck').on('change', function () {
     else $('.input-alarm').prop('disabled', true)
 });
 
+//Find variable object based on PLC IP address, variable ip address
+//variableObject = {gateway: Name, plc: PLC address, variable: address}
+function findVariable(variableObject, callback) {
+    for (var i = 0; i < rcvDeviceObject.length; i++) {
+        if (rcvDeviceObject[i].deviceName == variableObject.gateway) {
+            for (var j = 0; j < rcvDeviceObject[i].PLCs.length; j++) {
+                if (rcvDeviceObject[i].PLCs[j].ipAddress == variableObject.plc) {
+                    for (var k = 0; k < rcvDeviceObject[i].PLCs[j].variables.length; k++) {
+                        console.log(rcvDeviceObject[i].PLCs[j].variables[k].address);
+                        if (rcvDeviceObject[i].PLCs[j].variables[k].address == variableObject.variable) {
+                            return callback({
+                                gatewayIndex: i,
+                                plcIndex: j,
+                                variableIndex: k
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

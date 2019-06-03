@@ -227,6 +227,59 @@ io.on('connection', function (socket) {
     });
   });
 
+  //Edit config
+  socket.on('/editConfig', function(editObject) {
+    var configFilePath = path.resolve(databasePath, editObject.user, 'Config', editObject.fileName);
+    var configObject = JSON.parse(fs.readFileSync(configFilePath));
+    switch(editObject.type) {
+      case 0 : { //Edit gateway
+        editObject.properties.forEach(function(proper) {
+          configObject[proper.name] = proper.value;
+        });
+        console.log('Edit gateway successfully');
+        break;
+      }
+      case 1 : {  //Edit PLC
+        editObject.properties.forEach(function(proper) {
+          configObject.PLCs[editObject.plcIndex][proper.name] = proper.value;
+        });
+        console.log('Edit PLC successfully');
+        break;
+      }
+      case 2 : {  //Edit variable
+        editObject.properties.forEach(function(proper) {
+          if (proper.name != 'hihi' && proper.name != 'hi' && proper.name != 'lo' && proper.name != 'lolo' && proper.name != 'deadband') {
+            configObject.PLCs[editObject.plcIndex].variables[editObject.variableIndex][proper.name] = proper.value;
+          } else {
+            configObject.PLCs[editObject.plcIndex].variables[editObject.variableIndex].parameters[proper.name] = proper.value;
+          }
+        });
+        console.log('Edit variable successfully');
+        break;
+      }
+    }
+    fs.writeFileSync(configFilePath, JSON.stringify(configObject, null, 4));
+    
+    //Send new socket to client
+    var arrConfig = [];
+    var userFolder = path.resolve(databasePath, editObject.user, 'Config');
+    async.series([
+      function (callback) {
+        var fileList = fs.readdirSync(userFolder);
+        if (fileList.length > 0) {
+          fileList.forEach(function (file) {
+            if (path.extname(file) == '.json')
+              arrConfig.push(JSON.parse(fs.readFileSync(path.resolve(userFolder, file))))
+          });
+        }
+        callback();
+      }
+    ], function (err) {
+      if (err) console.log(err);
+      else socket.emit('/' + editObject.user + '/resDeviceConfig', arrConfig);
+    });
+  });
+
   socket.on('/write', function (rcvObj) {
     mqttClient.publish('/' + rcvObj.deviceID + '/write', rcvObj.command);
   });
