@@ -63,7 +63,7 @@
     "user": "nmkhanhbk@gmail.com",
     "creationTime": "3/1/2019, 2:31:30 AM",
     "status": true,
-    "published": true,
+    "published": false,
     "fileName": "deviceConfig_123456789.json",
     "lastActive": "23/04/2019",
     "link": "/published/nmkhanhbk@gmail.com/Device_123456789_publish.ejs"

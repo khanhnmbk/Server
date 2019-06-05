@@ -368,6 +368,7 @@ $(document).ready(function () {
                             });
                             row.find('td:eq(1)').text($('#editGatewayModal .inputName').val());
                         }
+
                         if (currentLongitude != $('#editGatewayModal .inputLongitude').val()) {
                             isChanged = true;
                             sendObject.properties.push({
@@ -376,6 +377,7 @@ $(document).ready(function () {
                             });
                             row.find('td:eq(4)').text($('#editGatewayModal .inputLongitude').val());
                         }
+
                         if (currentLatitude != $('#editGatewayModal .inputLatitude').val()) {
                             isChanged = true;
                             sendObject.properties.push({
@@ -384,6 +386,7 @@ $(document).ready(function () {
                             });
                             row.find('td:eq(5)').text($('#editGatewayModal .inputLatitude').val());
                         }
+
                         if (currentInterval != $('#editGatewayModal .inputInterval').val()) {
                             isChanged = true;
                             sendObject.properties.push({
@@ -392,6 +395,17 @@ $(document).ready(function () {
                             });
                             row.find('td:eq(6)').text($('#editGatewayModal .inputInterval').val());
                         }
+
+                        if ($('#cbResetPublish').prop('checked')) {
+                            isChanged = true;
+                            sendObject.properties.push({
+                                name: 'published',
+                                value: false
+                            });
+                            //console.log(row.find('td:eq(9)').val());
+                            row.find('td:eq(9)').html(`<a class = "btn btn-link btn-warning btn-block " style="max-width:180px" href = "/design/` + rcvDeviceObject[i].user + '/' + rcvDeviceObject[i].fileName + `">Designable</a>`)
+                        }
+
                         if (isChanged) socket.emit('/editConfig', sendObject);
                         $('#editGatewayModal').modal('hide');
                         break;
