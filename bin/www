@@ -278,6 +278,14 @@ io.on('connection', function (socket) {
       if (err) console.log(err);
       else socket.emit('/' + editObject.user + '/resDeviceConfig', arrConfig);
     });
+
+    //Notify gateway
+    var mqttResetTopic = '/' + configObject.deviceID + '/reset';
+    var mqttConfigTopic = '/' +configObject.deviceID + '/config';
+    mqttClient.publish(mqttResetTopic, JSON.stringify({CMD : true}), retainOption);
+    setInterval(function() {
+      mqttClient.publish(mqttConfigTopic, JSON.stringify(JSON.parse(fs.readFileSync(configFilePath))), retainOption);
+    }, 3000);
   });
 
   socket.on('/write', function (rcvObj) {

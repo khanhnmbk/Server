@@ -1,9 +1,9 @@
 {
     "deviceName": "OPC",
     "deviceID": "OPCUA",
-    "longitude": "",
-    "latitude": "",
-    "period": 5000,
+    "longitude": 10,
+    "latitude": 10,
+    "period": 1000,
     "PLCs": [
         {
             "name": "PLC1",
@@ -14,7 +14,7 @@
                     "name": "StartLight",
                     "dataType": "Bool",
                     "plc": "PLC1",
-                    "address": "ns=3;s=\"StartLight\"",
+                    "address": "M0.0",
                     "access": "read",
                     "unit": "",
                     "isAlarm": false,
@@ -51,7 +51,7 @@
     ],
     "user": "nmkhanhbk@gmail.com",
     "creationTime": "2019-06-01 19:22:27",
-    "lastActive": "2019-05-21 10:45:25",
+    "lastActive": "2019-06-06 15:02:24",
     "published": false,
     "status": false,
     "fileName": "deviceConfig_OPCUA.json"
